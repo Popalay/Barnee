@@ -1,0 +1,4 @@
+<resources>
+    <!-- Base application theme. -->
+    <style name="Theme.Barnee.Base" parent="android:Theme.Material.NoActionBar"/>
+</resources>
