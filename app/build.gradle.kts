@@ -31,7 +31,7 @@ android {
         applicationId = "com.popalay.barnee"
         minSdkVersion(28)
         targetSdkVersion(30)
-        versionCode = 1
+        versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
         versionName = "1.0"
     }
     buildTypes {
