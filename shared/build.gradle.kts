@@ -3,8 +3,10 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+    id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
 }
 
+// workaround for https://youtrack.jetbrains.com/issue/KT-43944
 android {
     configurations {
         create("androidTestApi")
@@ -17,35 +19,45 @@ android {
 }
 
 kotlin {
-    android()
-    ios {
-        binaries {
-            framework {
-                baseName = "shared"
-            }
-        }
+    val sdkName: String? = System.getenv("SDK_NAME")
+
+    val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
+    if (isiOSDevice) {
+        iosArm64("iOS")
+    } else {
+        iosX64("iOS")
     }
+
+    val isWatchOSDevice = sdkName.orEmpty().startsWith("watchos")
+    if (isWatchOSDevice) {
+        watchosArm64("watch")
+    } else {
+        watchosX86("watch")
+    }
+
+    macosX64("macOS")
+    android()
+    jvm()
+
     sourceSets {
-        val commonMain by getting
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test-common"))
-                implementation(kotlin("test-annotations-common"))
-            }
+        sourceSets["commonMain"].dependencies {
         }
-        val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.3.0")
-            }
+        sourceSets["commonTest"].dependencies {
         }
-        val androidTest by getting {
-            dependencies {
-                implementation(kotlin("test-junit"))
-                implementation("junit:junit:4.13.2")
-            }
+        sourceSets["androidMain"].dependencies {
         }
-        val iosMain by getting
-        val iosTest by getting
+        sourceSets["androidTest"].dependencies {
+        }
+        sourceSets["jvmMain"].dependencies {
+        }
+        sourceSets["iOSMain"].dependencies {
+        }
+        sourceSets["iOSTest"].dependencies {
+        }
+        sourceSets["watchMain"].dependencies {
+        }
+        sourceSets["macOSMain"].dependencies {
+        }
     }
 }
 
@@ -58,17 +70,10 @@ android {
     }
 }
 
-val packForXcode by tasks.creating(Sync::class) {
-    group = "build"
-    val mode = System.getenv("CONFIGURATION") ?: "DEBUG"
-    val sdkName = System.getenv("SDK_NAME") ?: "iphonesimulator"
-    val targetName = "ios" + if (sdkName.startsWith("iphoneos")) "Arm64" else "X64"
-    val framework = kotlin.targets.getByName<KotlinNativeTarget>(targetName).binaries.getFramework(mode)
-    inputs.property("mode", mode)
-    dependsOn(framework.linkTask)
-    val targetDir = File(buildDir, "xcode-frameworks")
-    from({ framework.outputDirectory })
-    into(targetDir)
+multiplatformSwiftPackage {
+    packageName("BarneeShared")
+    swiftToolsVersion("5.3")
+    targetPlatforms {
+        iOS { v("13") }
+    }
 }
-
-tasks.getByName("build").dependsOn(packForXcode)
