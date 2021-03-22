@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.31")
 }
 
 dependencies {
@@ -11,18 +10,10 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.accompanist.coil)
     implementation(libs.accompanist.insets)
-    implementation(libs.datastore.runtime)
-    implementation(libs.datastore.core)
-    implementation(libs.datastore.preferences)
     implementation(libs.lottie.compose)
-    implementation(libs.ktor.android)
-    implementation(libs.ktor.serialization)
-    implementation(libs.ktor.logging)
-    implementation(libs.jsoup)
     implementation(libs.mavericks.compose)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor)
-    implementation(libs.logback.classic)
 }
 
 android {

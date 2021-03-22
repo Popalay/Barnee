@@ -4,6 +4,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
+    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.31")
 }
 
 // workaround for https://youtrack.jetbrains.com/issue/KT-43944
@@ -27,36 +28,28 @@ kotlin {
     } else {
         iosX64("iOS")
     }
-
-    val isWatchOSDevice = sdkName.orEmpty().startsWith("watchos")
-    if (isWatchOSDevice) {
-        watchosArm64("watch")
-    } else {
-        watchosX86("watch")
-    }
-
-    macosX64("macOS")
     android()
-    jvm()
 
     sourceSets {
         sourceSets["commonMain"].dependencies {
+            implementation(libs.ktor.core)
+            implementation(libs.ktor.serialization)
+            implementation(libs.ktor.logging)
+            implementation(libs.logback.classic)
+            implementation(libs.kotlinx.coroutines.core)
         }
         sourceSets["commonTest"].dependencies {
         }
         sourceSets["androidMain"].dependencies {
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.runtime)
+            implementation(libs.datastore.preferences)
+            implementation(libs.ktor.android)
+            implementation(libs.jsoup)
         }
         sourceSets["androidTest"].dependencies {
         }
-        sourceSets["jvmMain"].dependencies {
-        }
-        sourceSets["iOSMain"].dependencies {
-        }
         sourceSets["iOSTest"].dependencies {
-        }
-        sourceSets["watchMain"].dependencies {
-        }
-        sourceSets["macOSMain"].dependencies {
         }
     }
 }

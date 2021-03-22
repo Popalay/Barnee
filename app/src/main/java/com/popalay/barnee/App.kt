@@ -2,7 +2,7 @@ package com.popalay.barnee
 
 import android.app.Application
 import com.airbnb.mvrx.Mavericks
-import com.popalay.barnee.data.LocalStore
+import com.popalay.barnee.data.local.LocalStore
 
 class App : Application() {
     override fun onCreate() {

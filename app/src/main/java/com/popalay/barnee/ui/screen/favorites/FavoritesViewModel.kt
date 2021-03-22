@@ -4,8 +4,8 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Uninitialized
-import com.popalay.barnee.data.Api
-import com.popalay.barnee.data.LocalStore
+import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Drink
 import kotlinx.coroutines.flow.map
 

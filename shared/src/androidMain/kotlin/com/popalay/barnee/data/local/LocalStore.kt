@@ -1,8 +1,7 @@
-package com.popalay.barnee.data
+package com.popalay.barnee.data.local
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringSetPreferencesKey
@@ -17,7 +16,7 @@ private object PreferencesKeys {
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 
 @SuppressLint("StaticFieldLeak")
-object LocalStore {
+actual object LocalStore {
 
     private lateinit var context: Context
 
@@ -25,23 +24,21 @@ object LocalStore {
         this.context = context
     }
 
-    fun getFavoriteDrinks(): Flow<Set<String>> = context.dataStore.data
+    actual fun getFavoriteDrinks(): Flow<Set<String>> = context.dataStore.data
         .map { it[PreferencesKeys.FAVORITES_DRINKS] ?: emptySet() }
 
-    suspend fun saveFavorite(alias: String) {
+    actual suspend fun saveFavorite(alias: String) {
         context.dataStore.updateData { preferences ->
             val currentFavorites = preferences[PreferencesKeys.FAVORITES_DRINKS] ?: emptySet()
-            Log.d("ssss", "current = $currentFavorites")
             preferences.toMutablePreferences().apply {
                 this[PreferencesKeys.FAVORITES_DRINKS] = currentFavorites + alias
             }
         }
     }
 
-    suspend fun removeFavorite(alias: String) {
+    actual suspend fun removeFavorite(alias: String) {
         context.dataStore.updateData { preferences ->
             val currentFavorites = preferences[PreferencesKeys.FAVORITES_DRINKS] ?: emptySet()
-            Log.d("ssss", "current = $currentFavorites")
             preferences.toMutablePreferences().apply {
                 this[PreferencesKeys.FAVORITES_DRINKS] = currentFavorites - alias
             }

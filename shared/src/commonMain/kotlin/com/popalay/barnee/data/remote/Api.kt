@@ -1,20 +1,19 @@
-package com.popalay.barnee.data
+package com.popalay.barnee.data.remote
 
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Receipt
 import com.popalay.barnee.data.model.Response
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
 import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.http.ContentType
+import io.ktor.http.ContentType.Text
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.jsoup.Jsoup
 
 object Api {
     private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
@@ -25,10 +24,10 @@ object Api {
         ignoreUnknownKeys = true
     }
 
-    private val client = HttpClient(Android) {
+    private val client = HttpClient {
         install(JsonFeature) {
             serializer = KotlinxSerializer(json)
-            accept(ContentType.Text.Html)
+            accept(Text.Html)
         }
         install(Logging)
     }
@@ -48,13 +47,11 @@ object Api {
     suspend fun searchDrinks(query: String): List<Drink> =
         client.get<Response>("${baseUrl}search/$query/is/specificImage/InEnvironment").result
 
-    suspend fun getReceipt(cocktail: String): Receipt {
-        val document = withContext(Dispatchers.IO) {
-            Jsoup.connect("https://www.absolutdrinks.com/en/drinks/$cocktail").get()
-        }
-
-        val scripts = document.head().select("script[type=application/ld+json]")
-        val data = scripts[0].childNode(0).toString()
-        return json.decodeFromString(data)
+    suspend fun getReceipt(cocktail: String): Receipt = withContext(Dispatchers.Default) {
+        val data = HtmlExtractor.extract(
+            url = "https://www.absolutdrinks.com/en/drinks/$cocktail",
+            selector = "script[type=application/ld+json]"
+        )
+        json.decodeFromString(data)
     }
 }
