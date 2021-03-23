@@ -17,10 +17,6 @@ import kotlinx.serialization.json.Json
 // Caused by: kotlin.native.concurrent.InvalidMutabilityException:
 // mutation attempt of frozen com.popalay.barnee.data.remote.Api
 class Api(json: Json) {
-    companion object {
-        private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
-    }
-
     private val localJson = json
 
     private val client = HttpClient {
@@ -52,5 +48,9 @@ class Api(json: Json) {
             selector = "script[type=application/ld+json]"
         )
         localJson.decodeFromString(data)
+    }
+
+    companion object {
+        private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
     }
 }
