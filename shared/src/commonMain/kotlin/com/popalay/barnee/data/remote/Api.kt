@@ -1,6 +1,5 @@
 package com.popalay.barnee.data.remote
 
-import com.futuremind.koru.ToNativeClass
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Receipt
 import com.popalay.barnee.data.model.Response
@@ -14,10 +13,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.koin.core.component.KoinComponent
 
-@ToNativeClass(launchOnScope = MainScopeProvider::class)
-class Api(json: Json) : KoinComponent {
+// Caused by: kotlin.native.concurrent.InvalidMutabilityException:
+// mutation attempt of frozen com.popalay.barnee.data.remote.Api
+class Api(json: Json) {
     companion object {
         private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
     }
@@ -26,8 +25,7 @@ class Api(json: Json) : KoinComponent {
 
     private val client = HttpClient {
         install(JsonFeature) {
-            val localJson = json
-            serializer = KotlinxSerializer(localJson)
+            serializer = KotlinxSerializer(json)
             accept(Text.Html)
         }
         install(Logging)
@@ -48,9 +46,9 @@ class Api(json: Json) : KoinComponent {
     suspend fun searchDrinks(query: String): List<Drink> =
         client.get<Response>("${baseUrl}search/$query/is/specificImage/InEnvironment").result
 
-    suspend fun getReceipt(cocktail: String): Receipt = withContext(Dispatchers.Default) {
+    suspend fun getReceipt(alias: String): Receipt = withContext(Dispatchers.Default) {
         val data = HtmlExtractor.extract(
-            url = "https://www.absolutdrinks.com/en/drinks/$cocktail",
+            url = "https://www.absolutdrinks.com/en/drinks/$alias",
             selector = "script[type=application/ld+json]"
         )
         localJson.decodeFromString(data)

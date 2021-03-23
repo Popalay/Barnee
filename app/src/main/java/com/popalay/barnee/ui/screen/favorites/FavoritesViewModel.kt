@@ -4,10 +4,8 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Uninitialized
-import com.popalay.barnee.data.remote.Api
-import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Drink
-import kotlinx.coroutines.flow.map
+import com.popalay.barnee.data.repository.DrinkRepository
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -16,15 +14,14 @@ data class FavoritesState(
 ) : MavericksState
 
 class FavoritesViewModel(initialState: FavoritesState) : MavericksViewModel<FavoritesState>(initialState), KoinComponent {
-    private val api: Api by inject()
+    private val drinkRepository by inject<DrinkRepository>()
 
     init {
         loadDrinks()
     }
 
     private fun loadDrinks() {
-        LocalStore.getFavoriteDrinks()
-            .map { api.drinksByAliases(it.toList()) }
+        drinkRepository.getFavoriteDrinks()
             .execute { copy(drinks = it) }
     }
 }

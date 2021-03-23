@@ -32,8 +32,9 @@ data class Receipt(
     val keywords: String,
     val recipeIngredient: List<String>,
     val recipeInstructions: List<InstructionStep>,
+    val nutrition: Nutrition,
     val video: List<Video> = emptyList(),
-    val nutrition: Nutrition
+    val isFavorite: Boolean = false
 ) {
     @Transient
     val videoUrl = video.firstOrNull()?.contentUrl.orEmpty()

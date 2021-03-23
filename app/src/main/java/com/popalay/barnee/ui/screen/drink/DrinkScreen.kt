@@ -99,7 +99,7 @@ fun DrinkScreen(
             ImageHeader(
                 name = name,
                 image = image,
-                isFavorite = state.isFavorite,
+                isFavorite = state.receipt()?.isFavorite ?: false,
                 onClickLike = { viewModel.toggleFavorite(alias) }
             )
             StateLayout(

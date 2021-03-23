@@ -36,7 +36,7 @@ import com.airbnb.mvrx.compose.mavericksViewModel
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.theme.BarneeTheme
 import dev.chrisbanes.accompanist.coil.CoilImage
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
+import dev.chrisbanes.accompanist.insets.navigationBarsHeight
 
 @Composable
 fun ReceiptScreen(
@@ -50,7 +50,6 @@ fun ReceiptScreen(
         val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
-                .navigationBarsPadding()
                 .verticalScroll(scrollState)
         ) {
             Box {
@@ -99,7 +98,7 @@ fun ReceiptScreen(
             Column(
                 modifier = Modifier
                     .padding(horizontal = 32.dp)
-                    .padding(top = 16.dp)
+                    .padding(vertical = 16.dp)
             ) {
                 steps.forEachIndexed { index, step ->
                     Row {
@@ -117,6 +116,8 @@ fun ReceiptScreen(
                     }
                     if (index != steps.lastIndex) {
                         Spacer(modifier = Modifier.height(16.dp))
+                    } else {
+                        Spacer(modifier = Modifier.navigationBarsHeight())
                     }
                 }
             }

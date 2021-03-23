@@ -10,7 +10,7 @@ class ViewModel: ObservableObject {
     
     init() {
         let sharedComponent = (UIApplication.shared.delegate as! AppDelegate).sharedComponent
-        createPublisher(wrapper: sharedComponent.provideApi().randomDrinks(count: 10))
+        createPublisher(wrapper: sharedComponent.provideDrinkRepository().getRandomDrinks(count: 10))
             .sink(
                 receiveCompletion: { _ in },
                 receiveValue: { [weak self] drinks in

@@ -31,3 +31,4 @@ gradle-app.setting
 *.xcscheme
 xcschememanagement.plist
 *.xcbkptlist
+/ios/iosApp.xcworkspace/xcuserdata/denys.nykyforov.xcuserdatad/xcdebugger/Expressions.xcexplist

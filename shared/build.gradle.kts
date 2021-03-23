@@ -38,34 +38,48 @@ kotlin {
     }
 
     sourceSets {
-        sourceSets["commonMain"].dependencies {
-            implementation(libs.ktor.core)
-            implementation(libs.ktor.serialization)
-            implementation(libs.ktor.logging)
-            implementation(libs.logback.classic)
-            implementation(libs.kotlinx.coroutines.core)
-            implementation(libs.koin.core)
-            implementation("com.futuremind:koru:0.3.4")
-            configurations.get("kapt").dependencies.add(
-                org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
-                    "com.futuremind", "koru-processor", "0.3.4"
+        all {
+            languageSettings.apply {
+                useExperimentalAnnotation("kotlin.RequiresOptIn")
+            }
+        }
+        configurations {
+            all {
+                exclude("com.russhwolf", "multiplatform-settings-coroutines")
+            }
+        }
+
+        commonMain {
+            dependencies {
+                implementation(libs.ktor.core)
+                implementation(libs.ktor.serialization)
+                implementation(libs.ktor.logging)
+                implementation(libs.logback.classic)
+                implementation(libs.kotlinx.coroutines.core)
+                implementation(libs.koin.core)
+                implementation(libs.settings)
+                implementation(libs.settingscoroutines)
+                implementation(libs.koru)
+                configurations["kapt"].dependencies.add(
+                    org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
+                        "com.futuremind", "koru-processor", "0.3.4"
+                    )
                 )
-            )
+            }
         }
-        sourceSets["commonTest"].dependencies {
+
+        val androidMain by getting {
+            dependencies {
+                implementation(libs.datastore.core)
+                implementation(libs.datastore.runtime)
+                implementation(libs.datastore.preferences)
+                implementation(libs.ktor.android)
+                implementation(libs.jsoup)
+                implementation(libs.settingsdatastore)
+            }
         }
-        sourceSets["androidMain"].dependencies {
-            implementation(libs.datastore.core)
-            implementation(libs.datastore.runtime)
-            implementation(libs.datastore.preferences)
-            implementation(libs.ktor.android)
-            implementation(libs.jsoup)
-        }
-        sourceSets["androidTest"].dependencies {
-        }
-        sourceSets["iosTest"].dependencies {
-        }
-        val iosMain by getting{
+
+        val iosMain by getting {
             kotlin.srcDir("${buildDir.absolutePath}/generated/source/kaptKotlin/")
 
             dependencies {

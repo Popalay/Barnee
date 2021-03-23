@@ -17,6 +17,8 @@ espresso = "3.3.0"
 logback = "1.2.3"
 coroutines = { strictly = "1.4.2-native-mt" }
 koin = "3.0.1-beta-1"
+settings = "0.7.4"
+koru = "0.3.4"
 
 [libraries]
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -47,6 +49,10 @@ kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-c
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
+settings = { module = "com.russhwolf:multiplatform-settings", version.ref = "settings" }
+settingscoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
+settingsdatastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
+koru = { module = "com.futuremind:koru", version.ref = "koru" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material"]
