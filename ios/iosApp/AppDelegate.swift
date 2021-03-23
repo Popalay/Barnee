@@ -1,12 +1,15 @@
 import UIKit
+import Combine
+import shared
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
-
+    private var cancellables = Set<AnyCancellable>()
+    let sharedComponent = DiComponent()
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        KoinKt.doInitKoin()
         return true
     }
 

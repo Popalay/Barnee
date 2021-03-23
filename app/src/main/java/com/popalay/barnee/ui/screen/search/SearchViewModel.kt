@@ -8,13 +8,16 @@ import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.model.Drink
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 data class SearchState(
     val searchQuery: String = "",
     val drinks: Async<List<Drink>> = Uninitialized,
 ) : MavericksState
 
-class SearchViewModel(initialState: SearchState) : MavericksViewModel<SearchState>(initialState) {
+class SearchViewModel(initialState: SearchState) : MavericksViewModel<SearchState>(initialState), KoinComponent {
+    private val api: Api by inject()
     private var searchJob: Job? = null
 
     fun onSearchQueryChanged(query: String) {
@@ -22,7 +25,7 @@ class SearchViewModel(initialState: SearchState) : MavericksViewModel<SearchStat
         searchJob?.cancel()
         searchJob = suspend {
             delay(500)
-            Api.searchDrinks(query)
+            api.searchDrinks(query)
         }.execute { copy(drinks = it) }
     }
 }

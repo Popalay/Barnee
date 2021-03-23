@@ -4,15 +4,19 @@ import com.airbnb.mvrx.Async
 import com.airbnb.mvrx.MavericksState
 import com.airbnb.mvrx.MavericksViewModel
 import com.airbnb.mvrx.Uninitialized
-import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.remote.Api
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 data class SimilarDrinksState(
     val drinks: Async<List<Drink>> = Uninitialized,
 ) : MavericksState
 
-class SimilarDrinksViewModel(initialState: SimilarDrinksState) : MavericksViewModel<SimilarDrinksState>(initialState) {
+class SimilarDrinksViewModel(initialState: SimilarDrinksState) : MavericksViewModel<SimilarDrinksState>(initialState), KoinComponent {
+    private val api: Api by inject()
+
     fun loadDrinks(alias: String) {
-        suspend { Api.similarDrinks(alias) }.execute { copy(drinks = it) }
+        suspend { api.similarDrinks(alias) }.execute { copy(drinks = it) }
     }
 }

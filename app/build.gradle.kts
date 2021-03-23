@@ -14,6 +14,8 @@ dependencies {
     implementation(libs.mavericks.compose)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor)
+    implementation(libs.koin.android)
+    implementation(libs.koin.compose)
 }
 
 android {

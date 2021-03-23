@@ -1,5 +1,6 @@
 package com.popalay.barnee.data.remote
 
+import com.futuremind.koru.ToNativeClass
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Receipt
 import com.popalay.barnee.data.model.Response
@@ -8,25 +9,25 @@ import io.ktor.client.features.json.JsonFeature
 import io.ktor.client.features.json.serializer.KotlinxSerializer
 import io.ktor.client.features.logging.Logging
 import io.ktor.client.request.get
-import io.ktor.http.ContentType
 import io.ktor.http.ContentType.Text
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
+import org.koin.core.component.KoinComponent
 
-object Api {
-    private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
-
-    private val json = Json {
-        prettyPrint = true
-        isLenient = true
-        ignoreUnknownKeys = true
+@ToNativeClass(launchOnScope = MainScopeProvider::class)
+class Api(json: Json) : KoinComponent {
+    companion object {
+        private const val baseUrl = "https://api.absolutdrinks.com/drinks/"
     }
+
+    private val localJson = json
 
     private val client = HttpClient {
         install(JsonFeature) {
-            serializer = KotlinxSerializer(json)
+            val localJson = json
+            serializer = KotlinxSerializer(localJson)
             accept(Text.Html)
         }
         install(Logging)
@@ -52,6 +53,6 @@ object Api {
             url = "https://www.absolutdrinks.com/en/drinks/$cocktail",
             selector = "script[type=application/ld+json]"
         )
-        json.decodeFromString(data)
+        localJson.decodeFromString(data)
     }
 }

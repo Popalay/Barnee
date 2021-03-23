@@ -2,10 +2,15 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
+    kotlin("kapt")
     id("com.android.library")
+    id("org.jetbrains.kotlin.native.cocoapods")
     id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
     id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.31")
 }
+
+// CocoaPods requires the podspec to have a version.
+version = "1.0"
 
 // workaround for https://youtrack.jetbrains.com/issue/KT-43944
 android {
@@ -20,15 +25,17 @@ android {
 }
 
 kotlin {
-    val sdkName: String? = System.getenv("SDK_NAME")
+    val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
+        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true) ::iosArm64 else ::iosX64
 
-    val isiOSDevice = sdkName.orEmpty().startsWith("iphoneos")
-    if (isiOSDevice) {
-        iosArm64("iOS")
-    } else {
-        iosX64("iOS")
-    }
+    iOSTarget("ios") {}
     android()
+
+    cocoapods {
+        // Configure fields required by CocoaPods.
+        summary = "Some description for a Kotlin/Native module"
+        homepage = "Link to a Kotlin/Native module homepage"
+    }
 
     sourceSets {
         sourceSets["commonMain"].dependencies {
@@ -37,6 +44,13 @@ kotlin {
             implementation(libs.ktor.logging)
             implementation(libs.logback.classic)
             implementation(libs.kotlinx.coroutines.core)
+            implementation(libs.koin.core)
+            implementation("com.futuremind:koru:0.3.4")
+            configurations.get("kapt").dependencies.add(
+                org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
+                    "com.futuremind", "koru-processor", "0.3.4"
+                )
+            )
         }
         sourceSets["commonTest"].dependencies {
         }
@@ -49,7 +63,14 @@ kotlin {
         }
         sourceSets["androidTest"].dependencies {
         }
-        sourceSets["iOSTest"].dependencies {
+        sourceSets["iosTest"].dependencies {
+        }
+        val iosMain by getting{
+            kotlin.srcDir("${buildDir.absolutePath}/generated/source/kaptKotlin/")
+
+            dependencies {
+                implementation(libs.ktor.ios)
+            }
         }
     }
 }
@@ -67,6 +88,6 @@ multiplatformSwiftPackage {
     packageName("BarneeShared")
     swiftToolsVersion("5.3")
     targetPlatforms {
-        iOS { v("13") }
+        iOS { v("13.5") }
     }
 }

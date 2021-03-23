@@ -16,6 +16,7 @@ androidx-test = "1.1.2"
 espresso = "3.3.0"
 logback = "1.2.3"
 coroutines = { strictly = "1.4.2-native-mt" }
+koin = "3.0.1-beta-1"
 
 [libraries]
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -31,6 +32,7 @@ datastore-preferences = { module = "androidx.datastore:datastore-preferences", v
 lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
@@ -42,6 +44,9 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "espresso" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
+koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
+koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
+koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material"]
