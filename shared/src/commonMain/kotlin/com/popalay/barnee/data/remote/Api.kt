@@ -16,7 +16,10 @@ import kotlinx.serialization.json.Json
 
 // Caused by: kotlin.native.concurrent.InvalidMutabilityException:
 // mutation attempt of frozen com.popalay.barnee.data.remote.Api
-class Api(json: Json) {
+class Api(
+    json: Json,
+    private val htmlExtractor: HtmlExtractor
+) {
     private val localJson = json
 
     private val client = HttpClient {
@@ -43,7 +46,7 @@ class Api(json: Json) {
         client.get<Response>("${baseUrl}search/$query/is/specificImage/InEnvironment").result
 
     suspend fun getReceipt(alias: String): Receipt = withContext(Dispatchers.Default) {
-        val data = HtmlExtractor.extract(
+        val data = htmlExtractor.extract(
             url = "https://www.absolutdrinks.com/en/drinks/$alias",
             selector = "script[type=application/ld+json]"
         )

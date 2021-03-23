@@ -1,5 +1,5 @@
 package com.popalay.barnee.data.remote
 
-expect object HtmlExtractor {
+expect class HtmlExtractor() {
     fun extract(url: String, selector: String): String
 }
