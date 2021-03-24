@@ -18,7 +18,6 @@ import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue.Concealed
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -160,7 +159,6 @@ private fun AggregationGroup(
     selected: Set<Pair<String, AggregationGroup>>,
     onClick: (Pair<String, AggregationGroup>) -> Unit
 ) {
-    val contentColor = LocalContentColor.current
     Text(
         text = name,
         color = MaterialTheme.colors.onSecondary,
@@ -175,7 +173,7 @@ private fun AggregationGroup(
             val isSelected = it.key to group in selected
             Text(
                 text = it.key.replace("-", " "),
-                color = if (isSelected) contentColor else MaterialTheme.colors.onSecondary,
+                color = if (isSelected) MaterialTheme.colors.secondary else MaterialTheme.colors.onSecondary,
                 modifier = Modifier
                     .background(if (isSelected) MaterialTheme.colors.onSecondary else Color.Transparent, RoundedCornerShape(40))
                     .border(1.dp, MaterialTheme.colors.onSecondary, RoundedCornerShape(40))
