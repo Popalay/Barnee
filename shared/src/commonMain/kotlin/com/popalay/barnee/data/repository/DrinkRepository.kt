@@ -2,6 +2,7 @@ package com.popalay.barnee.data.repository
 
 import com.futuremind.koru.ToNativeClass
 import com.popalay.barnee.data.local.LocalStore
+import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Receipt
 import com.popalay.barnee.data.remote.Api
@@ -25,7 +26,19 @@ class DrinkRepository(
 
     suspend fun getSimilarDrinksFor(alias: String): List<Drink> = api.similarDrinks(alias)
 
-    suspend fun searchDrinks(query: String): List<Drink> = api.searchDrinks(query)
+    suspend fun searchDrinks(
+        query: String,
+        filters: Map<String, List<String>>
+    ): List<Drink> {
+        val searchRequest = filters
+            .filter { it.key.isNotBlank() && it.value.isNotEmpty() }
+            .map { it.key + "/" + it.value.joinToString(",") }
+            .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
+
+        return api.searchDrinks(searchRequest)
+    }
+
+    suspend fun getAggregation(): Aggregation = api.getAggregation()
 
     fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
         .map { api.drinksByAliases(it.toList()) }
