@@ -38,7 +38,7 @@ class SearchViewModel(initialState: SearchState) : MavericksViewModel<SearchStat
         }.execute { copy(drinks = it) }
     }
 
-    fun onAggregationGroupClicked(value: Pair<String, AggregationGroup>) {
+    fun onFilterClicked(value: Pair<String, AggregationGroup>) {
         setState {
             if (value in selectedGroups) {
                 copy(selectedGroups = selectedGroups - value)

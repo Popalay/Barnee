@@ -5,7 +5,6 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -38,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.airbnb.mvrx.compose.collectAsState
 import com.airbnb.mvrx.compose.mavericksViewModel
+import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.ui.common.DrinkList
 import com.popalay.barnee.ui.common.SimpleFlowRow
@@ -89,50 +89,12 @@ fun SearchScreen(
         },
         peekHeight = 80.dp,
         backLayerContent = {
-            state.aggregation()?.let {
-                Column(
-                    modifier = Modifier
-                        .padding(horizontal = 16.dp)
-                        .height(300.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AggregationGroup(
-                        name = "Served in",
-                        group = it.servedIn,
-                        selected = state.selectedGroups,
-                        onClick = { viewModel.onAggregationGroupClicked(it) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AggregationGroup(
-                        name = "Color",
-                        group = it.colored,
-                        selected = state.selectedGroups,
-                        onClick = { viewModel.onAggregationGroupClicked(it) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AggregationGroup(
-                        name = "Skill lvl",
-                        group = it.skill,
-                        selected = state.selectedGroups,
-                        onClick = { viewModel.onAggregationGroupClicked(it) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AggregationGroup(
-                        name = "Taste",
-                        group = it.tasting,
-                        selected = state.selectedGroups,
-                        onClick = { viewModel.onAggregationGroupClicked(it) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    AggregationGroup(
-                        name = "Making with",
-                        group = it.withType,
-                        selected = state.selectedGroups,
-                        onClick = { viewModel.onAggregationGroupClicked(it) }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
+            state.aggregation()?.let { aggregation ->
+                Filters(
+                    aggregation = aggregation,
+                    selected = state.selectedGroups,
+                    onFilterClicked = { viewModel.onFilterClicked(it) }
+                )
             }
         },
         frontLayerContent = {
@@ -160,7 +122,39 @@ fun SearchScreen(
 }
 
 @Composable
-private fun ColumnScope.AggregationGroup(
+private fun Filters(
+    aggregation: Aggregation,
+    selected: Set<Pair<String, AggregationGroup>>,
+    onFilterClicked: (Pair<String, AggregationGroup>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .padding(horizontal = 16.dp)
+            .height(300.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        Spacer(modifier = Modifier.height(16.dp))
+        listOf(
+            "Color" to aggregation.colored,
+            "Taste" to aggregation.tasting,
+            "Made with" to aggregation.withType,
+            "Served in" to aggregation.servedIn,
+            "Skill lvl" to aggregation.skill
+        ).forEach { (title, group) ->
+            AggregationGroup(
+                name = title,
+                group = group,
+                selected = selected,
+                onClick = onFilterClicked
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+        }
+    }
+}
+
+@Composable
+private fun AggregationGroup(
     name: String,
     group: AggregationGroup,
     selected: Set<Pair<String, AggregationGroup>>,
