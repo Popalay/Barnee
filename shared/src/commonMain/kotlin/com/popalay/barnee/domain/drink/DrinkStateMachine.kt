@@ -11,7 +11,7 @@ import com.popalay.barnee.domain.drink.DrinkAction.Initial
 import com.popalay.barnee.domain.drink.DrinkAction.ToggleFavorite
 
 data class DrinkState(
-    val receipt: Result<Receipt> = Uninitialized
+    val receipt: Result<Receipt> = Uninitialized()
 ) : State
 
 sealed class DrinkAction : Action {

@@ -18,8 +18,8 @@ import kotlinx.coroutines.delay
 
 data class SearchState(
     val searchQuery: String = "",
-    val drinks: Result<List<Drink>> = Uninitialized,
-    val aggregation: Result<Aggregation> = Uninitialized,
+    val drinks: Result<List<Drink>> = Uninitialized(),
+    val aggregation: Result<Aggregation> = Uninitialized(),
     val selectedGroups: Set<Pair<String, AggregationGroup>> = emptySet(),
     val isBackDropRevealed: Boolean = false
 ) : State

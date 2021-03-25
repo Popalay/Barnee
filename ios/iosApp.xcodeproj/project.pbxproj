@@ -10,7 +10,6 @@
 		751EF55E2608B6FB00404D49 /* shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 751EF55D2608B6FB00404D49 /* shared.framework */; };
 		751EF55F2608B6FB00404D49 /* shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 751EF55D2608B6FB00404D49 /* shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		751EF5642608BDF400404D49 /* ImageFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751EF5632608BDF400404D49 /* ImageFile.swift */; };
-		751EF5672608C6B300404D49 /* CoroutinesToCombine.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751EF5662608C6B300404D49 /* CoroutinesToCombine.swift */; };
 		751EF56B2608F12A00404D49 /* SceneDelegat.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751EF56A2608F12A00404D49 /* SceneDelegat.swift */; };
 		753DC28E260C35ED00631158 /* DiscoveryViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753DC28D260C35ED00631158 /* DiscoveryViewModel.swift */; };
 		753DC290260C385400631158 /* DiscoveryScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753DC28F260C385400631158 /* DiscoveryScreen.swift */; };
@@ -60,7 +59,6 @@
 		706AF17D445B059F56AD1643 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 		751EF55D2608B6FB00404D49 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../shared/build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
 		751EF5632608BDF400404D49 /* ImageFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFile.swift; sourceTree = "<group>"; };
-		751EF5662608C6B300404D49 /* CoroutinesToCombine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoroutinesToCombine.swift; sourceTree = "<group>"; };
 		751EF56A2608F12A00404D49 /* SceneDelegat.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegat.swift; sourceTree = "<group>"; };
 		753DC28D260C35ED00631158 /* DiscoveryViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryViewModel.swift; sourceTree = "<group>"; };
 		753DC28F260C385400631158 /* DiscoveryScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiscoveryScreen.swift; sourceTree = "<group>"; };
@@ -108,14 +106,6 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		751EF5652608C68C00404D49 /* Utils */ = {
-			isa = PBXGroup;
-			children = (
-				751EF5662608C6B300404D49 /* CoroutinesToCombine.swift */,
-			);
-			path = Utils;
-			sourceTree = "<group>";
-		};
 		753DC28B260C35B000631158 /* Screen */ = {
 			isa = PBXGroup;
 			children = (
@@ -159,7 +149,6 @@
 			isa = PBXGroup;
 			children = (
 				753DC28B260C35B000631158 /* Screen */,
-				751EF5652608C68C00404D49 /* Utils */,
 				7555FF7E242A565900829871 /* AppDelegate.swift */,
 				7555FF82242A565900829871 /* ContentView.swift */,
 				7555FF84242A565B00829871 /* Assets.xcassets */,
@@ -378,7 +367,6 @@
 				753DC290260C385400631158 /* DiscoveryScreen.swift in Sources */,
 				7555FF7F242A565900829871 /* AppDelegate.swift in Sources */,
 				753DC28E260C35ED00631158 /* DiscoveryViewModel.swift in Sources */,
-				751EF5672608C6B300404D49 /* CoroutinesToCombine.swift in Sources */,
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				751EF5642608BDF400404D49 /* ImageFile.swift in Sources */,
 				751EF56B2608F12A00404D49 /* SceneDelegat.swift in Sources */,

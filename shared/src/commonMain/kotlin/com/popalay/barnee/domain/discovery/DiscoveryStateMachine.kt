@@ -10,7 +10,7 @@ import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.discovery.DiscoveryAction.Initial
 
 data class DiscoveryState(
-    val drinks: Result<List<Drink>> = Uninitialized
+    val drinks: Result<List<Drink>> = Uninitialized()
 ) : State
 
 sealed class DiscoveryAction : Action {

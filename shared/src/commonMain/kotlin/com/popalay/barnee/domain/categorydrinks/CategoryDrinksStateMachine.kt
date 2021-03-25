@@ -10,7 +10,7 @@ import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.categorydrinks.CategoryDrinksAction.Initial
 
 data class CategoryDrinksState(
-    val drinks: Result<List<Drink>> = Uninitialized,
+    val drinks: Result<List<Drink>> = Uninitialized(),
 ) : State
 
 sealed class CategoryDrinksAction : Action {

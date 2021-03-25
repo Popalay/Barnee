@@ -9,7 +9,6 @@
 import Foundation
 import SwiftUI
 import shared
-import resu
 
 struct DiscoveryScreen: View {
     @ObservedObject var viewModel: DiscoveryViewModel
@@ -17,10 +16,17 @@ struct DiscoveryScreen: View {
     var body: some View {
         NavigationView {
             VStack {
-                List(viewModel.state.drinks.get()!!, id: \.name) { drink in
-                    DrinkView(drink: drink)
+                switch viewModel.state.drinks {
+                case is Loading<NSArray>:
+                    ProgressView("Loading…")
+                case is Success<NSArray>:
+                    List(viewModel.state.drinks.invoke() as! [Drink], id: \.name) { drink in
+                        DrinkView(drink: drink)
+                    }
+                    .navigationBarTitle(Text("Barnee"))
+                default :
+                    Text("Empty state")
                 }
-                .navigationBarTitle(Text("Barnee"))
             }
         }
     }

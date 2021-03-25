@@ -4,7 +4,7 @@ sealed class Result<out T>(val complete: Boolean, val shouldLoad: Boolean, priva
     open operator fun invoke(): T? = value
 }
 
-object Uninitialized : Result<Nothing>(complete = false, shouldLoad = true, value = null)
+class Uninitialized<out T> : Result<T>(complete = false, shouldLoad = true, value = null)
 
 data class Loading<out T>(private val value: T? = null) : Result<T>(complete = false, shouldLoad = false, value = value)
 

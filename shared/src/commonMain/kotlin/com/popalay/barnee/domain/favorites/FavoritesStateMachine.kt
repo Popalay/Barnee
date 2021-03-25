@@ -10,7 +10,7 @@ import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.favorites.FavoritesAction.Initial
 
 data class FavoritesState(
-    val drinks: Result<List<Drink>> = Uninitialized,
+    val drinks: Result<List<Drink>> = Uninitialized()
 ) : State
 
 sealed class FavoritesAction : Action {

@@ -12,9 +12,14 @@ And let this app help you in searching for amazing drinks and cooking steps!
 
 ## :camera_flash: Screenshots
 
-<!-- You can add more screenshots here if you like -->
+### :robot: Android
+
 <img src="/art/screenshot_1.png" width="260">&emsp;<img src="/art/screenshot_2.png" width="260">
 &emsp;<img src="/art/screenshot_3.png" width="260">
+
+### :green_apple: iOS
+
+<img src="/art/screenshot_4.png" width="260">
 
 ## License
 

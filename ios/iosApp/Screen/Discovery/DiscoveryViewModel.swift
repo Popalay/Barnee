@@ -12,7 +12,7 @@ import SwiftUI
 
 class DiscoveryViewModel : ObservableObject {
     let stateMachine : DiscoveryStateMachine
-    @Published var state : DiscoveryState = DiscoveryState(drinks: [])
+    @Published var state : DiscoveryState = DiscoveryState(drinks: Uninitialized())
     
     init() {
         let sharedComponent = (UIApplication.shared.delegate as! AppDelegate).sharedComponent
@@ -20,5 +20,6 @@ class DiscoveryViewModel : ObservableObject {
         stateMachine.onChange { newState in
             self.state = newState
         }
+        stateMachine.consume(action: DiscoveryAction.Initial())
     }
 }
