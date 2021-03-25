@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,15 +35,15 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.airbnb.mvrx.compose.collectAsState
-import com.airbnb.mvrx.compose.mavericksViewModel
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
+import com.popalay.barnee.domain.search.SearchAction
 import com.popalay.barnee.ui.common.DrinkList
 import com.popalay.barnee.ui.common.SimpleFlowRow
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.theme.BarneeTheme
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -51,8 +52,8 @@ fun SearchScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val navController: NavController = LocalNavController.current
-    val viewModel: SearchViewModel = mavericksViewModel()
-    val state by viewModel.collectAsState()
+    val viewModel: SearchViewModel = getViewModel()
+    val state by viewModel.stateFlow.collectAsState()
     val scaffoldState = rememberBackdropScaffoldState(Concealed)
 
     LaunchedEffect(state.isBackDropRevealed) {
@@ -82,7 +83,7 @@ fun SearchScreen(
                 Text(
                     text = "Apply",
                     color = MaterialTheme.colors.onSecondary,
-                    modifier = modifier.clickable { viewModel.onApplyClicked() }
+                    modifier = modifier.clickable { viewModel.consumeAction(SearchAction.ApplyClicked) }
                 )
             }
         },
@@ -92,7 +93,7 @@ fun SearchScreen(
                 Filters(
                     aggregation = aggregation,
                     selected = state.selectedGroups,
-                    onFilterClicked = { viewModel.onFilterClicked(it) }
+                    onFilterClicked = { viewModel.consumeAction(SearchAction.FilterClicked(it)) }
                 )
             }
         },
@@ -104,7 +105,7 @@ fun SearchScreen(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         backgroundColor = MaterialTheme.colors.surface
                     ),
-                    onValueChange = { viewModel.onSearchQueryChanged(it) },
+                    onValueChange = { viewModel.consumeAction(SearchAction.QueryChanged(it)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)

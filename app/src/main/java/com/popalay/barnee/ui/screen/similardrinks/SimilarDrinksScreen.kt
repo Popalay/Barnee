@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.SpanStyle
@@ -16,12 +17,12 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.airbnb.mvrx.compose.collectAsState
-import com.airbnb.mvrx.compose.mavericksViewModel
 import com.popalay.barnee.ui.common.DrinkList
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.theme.BarneeTheme
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun SimilarDrinksScreen(
@@ -31,12 +32,8 @@ fun SimilarDrinksScreen(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val navController: NavController = LocalNavController.current
-    val viewModel: SimilarDrinksViewModel = mavericksViewModel()
-    val state by viewModel.collectAsState()
-
-    LaunchedEffect(alias) {
-        viewModel.loadDrinks(alias)
-    }
+    val viewModel: SimilarDrinksViewModel = getViewModel { parametersOf(alias) }
+    val state by viewModel.stateFlow.collectAsState()
 
     Column(
         modifier = modifier

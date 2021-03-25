@@ -1,6 +1,5 @@
 package com.popalay.barnee.data.repository
 
-import com.futuremind.koru.ToNativeClass
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Drink
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
-@ToNativeClass(launchOnScope = MainScopeProvider::class)
 class DrinkRepository(
     private val api: Api,
     private val localStore: LocalStore

@@ -8,7 +8,6 @@ datastore = "1.0.0-alpha08"
 lottie = "1.0.0-alpha07-SNAPSHOT"
 ktor = "1.5.2"
 jsoup = "1.13.1"
-mavericks = "2.1.0-alpha01"
 exoplayer = "2.13.2"
 youtubeExtractor = "v2.1.0"
 junit = "4.13.2"
@@ -38,7 +37,6 @@ ktor-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
 ktor-serialization = { module = "io.ktor:ktor-client-serialization", version.ref = "ktor" }
 ktor-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-mavericks-compose = { module = "com.airbnb.android:mavericks-compose", version.ref = "mavericks" }
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer", exclude = "com.google.android.exoplayer:exoplayer-ui" }
 youtubeExtractor = { module = "com.github.HaarigerHarald:android-youtubeExtractor", version.ref = "youtubeExtractor" }
 junit = { module = "junit:junit", version.ref = "junit" }

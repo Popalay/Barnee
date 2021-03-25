@@ -1,15 +1,15 @@
 package com.popalay.barnee.ui.common
 
 import androidx.compose.runtime.Composable
-import com.airbnb.mvrx.Async
-import com.airbnb.mvrx.Fail
-import com.airbnb.mvrx.Loading
-import com.airbnb.mvrx.Success
+import com.popalay.barnee.domain.Fail
+import com.popalay.barnee.domain.Loading
+import com.popalay.barnee.domain.Result
+import com.popalay.barnee.domain.Success
 
 @JvmName("StateLayoutForList")
 @Composable
 fun <T : Any> StateLayout(
-    value: Async<List<T>>,
+    value: Result<List<T>>,
     loadingState: @Composable () -> Unit = {},
     emptyState: @Composable () -> Unit = {},
     errorState: @Composable () -> Unit = {},
@@ -25,7 +25,7 @@ fun <T : Any> StateLayout(
 
 @Composable
 fun <T : Any> StateLayout(
-    value: Async<T>,
+    value: Result<T>,
     loadingState: @Composable () -> Unit = {},
     emptyState: @Composable () -> Unit = {},
     errorState: @Composable () -> Unit = {},

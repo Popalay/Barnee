@@ -11,7 +11,6 @@ dependencies {
     implementation(libs.accompanist.coil)
     implementation(libs.accompanist.insets)
     implementation(libs.lottie.compose)
-    implementation(libs.mavericks.compose)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor)
     implementation(libs.koin.android)

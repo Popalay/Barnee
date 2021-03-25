@@ -59,12 +59,6 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.settings)
                 implementation(libs.settingscoroutines)
-                implementation(libs.koru)
-                configurations["kapt"].dependencies.add(
-                    org.gradle.api.internal.artifacts.dependencies.DefaultExternalModuleDependency(
-                        "com.futuremind", "koru-processor", "0.3.4"
-                    )
-                )
             }
         }
 
@@ -80,8 +74,6 @@ kotlin {
         }
 
         val iosMain by getting {
-            kotlin.srcDir("${buildDir.absolutePath}/generated/source/kaptKotlin/")
-
             dependencies {
                 implementation(libs.ktor.ios)
             }

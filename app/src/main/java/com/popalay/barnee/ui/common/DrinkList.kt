@@ -26,15 +26,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import com.airbnb.mvrx.Async
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.domain.Result
 import com.popalay.barnee.ui.screen.navigation.Screen
 import dev.chrisbanes.accompanist.coil.CoilImage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrinkList(
-    drinks: Async<List<Drink>>,
+    drinks: Result<List<Drink>>,
     navController: NavController,
     emptyMessage: String,
     modifier: Modifier = Modifier,

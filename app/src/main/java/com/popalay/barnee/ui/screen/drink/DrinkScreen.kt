@@ -28,7 +28,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,9 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import com.airbnb.mvrx.compose.collectAsState
-import com.airbnb.mvrx.compose.mavericksViewModel
+import com.popalay.barnee.data.model.InstructionStep
 import com.popalay.barnee.data.model.Nutrition
+import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.ui.common.SimpleFlowRow
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
@@ -51,6 +51,8 @@ import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.insets.navigationBarsPadding
+import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun DrinkScreen(
@@ -59,12 +61,8 @@ fun DrinkScreen(
     name: String,
 ) {
     val navController: NavController = LocalNavController.current
-    val viewModel: DrinkViewModel = mavericksViewModel()
-    val state by viewModel.collectAsState()
-
-    LaunchedEffect(Unit) {
-        viewModel.loadReceipt(alias)
-    }
+    val viewModel: DrinkViewModel = getViewModel { parametersOf(alias) }
+    val state by viewModel.stateFlow.collectAsState()
 
     Scaffold(
         floatingActionButtonPosition = FabPosition.Center,
@@ -75,7 +73,7 @@ fun DrinkScreen(
                     state.receipt()?.let {
                         navController.navigate(
                             Screen.Receipt(
-                                it.recipeInstructions.map { it.text },
+                                it.recipeInstructions.map(InstructionStep::text),
                                 image,
                                 it.videoUrl
                             ).route
@@ -100,7 +98,7 @@ fun DrinkScreen(
                 name = name,
                 image = image,
                 isFavorite = state.receipt()?.isFavorite ?: false,
-                onClickLike = { viewModel.toggleFavorite(alias) }
+                onClickLike = { viewModel.consumeAction(DrinkAction.ToggleFavorite(alias)) }
             )
             StateLayout(
                 value = state.receipt,

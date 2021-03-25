@@ -1,14 +1,10 @@
 package com.popalay.barnee.ui.screen.receipt
 
-import com.airbnb.mvrx.MavericksState
-import com.airbnb.mvrx.MavericksViewModel
+import com.popalay.barnee.domain.receipt.ReceiptAction
+import com.popalay.barnee.domain.receipt.ReceiptState
+import com.popalay.barnee.domain.receipt.ReceiptStateMachine
+import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
-data class ReceiptState(
-    val isPlaying: Boolean = false
-) : MavericksState
-
-class ReceiptViewModel(initialState: ReceiptState) : MavericksViewModel<ReceiptState>(initialState) {
-    fun togglePlaying() {
-        setState { copy(isPlaying = !isPlaying) }
-    }
-}
+class ReceiptViewModel(
+    stateMachine: ReceiptStateMachine
+) : StateMachineWrapperViewModel<ReceiptState, ReceiptAction, ReceiptStateMachine>(stateMachine)

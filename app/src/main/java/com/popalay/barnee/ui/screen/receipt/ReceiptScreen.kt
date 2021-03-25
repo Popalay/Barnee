@@ -23,6 +23,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -31,12 +32,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.airbnb.mvrx.compose.collectAsState
-import com.airbnb.mvrx.compose.mavericksViewModel
+import com.popalay.barnee.domain.receipt.ReceiptAction
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.theme.BarneeTheme
 import dev.chrisbanes.accompanist.coil.CoilImage
 import dev.chrisbanes.accompanist.insets.navigationBarsHeight
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ReceiptScreen(
@@ -44,8 +45,9 @@ fun ReceiptScreen(
     image: String,
     video: String
 ) {
-    val viewModel: ReceiptViewModel = mavericksViewModel()
-    val state by viewModel.collectAsState()
+    val viewModel: ReceiptViewModel = getViewModel()
+    val state by viewModel.stateFlow.collectAsState()
+
     Scaffold {
         val scrollState = rememberScrollState()
         Column(
@@ -72,7 +74,7 @@ fun ReceiptScreen(
                 }
                 if (video.isNotBlank() && !state.isPlaying) {
                     IconButton(
-                        onClick = { viewModel.togglePlaying() },
+                        onClick = { viewModel.consumeAction(ReceiptAction.TogglePlaying) },
                         modifier = Modifier
                             .padding(24.dp)
                             .clip(CircleShape)
