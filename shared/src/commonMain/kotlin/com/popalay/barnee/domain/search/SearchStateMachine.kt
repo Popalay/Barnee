@@ -13,7 +13,7 @@ import com.popalay.barnee.domain.search.SearchAction.ApplyClicked
 import com.popalay.barnee.domain.search.SearchAction.FilterClicked
 import com.popalay.barnee.domain.search.SearchAction.Initial
 import com.popalay.barnee.domain.search.SearchAction.QueryChanged
-import kotlinx.coroutines.Job
+import com.popalay.barnee.util.ConflatedJob
 import kotlinx.coroutines.delay
 
 data class SearchState(
@@ -34,7 +34,7 @@ sealed class SearchAction : Action {
 class SearchStateMachine(
     private val drinkRepository: DrinkRepository
 ) : StateMachine<SearchState, SearchAction>(SearchState()) {
-    private var searchJob: Job? = null
+    private val searchJob = ConflatedJob()
 
     override fun reducer(currentState: SearchState, action: SearchAction) {
         when (action) {
@@ -45,8 +45,7 @@ class SearchStateMachine(
             }
             is QueryChanged -> {
                 setState { copy(searchQuery = action.query) }
-                searchJob?.cancel()
-                searchJob = suspend {
+                searchJob += suspend {
                     delay(500)
                     requestSearch()
                 }.execute { copy(drinks = it) }
