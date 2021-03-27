@@ -21,6 +21,7 @@
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
 		8266FAA628FB75EE99913D75 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6BB0763D604A1039B41A3E /* libPods-iosApp.a */; };
+		DCC5396EFA4C795C7A25D78B /* StateMachineWrapperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC53B7D6990036D41000005 /* StateMachineWrapperViewModel.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +78,7 @@
 		7555FFA2242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		7555FFB1242A642300829871 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = "../shared/build/xcode-frameworks/shared.framework"; sourceTree = "<group>"; };
 		9F5A1D9A0D288E3C549F608E /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
+		DCC53B7D6990036D41000005 /* StateMachineWrapperViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachineWrapperViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -110,6 +112,7 @@
 			isa = PBXGroup;
 			children = (
 				753DC28C260C35C500631158 /* Discovery */,
+				DCC53B7D6990036D41000005 /* StateMachineWrapperViewModel.swift */,
 			);
 			path = Screen;
 			sourceTree = "<group>";
@@ -370,6 +373,7 @@
 				7555FF83242A565900829871 /* ContentView.swift in Sources */,
 				751EF5642608BDF400404D49 /* ImageFile.swift in Sources */,
 				751EF56B2608F12A00404D49 /* SceneDelegat.swift in Sources */,
+				DCC5396EFA4C795C7A25D78B /* StateMachineWrapperViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -553,6 +557,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Debug;
 		};
@@ -577,6 +582,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_WORKSPACE = YES;
 			};
 			name = Release;
 		};

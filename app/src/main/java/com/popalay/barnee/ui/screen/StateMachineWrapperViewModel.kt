@@ -15,7 +15,6 @@ abstract class StateMachineWrapperViewModel<S : State, A : Action, T : StateMach
 
     fun consumeAction(action: A) {
         stateMachine.consume(action)
-        viewModelScope
     }
 
     override fun onCleared() {

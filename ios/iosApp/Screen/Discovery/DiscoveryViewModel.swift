@@ -10,16 +10,10 @@ import Foundation
 import shared
 import SwiftUI
 
-class DiscoveryViewModel : ObservableObject {
-    let stateMachine : DiscoveryStateMachine
-    @Published var state : DiscoveryState = DiscoveryState(drinks: Uninitialized())
-    
-    init() {
+class DiscoveryViewModel: StateMachineWrapperViewModel<DiscoveryState, DiscoveryAction, DiscoveryStateMachine> {
+    convenience init() {
         let sharedComponent = (UIApplication.shared.delegate as! AppDelegate).sharedComponent
-        stateMachine = sharedComponent.provideDiscoveryStateMachine()
-        stateMachine.onChange { newState in
-            self.state = newState
-        }
-        stateMachine.consume(action: DiscoveryAction.Initial())
+        self.init(stateMachine: sharedComponent.provideDiscoveryStateMachine(), initialState: DiscoveryState(drinks: Uninitialized()))
+        consumeAction(action: DiscoveryAction.Initial())
     }
 }
