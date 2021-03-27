@@ -20,7 +20,7 @@ import androidx.navigation.NavController
 import com.popalay.barnee.ui.common.DrinkList
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 

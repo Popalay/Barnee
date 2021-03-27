@@ -35,14 +35,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.google.accompanist.flowlayout.FlowRow
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
 import com.popalay.barnee.ui.common.DrinkList
-import com.popalay.barnee.ui.common.SimpleFlowRow
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -166,7 +166,7 @@ private fun AggregationGroup(
         style = MaterialTheme.typography.h3
     )
     Spacer(modifier = Modifier.height(8.dp))
-    SimpleFlowRow(
+    FlowRow(
         mainAxisSpacing = 8.dp,
         crossAxisSpacing = 8.dp
     ) {

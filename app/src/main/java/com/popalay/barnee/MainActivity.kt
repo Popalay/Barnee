@@ -14,6 +14,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.ui.screen.categorydrinks.CategoryDrinksScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
 import com.popalay.barnee.ui.screen.home.HomeScreen
@@ -21,9 +24,6 @@ import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.receipt.ReceiptScreen
 import com.popalay.barnee.ui.screen.similardrinks.SimilarDrinksScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.insets.LocalWindowInsets
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.toPaddingValues
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

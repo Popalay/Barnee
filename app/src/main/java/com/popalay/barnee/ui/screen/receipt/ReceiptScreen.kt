@@ -35,8 +35,8 @@ import androidx.compose.ui.unit.dp
 import com.popalay.barnee.domain.receipt.ReceiptAction
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.coil.CoilImage
-import dev.chrisbanes.accompanist.insets.navigationBarsHeight
+import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.insets.navigationBarsHeight
 import org.koin.androidx.compose.getViewModel
 
 @Composable

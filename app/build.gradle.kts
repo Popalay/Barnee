@@ -10,6 +10,7 @@ dependencies {
     implementation(libs.navigation.compose)
     implementation(libs.accompanist.coil)
     implementation(libs.accompanist.insets)
+    implementation(libs.accompanist.flowlayout)
     implementation(libs.lottie.compose)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor)
@@ -38,11 +39,15 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
         useIR = true
+        kotlinOptions.freeCompilerArgs += listOf(
+            "-Xopt-in=kotlin.RequiresOptIn",
+            "-Xopt-in=kotlin.OptIn"
+        )
     }
     buildFeatures {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta02"
+        kotlinCompilerExtensionVersion = "1.0.0-beta03"
     }
 }

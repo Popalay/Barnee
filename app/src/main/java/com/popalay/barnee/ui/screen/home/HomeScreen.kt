@@ -26,9 +26,9 @@ import com.popalay.barnee.ui.screen.navigation.TabScreen
 import com.popalay.barnee.ui.screen.navigation.homeScreens
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.insets.LocalWindowInsets
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
-import dev.chrisbanes.accompanist.insets.toPaddingValues
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.toPaddingValues
 
 @Composable
 fun HomeScreen() {

@@ -44,13 +44,13 @@ import androidx.navigation.compose.navigate
 import com.popalay.barnee.data.model.InstructionStep
 import com.popalay.barnee.data.model.Nutrition
 import com.popalay.barnee.domain.drink.DrinkAction
-import com.popalay.barnee.ui.common.SimpleFlowRow
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import dev.chrisbanes.accompanist.coil.CoilImage
-import dev.chrisbanes.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.insets.navigationBarsPadding
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -253,7 +253,7 @@ fun Keywords(
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         Spacer(modifier = Modifier.padding(top = 16.dp))
-        SimpleFlowRow {
+        FlowRow {
             keywords.forEach { item ->
                 Text(
                     text = item,

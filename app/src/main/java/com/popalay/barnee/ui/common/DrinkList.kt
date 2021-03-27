@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells.Fixed
 import androidx.compose.foundation.lazy.LazyVerticalGrid
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -26,10 +26,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import com.google.accompanist.coil.CoilImage
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.ui.screen.navigation.Screen
-import dev.chrisbanes.accompanist.coil.CoilImage
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -52,7 +52,7 @@ fun DrinkList(
         ) {
             item { Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding())) }
             item { Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding())) }
-            itemsIndexed(value) { index, item ->
+            items(value) { item ->
                 DrinkListItem(
                     item,
                     modifier
