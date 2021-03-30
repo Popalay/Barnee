@@ -32,11 +32,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.insets.navigationBarsHeight
 import com.popalay.barnee.domain.receipt.ReceiptAction
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.google.accompanist.coil.CoilImage
-import com.google.accompanist.insets.navigationBarsHeight
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -74,7 +74,7 @@ fun ReceiptScreen(
                 }
                 if (video.isNotBlank() && !state.isPlaying) {
                     IconButton(
-                        onClick = { viewModel.consumeAction(ReceiptAction.TogglePlaying) },
+                        onClick = { viewModel.processAction(ReceiptAction.TogglePlaying) },
                         modifier = Modifier
                             .padding(24.dp)
                             .clip(CircleShape)

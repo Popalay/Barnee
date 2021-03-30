@@ -5,20 +5,32 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.Output
+import com.popalay.barnee.domain.Processor
+import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.search.SearchAction.ApplyClicked
 import com.popalay.barnee.domain.search.SearchAction.FilterClicked
 import com.popalay.barnee.domain.search.SearchAction.Initial
 import com.popalay.barnee.domain.search.SearchAction.QueryChanged
-import com.popalay.barnee.util.ConflatedJob
-import kotlinx.coroutines.delay
+import com.popalay.barnee.domain.search.SearchOutput.AggregationOutput
+import com.popalay.barnee.domain.search.SearchOutput.FilterClickedOutput
+import com.popalay.barnee.domain.search.SearchOutput.QueryChangedOutput
+import com.popalay.barnee.domain.search.SearchOutput.SearchingOutput
+import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.take
 
 data class SearchState(
     val searchQuery: String = "",
-    val drinks: Result<List<Drink>> = Uninitialized(),
+    val drinks: Result<List<Drink>> = Success(emptyList()),
     val aggregation: Result<Aggregation> = Uninitialized(),
     val selectedGroups: Set<Pair<String, AggregationGroup>> = emptySet(),
     val isBackDropRevealed: Boolean = false
@@ -31,39 +43,51 @@ sealed class SearchAction : Action {
     data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction()
 }
 
+sealed class SearchOutput : Output {
+    data class AggregationOutput(val data: Aggregation) : SearchOutput()
+    data class SearchingOutput(val data: Result<List<Drink>>) : SearchOutput()
+    data class QueryChangedOutput(val data: String) : SearchOutput()
+    data class FilterClickedOutput(val data: Set<Pair<String, AggregationGroup>>) : SearchOutput()
+}
+
 class SearchStateMachine(
     private val drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction>(SearchState()) {
-    private val searchJob = ConflatedJob()
-
-    override fun reducer(currentState: SearchState, action: SearchAction) {
-        when (action) {
-            Initial -> suspend { drinkRepository.getAggregation() }.execute { copy(aggregation = it) }
-            ApplyClicked -> {
-                setState { copy(isBackDropRevealed = true) }
-                suspend { requestSearch() }.execute { copy(drinks = it) }
-            }
-            is QueryChanged -> {
-                setState { copy(searchQuery = action.query) }
-                searchJob += suspend {
-                    delay(500)
-                    requestSearch()
-                }.execute { copy(drinks = it) }
-            }
-            is FilterClicked -> {
-                setState {
-                    if (action.value in selectedGroups) {
-                        copy(selectedGroups = selectedGroups - action.value)
+) : StateMachine<SearchState, SearchAction, SearchOutput>(SearchState()) {
+    override val processor: Processor<SearchState, SearchOutput> = { state ->
+        merge(
+            filterIsInstance<Initial>()
+                .take(1)
+                .map { drinkRepository.getAggregation() }
+                .map { AggregationOutput(it) },
+            filterIsInstance<ApplyClicked>()
+                .mapToResult { drinkRepository.searchDrinks(state.searchQuery, getFilters(state.aggregation(), state.selectedGroups)) }
+                .map { SearchingOutput(it) },
+            filterIsInstance<QueryChanged>()
+                .debounce(500L)
+                .distinctUntilChanged()
+                .mapToResult { drinkRepository.searchDrinks(it.query, getFilters(state.aggregation(), state.selectedGroups)) }
+                .map { SearchingOutput(it) },
+            filterIsInstance<QueryChanged>()
+                .map { QueryChangedOutput(it.query) },
+            filterIsInstance<FilterClicked>()
+                .map {
+                    if (it.value in state.selectedGroups) {
+                        state.selectedGroups - it.value
                     } else {
-                        copy(selectedGroups = selectedGroups + action.value)
+                        state.selectedGroups + it.value
                     }
                 }
-            }
-        }
+                .map { FilterClickedOutput(it) },
+        )
     }
 
-    private suspend fun requestSearch() = awaitState().run {
-        drinkRepository.searchDrinks(searchQuery, getFilters(aggregation(), selectedGroups))
+    override val reducer: Reducer<SearchState, SearchOutput> = { result ->
+        when (result) {
+            is AggregationOutput -> copy(aggregation = Success(result.data))
+            is SearchingOutput -> copy(drinks = result.data)
+            is QueryChangedOutput -> copy(searchQuery = result.data)
+            is FilterClickedOutput -> copy(selectedGroups = result.data)
+        }
     }
 
     private fun getFilters(

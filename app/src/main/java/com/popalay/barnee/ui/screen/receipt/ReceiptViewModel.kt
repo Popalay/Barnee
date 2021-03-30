@@ -7,4 +7,4 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class ReceiptViewModel(
     stateMachine: ReceiptStateMachine
-) : StateMachineWrapperViewModel<ReceiptState, ReceiptAction, ReceiptStateMachine>(stateMachine)
+) : StateMachineWrapperViewModel<ReceiptState, ReceiptAction>(stateMachine)

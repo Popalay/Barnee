@@ -36,13 +36,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
 import com.popalay.barnee.ui.common.DrinkList
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.google.accompanist.insets.statusBarsPadding
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -83,7 +83,7 @@ fun SearchScreen(
                 Text(
                     text = "Apply",
                     color = MaterialTheme.colors.onSecondary,
-                    modifier = modifier.clickable { viewModel.consumeAction(SearchAction.ApplyClicked) }
+                    modifier = modifier.clickable { viewModel.processAction(SearchAction.ApplyClicked) }
                 )
             }
         },
@@ -93,7 +93,7 @@ fun SearchScreen(
                 Filters(
                     aggregation = aggregation,
                     selected = state.selectedGroups,
-                    onFilterClicked = { viewModel.consumeAction(SearchAction.FilterClicked(it)) }
+                    onFilterClicked = { viewModel.processAction(SearchAction.FilterClicked(it)) }
                 )
             }
         },
@@ -105,7 +105,7 @@ fun SearchScreen(
                     colors = TextFieldDefaults.outlinedTextFieldColors(
                         backgroundColor = MaterialTheme.colors.surface
                     ),
-                    onValueChange = { viewModel.consumeAction(SearchAction.QueryChanged(it)) },
+                    onValueChange = { viewModel.processAction(SearchAction.QueryChanged(it)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)

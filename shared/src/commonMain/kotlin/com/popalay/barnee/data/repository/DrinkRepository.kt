@@ -56,7 +56,7 @@ class DrinkRepository(
         localStore.removeFavorite(alias)
     }
 
-    suspend fun toggleFavoriteFor(alias: String) {
+    suspend fun toggleFavoriteFor(alias: String): Boolean {
         val favorites = localStore.getFavoriteDrinks().first()
         val isInFavorites = alias in favorites
         if (isInFavorites) {
@@ -64,5 +64,6 @@ class DrinkRepository(
         } else {
             saveAsFavorite(alias)
         }
+        return !isInFavorites
     }
 }
