@@ -28,7 +28,7 @@ class ReceiptStateMachine : StateMachine<ReceiptState, ReceiptAction, ReceiptOut
     override val processor: Processor<ReceiptState, ReceiptOutput> = { state ->
         merge(
             filterIsInstance<TogglePlaying>()
-                .map { !state.isPlaying }
+                .map { !state().isPlaying }
                 .map { TogglePlayingOutput(it) },
         )
     }

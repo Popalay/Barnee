@@ -60,24 +60,35 @@ class SearchStateMachine(
                 .map { drinkRepository.getAggregation() }
                 .map { AggregationOutput(it) },
             filterIsInstance<ApplyClicked>()
-                .mapToResult { drinkRepository.searchDrinks(state.searchQuery, getFilters(state.aggregation(), state.selectedGroups)) }
+                .mapToResult {
+                    drinkRepository.searchDrinks(
+                        state().searchQuery,
+                        getFilters(state().aggregation(), state().selectedGroups)
+                    )
+                }
                 .map { SearchingOutput(it) },
             filterIsInstance<QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
-                .mapToResult { drinkRepository.searchDrinks(it.query, getFilters(state.aggregation(), state.selectedGroups)) }
+                .mapToResult {
+                    drinkRepository.searchDrinks(
+                        it.query,
+                        getFilters(state().aggregation(), state().selectedGroups)
+                    )
+                }
                 .map { SearchingOutput(it) },
             filterIsInstance<QueryChanged>()
                 .map { QueryChangedOutput(it.query) },
             filterIsInstance<FilterClicked>()
                 .map {
-                    if (it.value in state.selectedGroups) {
-                        state.selectedGroups - it.value
-                    } else {
-                        state.selectedGroups + it.value
-                    }
+                    FilterClickedOutput(
+                        if (it.value in state().selectedGroups) {
+                            state().selectedGroups - it.value
+                        } else {
+                            state().selectedGroups + it.value
+                        }
+                    )
                 }
-                .map { FilterClickedOutput(it) },
         )
     }
 
@@ -93,19 +104,18 @@ class SearchStateMachine(
     private fun getFilters(
         aggregation: Aggregation?,
         selectedGroups: Set<Pair<String, AggregationGroup>>,
-    ): Map<String, List<String>> =
-        selectedGroups.map {
-            val aggregationName = when (it.second) {
-                aggregation?.tasting -> "tasting"
-                aggregation?.skill -> "skill"
-                aggregation?.servedIn -> "servedIn"
-                aggregation?.colored -> "colored"
-                aggregation?.withType -> "withtype"
-                else -> ""
-            }
-            aggregationName to it.first
-        }.groupBy(
-            keySelector = { it.first },
-            valueTransform = { it.second }
-        )
+    ): Map<String, List<String>> = selectedGroups.map {
+        val aggregationName = when (it.second) {
+            aggregation?.tasting -> "tasting"
+            aggregation?.skill -> "skill"
+            aggregation?.servedIn -> "servedIn"
+            aggregation?.colored -> "colored"
+            aggregation?.withType -> "withtype"
+            else -> ""
+        }
+        aggregationName to it.first
+    }.groupBy(
+        keySelector = { it.first },
+        valueTransform = { it.second }
+    )
 }

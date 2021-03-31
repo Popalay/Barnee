@@ -17,7 +17,7 @@ logback = "1.2.3"
 coroutines = { strictly = "1.4.2-native-mt" }
 koin = "3.0.1-beta-1"
 settings = "0.7.4"
-koru = "0.3.4"
+logger = "1.12.5
 
 [libraries]
 compose-ui = { module = "androidx.compose.ui:ui", version.ref = "compose" }
@@ -51,7 +51,7 @@ koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = 
 settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
 settingscoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
 settingsdatastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
-koru = { module = "com.futuremind:koru", version.ref = "koru" }
+logger = { module = "io.github.microutils:kotlin-logging", version.ref = "logger" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material"]
