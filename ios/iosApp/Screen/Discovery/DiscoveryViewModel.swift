@@ -14,6 +14,6 @@ class DiscoveryViewModel: StateMachineWrapperViewModel<DiscoveryState, Discovery
     convenience init() {
         let sharedComponent = (UIApplication.shared.delegate as! AppDelegate).sharedComponent
         self.init(stateMachine: sharedComponent.provideDiscoveryStateMachine(), initialState: DiscoveryState(drinks: Uninitialized()))
-        consumeAction(action: DiscoveryAction.Initial())
+        processAction(action: DiscoveryAction.Initial())
     }
 }

@@ -8,8 +8,8 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 class SimilarDrinksViewModel(
     alias: String,
     stateMachine: SimilarDrinksStateMachine
-) : StateMachineWrapperViewModel<SimilarDrinksState, SimilarDrinksAction, SimilarDrinksStateMachine>(stateMachine) {
+) : StateMachineWrapperViewModel<SimilarDrinksState, SimilarDrinksAction>(stateMachine) {
     init {
-        consumeAction(SimilarDrinksAction.Initial(alias))
+        processAction(SimilarDrinksAction.Initial(alias))
     }
 }

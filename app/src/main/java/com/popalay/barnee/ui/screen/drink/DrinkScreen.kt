@@ -41,6 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
+import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.flowlayout.FlowRow
+import com.google.accompanist.insets.navigationBarsPadding
 import com.popalay.barnee.data.model.InstructionStep
 import com.popalay.barnee.data.model.Nutrition
 import com.popalay.barnee.domain.drink.DrinkAction
@@ -48,9 +51,6 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.google.accompanist.coil.CoilImage
-import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.navigationBarsPadding
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -98,7 +98,7 @@ fun DrinkScreen(
                 name = name,
                 image = image,
                 isFavorite = state.receipt()?.isFavorite ?: false,
-                onClickLike = { viewModel.consumeAction(DrinkAction.ToggleFavorite(alias)) }
+                onClickLike = { viewModel.processAction(DrinkAction.ToggleFavorite(alias)) }
             )
             StateLayout(
                 value = state.receipt,

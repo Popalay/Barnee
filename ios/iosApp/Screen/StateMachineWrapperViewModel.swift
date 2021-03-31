@@ -19,7 +19,7 @@ class StateMachineWrapperViewModel<S: shared.State, A: Action, T: StateMachine<S
         }
     }
 
-    func consumeAction(action: A) {
+    func processAction(action: A) {
         stateMachine.consume(action: action)
     }
 }

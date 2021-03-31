@@ -7,8 +7,8 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class FavoritesViewModel(
     stateMachine: FavoritesStateMachine
-) : StateMachineWrapperViewModel<FavoritesState, FavoritesAction, FavoritesStateMachine>(stateMachine) {
+) : StateMachineWrapperViewModel<FavoritesState, FavoritesAction>(stateMachine) {
     init {
-        consumeAction(FavoritesAction.Initial)
+        processAction(FavoritesAction.Initial)
     }
 }

@@ -1,40 +1,55 @@
 package com.popalay.barnee.domain
 
+import com.popalay.barnee.util.prettyPrint
 import io.ktor.utils.io.core.Closeable
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.scan
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.plus
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
+import mu.KotlinLogging
 
 interface State
 interface Action
+interface Output
 
-abstract class StateMachine<S : State, A : Action>(initialState: S) {
-    private val localStateFlow = MutableStateFlow(initialState)
-    private val localActionFlow = MutableSharedFlow<A>()
+@OptIn(ExperimentalCoroutinesApi::class)
+abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) {
+    private val actionFlow = MutableSharedFlow<A>(extraBufferCapacity = 64, replay = 1)
     private val stateMachineScope = MainScope()
+    private val logger by lazy { KotlinLogging.logger { } }
+
     val stateFlow: StateFlow<S>
-        get() = localStateFlow
+
+    abstract val processor: Processor<S, R>
+    abstract val reducer: Reducer<S, R>
 
     init {
-        stateMachineScope.launch {
-            localActionFlow
-                .collect { reducer(localStateFlow.value, it) }
-        }
+        stateFlow = actionFlow
+            .onEach { log(it) }
+            .applyProcessor()
+            .scan(initialState) { state, result -> reducer(state, result) }
+            .onEach { log(it) }
+            .stateIn(
+                stateMachineScope,
+                SharingStarted.Eagerly,
+                initialState
+            )
     }
 
     fun onChange(provideNewState: ((S) -> Unit)): Closeable {
@@ -49,47 +64,44 @@ abstract class StateMachine<S : State, A : Action>(initialState: S) {
         }
     }
 
-    fun consume(action: A) {
-        stateMachineScope.launch { localActionFlow.emit(action) }
+    fun process(action: A) {
+        stateMachineScope.launch { actionFlow.emit(action) }
     }
 
     open fun onCleared() {
         stateMachineScope.cancel()
     }
 
-    protected fun setState(body: S.() -> S) {
-        localStateFlow.value = body(stateFlow.value)
-    }
-
-    protected fun awaitState(): S = stateFlow.value
-
-    protected abstract fun reducer(currentState: S, action: A)
-
-    protected fun <T : Any?> (suspend () -> T).execute(
-        dispatcher: CoroutineDispatcher? = null,
-        reducer: S.(Result<T>) -> S = { this }
-    ): Job {
-        setState { reducer(Loading()) }
-        return stateMachineScope.launch(dispatcher ?: EmptyCoroutineContext) {
-            try {
-                val result = invoke()
-                setState { reducer(Success(result)) }
-            } catch (e: CancellationException) {
-                @Suppress("RethrowCaughtException")
-                throw e
-            } catch (@Suppress("TooGenericExceptionCaught") e: Exception) {
-                setState { reducer(Fail(e)) }
-            }
+    protected inline fun <T : Any, R : Any> Flow<T>.mapToResult(
+        crossinline transform: suspend (value: T) -> R
+    ): Flow<Result<R>> = transform { value ->
+        emit(Loading<R>())
+        try {
+            emit(Success(transform(value)))
+        } catch (exception: Exception) {
+            emit(Fail<R>(exception))
         }
     }
 
-    protected fun <T> Flow<T>.execute(
-        dispatcher: CoroutineDispatcher? = null,
-        reducer: S.(Result<T>) -> S = { this }
-    ): Job {
-        setState { reducer(Loading()) }
-        return catch { error -> setState { reducer(Fail(error)) } }
-            .onEach { value -> setState { reducer(Success(value)) } }
-            .launchIn(stateMachineScope + (dispatcher ?: EmptyCoroutineContext))
+    protected inline fun <T : Any, R : Any> Flow<T>.flatMapToResult(
+        crossinline transform: suspend (value: T) -> Flow<R>
+    ): Flow<Result<R>> = transform { value ->
+        emit(Loading<R>())
+        transform(value)
+            .catch { emit(Fail<R>(it)) }
+            .collect { emit(Success(it)) }
+    }
+
+    @OptIn(FlowPreview::class)
+    private fun Flow<Any>.applyProcessor() = flatMapConcat { processor(actionFlow) { stateFlow.value } }
+
+    private fun log(value: Any) {
+        when (value) {
+            is State -> logger.debug { "New state --> ${value.prettyPrint()}" }
+            is Action -> logger.debug { "Action processed --> ${value.prettyPrint()}" }
+        }
     }
 }
+
+typealias Processor<State, Result> = Flow<Any>.(state: () -> State) -> Flow<Result>
+typealias Reducer<State, R> = State.(result: R) -> State

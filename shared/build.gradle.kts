@@ -59,6 +59,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.settings)
                 implementation(libs.settingscoroutines)
+                implementation(libs.logger)
             }
         }
 
