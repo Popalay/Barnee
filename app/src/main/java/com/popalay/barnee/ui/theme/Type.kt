@@ -8,36 +8,48 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.popalay.barnee.R
 
-private val RozhaOne = FontFamily(
-    Font(R.font.rozha_one_regular, FontWeight.Normal),
+private val Roboto = FontFamily(
+    Font(R.font.roboto_regular, FontWeight.Normal),
+    Font(R.font.roboto_medium, FontWeight.Medium),
+    Font(R.font.roboto_bold, FontWeight.Bold),
 )
 
 // Set of Material typography styles to start with
 val Typography = Typography(
     h1 = TextStyle(
-        fontFamily = RozhaOne,
-        fontWeight = FontWeight.Normal,
-        fontSize = 36.sp
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Bold,
+        fontSize = 50.sp
     ),
     h2 = TextStyle(
-        fontFamily = RozhaOne,
-        fontWeight = FontWeight.Normal,
-        fontSize = 24.sp
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Bold,
+        fontSize = 20.sp
     ),
-    h3 = TextStyle(
-        fontFamily = RozhaOne,
+    subtitle1 = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Medium,
+        fontSize = 17.sp
+    ),
+    subtitle2 = TextStyle(
+        fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
         fontSize = 16.sp
     ),
     body1 = TextStyle(
-        fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Normal,
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Medium,
         letterSpacing = 1.5.sp,
-        fontSize = 14.sp
+        fontSize = 16.sp
     ),
     body2 = TextStyle(
-        fontFamily = FontFamily.Default,
+        fontFamily = Roboto,
         fontWeight = FontWeight.Normal,
-        fontSize = 12.sp
-    )
+        fontSize = 16.sp
+    ),
+    button = TextStyle(
+        fontFamily = Roboto,
+        fontWeight = FontWeight.Medium,
+        fontSize = 18.sp
+    ),
 )
