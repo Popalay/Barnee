@@ -60,7 +60,7 @@ class SearchStateMachine(
                 .map { drinkRepository.getAggregation() }
                 .map { AggregationOutput(it) },
             filterIsInstance<ApplyClicked>()
-                .mapToResult {
+                .flatMapToResult {
                     drinkRepository.searchDrinks(
                         state().searchQuery,
                         getFilters(state().aggregation(), state().selectedGroups)
@@ -70,7 +70,7 @@ class SearchStateMachine(
             filterIsInstance<QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
-                .mapToResult {
+                .flatMapToResult {
                     drinkRepository.searchDrinks(
                         it.query,
                         getFilters(state().aggregation(), state().selectedGroups)
