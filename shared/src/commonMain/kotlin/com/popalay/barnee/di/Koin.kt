@@ -7,6 +7,7 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.categorydrinks.CategoryDrinksStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
+import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
 import com.popalay.barnee.domain.favorites.FavoritesStateMachine
 import com.popalay.barnee.domain.receipt.ReceiptStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -37,6 +38,7 @@ val commonModule = module {
     factory { ReceiptStateMachine() }
     factory { SearchStateMachine(get()) }
     factory { SimilarDrinksStateMachine(get()) }
+    factory { DrinkListStateMachine(get()) }
 }
 
 expect val platformModule: Module
