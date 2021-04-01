@@ -12,36 +12,41 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class DrinkRepository(
     private val api: Api,
     private val localStore: LocalStore
 ) {
-    suspend fun getRandomDrinks(count: Int): List<Drink> = api.randomDrinks(count)
+    suspend fun getRandomDrinks(count: Int): Flow<List<Drink>> = flow { emit(api.randomDrinks(count)) }
+        .flatMapLatest { mapFavorites(it) }
 
-    suspend fun getDrinksByAliases(aliases: List<String>): List<Drink> = api.drinksByAliases(aliases)
+    suspend fun getDrinksByAliases(aliases: List<String>): Flow<List<Drink>> = flow { emit(api.drinksByAliases(aliases)) }
+        .flatMapLatest { mapFavorites(it) }
 
-    suspend fun getDrinksByTags(tags: List<String>): List<Drink> = api.drinksByTags(tags)
+    suspend fun getDrinksByTags(tags: List<String>): Flow<List<Drink>> = flow { emit(api.drinksByTags(tags)) }
+        .flatMapLatest { mapFavorites(it) }
 
-    suspend fun getSimilarDrinksFor(alias: String): List<Drink> = api.similarDrinks(alias)
+    suspend fun getSimilarDrinksFor(alias: String): Flow<List<Drink>> = flow { emit(api.similarDrinks(alias)) }
+        .flatMapLatest { mapFavorites(it) }
 
     suspend fun searchDrinks(
         query: String,
         filters: Map<String, List<String>>
-    ): List<Drink> {
+    ): Flow<List<Drink>> {
         val searchRequest = filters
             .filter { it.key.isNotBlank() && it.value.isNotEmpty() }
             .map { it.key + "/" + it.value.joinToString(",") }
             .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
 
-        return api.searchDrinks(searchRequest)
+        return flow { emit(api.searchDrinks(searchRequest)) }
+            .flatMapLatest { mapFavorites(it) }
     }
 
     suspend fun getAggregation(): Aggregation = api.getAggregation()
 
     fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
-        .map { api.drinksByAliases(it.toList()) }
+        .map { favorites -> api.drinksByAliases(favorites.toList()).map { it.copy(isFavorite = true) } }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     fun getReceipt(alias: String): Flow<Receipt> = flow { emit(api.getReceipt(alias)) }
         .flatMapLatest { receipt ->
             localStore.getFavoriteDrinks()
@@ -66,4 +71,7 @@ class DrinkRepository(
         }
         return !isInFavorites
     }
+
+    private fun mapFavorites(drinks: List<Drink>) = localStore.getFavoriteDrinks()
+        .map { favorites -> drinks.map { it.copy(isFavorite = it.alias in favorites) } }
 }

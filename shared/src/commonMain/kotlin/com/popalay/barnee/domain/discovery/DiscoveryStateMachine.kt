@@ -36,7 +36,7 @@ class DiscoveryStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .mapToResult { drinkRepository.getRandomDrinks(10) }
+                .flatMapToResult { drinkRepository.getRandomDrinks(10) }
                 .map { DrinksOutput(it) }
         )
     }

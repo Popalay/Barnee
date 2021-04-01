@@ -36,7 +36,7 @@ class CategoryDrinksStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .mapToResult { drinkRepository.getDrinksByTags(listOf(it.tag)) }
+                .flatMapToResult { drinkRepository.getDrinksByTags(listOf(it.tag)) }
                 .map { DrinksOutput(it) }
         )
     }

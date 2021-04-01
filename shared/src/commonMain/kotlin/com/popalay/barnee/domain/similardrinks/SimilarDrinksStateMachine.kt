@@ -36,7 +36,7 @@ class SimilarDrinksStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .mapToResult { drinkRepository.getSimilarDrinksFor(it.alias) }
+                .flatMapToResult { drinkRepository.getSimilarDrinksFor(it.alias) }
                 .map { DrinksOutput(it) },
         )
     }

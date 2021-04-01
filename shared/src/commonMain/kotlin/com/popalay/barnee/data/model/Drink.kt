@@ -9,7 +9,8 @@ data class Drink(
     val name: String,
     val alias: String,
     val rating: Int,
-    val images: List<Image>
+    val images: List<Image>,
+    val isFavorite: Boolean = false
 ) {
     @Transient
     val displayImageUrl = images.last().uri
