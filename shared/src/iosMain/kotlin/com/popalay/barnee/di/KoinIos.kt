@@ -5,6 +5,7 @@ package com.popalay.barnee.di
 import com.popalay.barnee.domain.categorydrinks.CategoryDrinksStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
+import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
 import com.popalay.barnee.domain.favorites.FavoritesStateMachine
 import com.popalay.barnee.domain.receipt.ReceiptStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -34,4 +35,5 @@ class DiComponent : KoinComponent {
     fun provideReceiptStateMachine(): ReceiptStateMachine = get()
     fun provideSearchStateMachine(): SearchStateMachine = get()
     fun provideSimilarDrinksStateMachine(): SimilarDrinksStateMachine = get()
+    fun provideDrinkListStateMachine(): DrinkListStateMachine = get()
 }

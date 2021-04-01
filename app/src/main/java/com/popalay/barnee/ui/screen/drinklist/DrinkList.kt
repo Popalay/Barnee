@@ -3,7 +3,7 @@ package com.popalay.barnee.ui.common
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -38,8 +38,11 @@ import com.google.accompanist.coil.CoilImage
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
+import com.popalay.barnee.domain.drinklist.DrinkListAction
+import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.LightGrey
+import org.koin.androidx.compose.getViewModel
 import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -51,6 +54,8 @@ fun DrinkList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
+    val viewModel: DrinkListViewModel = getViewModel()
+
     StateLayout(
         value = drinks,
         emptyState = { EmptyStateView(message = emptyMessage) },
@@ -67,6 +72,8 @@ fun DrinkList(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(Screen.Drink(item.alias, item.name, item.displayImageUrl).route) },
+                    onDoubleClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
+                    onHeartClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
                     modifier = modifier
                         .padding(start = 12.dp, end = 12.dp, bottom = 0.dp)
                         .padding(top = if (index % 2 == 0 && value.size > 1) 24.dp else 0.dp)
@@ -78,17 +85,20 @@ fun DrinkList(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DrinkListItem(
     data: Drink,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onDoubleClick: () -> Unit = {},
+    onHeartClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
             .aspectRatio(0.8F)
             .clip(RoundedCornerShape(16.dp))
-            .clickable(onClick = onClick)
+            .combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
     ) {
         CoilImage(
             data = data.displayImageUrl,
@@ -127,7 +137,7 @@ private fun DrinkListItem(
                 .align(Alignment.BottomStart)
         )
         IconButton(
-            onClick = { },
+            onClick = onHeartClick,
             modifier = Modifier
                 .align(Alignment.TopEnd)
                 .padding(4.dp)
