@@ -69,19 +69,19 @@ fun HomeScreen() {
             composable(TabScreen.Discovery.route) {
                 DiscoveryScreen(
                     modifier = Modifier.padding(innerPadding),
-                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 64.dp)
+                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 72.dp)
                 )
             }
             composable(TabScreen.Search.route) {
                 SearchScreen(
                     modifier = Modifier.padding(innerPadding),
-                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 64.dp)
+                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 72.dp)
                 )
             }
             composable(TabScreen.Favorites.route) {
                 FavoritesScreen(
                     modifier = Modifier.padding(innerPadding),
-                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 64.dp)
+                    contentPadding = insets.navigationBars.toPaddingValues(additionalBottom = 72.dp)
                 )
             }
         }
