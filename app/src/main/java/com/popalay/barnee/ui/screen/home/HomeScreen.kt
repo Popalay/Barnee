@@ -7,6 +7,7 @@ import androidx.compose.material.BottomAppBar
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.FabPosition.Center
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,15 +21,15 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.insets.LocalWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
+import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.favorites.FavoritesScreen
 import com.popalay.barnee.ui.screen.navigation.TabScreen
 import com.popalay.barnee.ui.screen.navigation.homeScreens
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.toPaddingValues
 
 @Composable
 fun HomeScreen() {
@@ -41,6 +42,7 @@ fun HomeScreen() {
             val navBackStackEntry by localNavController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
             BottomAppBar(
+                backgroundColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.93F),
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .navigationBarsPadding()
@@ -51,6 +53,7 @@ fun HomeScreen() {
                     BottomNavigationItem(
                         icon = { Icon(screen.icon, screen.title) },
                         selected = currentRoute == screen.route,
+                        selectedContentColor = MaterialTheme.colors.primary,
                         onClick = {
                             localNavController.navigate(screen.route) {
                                 popUpTo = localNavController.graph.startDestination
