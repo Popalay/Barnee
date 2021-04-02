@@ -21,7 +21,6 @@ import com.popalay.barnee.ui.screen.categorydrinks.CategoryDrinksScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
 import com.popalay.barnee.ui.screen.home.HomeScreen
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.receipt.ReceiptScreen
 import com.popalay.barnee.ui.screen.similardrinks.SimilarDrinksScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 
@@ -63,20 +62,6 @@ fun ComposeApp() {
                         alias = it.arguments?.getString("alias").orEmpty(),
                         image = it.arguments?.getString("image").orEmpty(),
                         name = it.arguments?.getString("name").orEmpty()
-                    )
-                }
-                composable(
-                    "receipt?steps={steps}&image={image}&video={video}",
-                    arguments = listOf(
-                        navArgument("steps") { type = NavType.StringType },
-                        navArgument("image") { type = NavType.StringType },
-                        navArgument("video") { type = NavType.StringType },
-                    )
-                ) {
-                    ReceiptScreen(
-                        steps = it.arguments?.getString("steps").orEmpty().split("::"),
-                        image = it.arguments?.getString("image").orEmpty(),
-                        video = it.arguments?.getString("video").orEmpty(),
                     )
                 }
                 composable(

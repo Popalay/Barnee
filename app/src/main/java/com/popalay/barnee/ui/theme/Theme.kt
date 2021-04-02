@@ -10,12 +10,12 @@ import androidx.compose.ui.graphics.Color
 
 private val DarkColorPalette = darkColors(
     primary = Yellow,
-    primaryVariant = Grey,
+    primaryVariant = DarkYellow,
     secondary = Green,
     surface = DarkGrey,
     background = DarkGrey,
     onPrimary = White,
-    onSurface = Black,
+    onSurface = White,
     onBackground = White
 )
 
@@ -31,6 +31,7 @@ private val LightColorPalette = lightColors(
 )
 
 val Colors.shadow get() = Color(0xCC15181B)
+val Colors.backgroundVariant get() = Grey
 
 @Composable
 fun BarneeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {

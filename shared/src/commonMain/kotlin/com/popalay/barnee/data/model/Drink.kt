@@ -14,4 +14,7 @@ data class Drink(
 ) {
     @Transient
     val displayImageUrl = images.last().uri
+
+    @Transient
+    val displayName = name.toLowerCase()
 }
