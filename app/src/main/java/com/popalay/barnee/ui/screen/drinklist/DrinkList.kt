@@ -15,14 +15,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.GridCells.Fixed
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -74,8 +73,8 @@ fun DrinkList(
                     onDoubleClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
                     modifier = modifier
-                        .padding(start = 12.dp, end = 12.dp, bottom = 0.dp)
                         .padding(top = if (index % 2 == 0 && value.size > 1) 24.dp else 0.dp)
+                        .padding(start = 12.dp, end = 12.dp, bottom = 0.dp)
                 )
             }
             item { Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding())) }
@@ -93,58 +92,60 @@ private fun DrinkListItem(
     onDoubleClick: () -> Unit = {},
     onHeartClick: () -> Unit = {}
 ) {
-    Box(
-        modifier = modifier
-            .aspectRatio(0.8F)
-            .clip(RoundedCornerShape(16.dp))
-            .combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
+    Card(
+        elevation = 4.dp,
+        modifier = modifier.aspectRatio(0.8F)
     ) {
-        CoilImage(
-            data = data.displayImageUrl,
-            fadeIn = true,
-            contentScale = ContentScale.Crop,
-            contentDescription = null,
-            loading = { Box(modifier = Modifier.background(MaterialTheme.colors.primaryVariant)) },
-            modifier = Modifier.fillMaxSize()
-        )
-        Text(
-            text = buildAnnotatedString {
-                append(data.name.toLowerCase(Locale.getDefault()))
-                withStyle(
-                    SpanStyle(
-                        color = MaterialTheme.colors.primary,
-                        fontStyle = MaterialTheme.typography.h3.fontStyle,
-                        fontFamily = MaterialTheme.typography.h3.fontFamily,
-                        fontWeight = MaterialTheme.typography.h3.fontWeight,
-                        fontSize = MaterialTheme.typography.h3.fontSize
-                    )
-                ) {
-                    append("  " + (data.rating / 10F).toString())
-                }
-            },
-            style = MaterialTheme.typography.h2,
-            textAlign = Start,
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.verticalGradient(
-                        0.1f to Color.Transparent,
-                        0.7f to Color.Black.copy(alpha = 0.5F)
-                    )
-                )
-                .padding(16.dp)
-                .align(Alignment.BottomStart)
-        )
-        IconButton(
-            onClick = onHeartClick,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .padding(4.dp)
+        Box(
+            modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
         ) {
-            Image(
-                painter = painterResource(id = if (data.isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart),
-                contentDescription = "Like"
+            CoilImage(
+                data = data.displayImageUrl,
+                fadeIn = true,
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+                loading = { Box(modifier = Modifier.background(MaterialTheme.colors.primaryVariant)) },
+                modifier = Modifier.fillMaxSize()
             )
+            Text(
+                text = buildAnnotatedString {
+                    append(data.name.toLowerCase(Locale.getDefault()))
+                    withStyle(
+                        SpanStyle(
+                            color = MaterialTheme.colors.primary,
+                            fontStyle = MaterialTheme.typography.h3.fontStyle,
+                            fontFamily = MaterialTheme.typography.h3.fontFamily,
+                            fontWeight = MaterialTheme.typography.h3.fontWeight,
+                            fontSize = MaterialTheme.typography.h3.fontSize
+                        )
+                    ) {
+                        append("  " + (data.rating / 10F).toString())
+                    }
+                },
+                style = MaterialTheme.typography.h2,
+                textAlign = Start,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.verticalGradient(
+                            0.1f to Color.Transparent,
+                            0.7f to Color.Black.copy(alpha = 0.5F)
+                        )
+                    )
+                    .padding(16.dp)
+                    .align(Alignment.BottomStart)
+            )
+            IconButton(
+                onClick = onHeartClick,
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(4.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = if (data.isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart),
+                    contentDescription = "Like"
+                )
+            }
         }
     }
 }
