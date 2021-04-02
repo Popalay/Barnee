@@ -41,7 +41,6 @@ import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinklist.DrinkListAction
 import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
 import com.popalay.barnee.ui.screen.navigation.Screen
-import com.popalay.barnee.ui.theme.LightGrey
 import org.koin.androidx.compose.getViewModel
 import java.util.Locale
 
@@ -105,7 +104,7 @@ private fun DrinkListItem(
             fadeIn = true,
             contentScale = ContentScale.Crop,
             contentDescription = null,
-            loading = { Box(modifier = Modifier.background(LightGrey)) },
+            loading = { Box(modifier = Modifier.background(MaterialTheme.colors.primaryVariant)) },
             modifier = Modifier.fillMaxSize()
         )
         Text(
