@@ -30,6 +30,7 @@ import com.popalay.barnee.ui.screen.navigation.TabScreen
 import com.popalay.barnee.ui.screen.navigation.homeScreens
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.theme.backgroundVariant
 
 @Composable
 fun HomeScreen() {
@@ -42,7 +43,7 @@ fun HomeScreen() {
             val navBackStackEntry by localNavController.currentBackStackEntryAsState()
             val currentRoute = navBackStackEntry?.arguments?.getString(KEY_ROUTE)
             BottomAppBar(
-                backgroundColor = MaterialTheme.colors.primaryVariant.copy(alpha = 0.93F),
+                backgroundColor = MaterialTheme.colors.backgroundVariant.copy(alpha = 0.93F),
                 modifier = Modifier
                     .padding(horizontal = 24.dp)
                     .navigationBarsPadding()

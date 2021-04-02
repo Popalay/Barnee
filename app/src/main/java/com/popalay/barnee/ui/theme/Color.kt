@@ -3,7 +3,7 @@ package com.popalay.barnee.ui.theme
 import androidx.compose.ui.graphics.Color
 
 val Yellow = Color(0xFFEEAF75)
-val DarkYellow = Color(0xFFF3C24A)
+val DarkYellow = Color(0xFF967354)
 val DarkGrey = Color(0xFF1C2126)
 val Grey = Color(0xFF565656)
 val LightGrey = Color(0xFF939393)

@@ -9,7 +9,6 @@ import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
 import com.popalay.barnee.domain.favorites.FavoritesStateMachine
-import com.popalay.barnee.domain.receipt.ReceiptStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.similardrinks.SimilarDrinksStateMachine
 import kotlinx.serialization.json.Json
@@ -35,7 +34,6 @@ val commonModule = module {
     factory { CategoryDrinksStateMachine(get()) }
     factory { DrinkStateMachine(get()) }
     factory { FavoritesStateMachine(get()) }
-    factory { ReceiptStateMachine() }
     factory { SearchStateMachine(get()) }
     factory { SimilarDrinksStateMachine(get()) }
     factory { DrinkListStateMachine(get()) }

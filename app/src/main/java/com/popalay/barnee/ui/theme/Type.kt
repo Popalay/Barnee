@@ -44,7 +44,6 @@ val Typography = Typography(
     body1 = TextStyle(
         fontFamily = Roboto,
         fontWeight = FontWeight.Medium,
-        letterSpacing = 1.5.sp,
         fontSize = 16.sp
     ),
     body2 = TextStyle(

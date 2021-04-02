@@ -40,8 +40,8 @@ import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinklist.DrinkListAction
 import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
 import com.popalay.barnee.ui.screen.navigation.Screen
+import com.popalay.barnee.ui.theme.backgroundVariant
 import org.koin.androidx.compose.getViewModel
-import java.util.Locale
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -69,7 +69,7 @@ fun DrinkList(
             itemsIndexed(value) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { navController.navigate(Screen.Drink(item.alias, item.name, item.displayImageUrl).route) },
+                    onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
                     onDoubleClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
                     modifier = modifier
@@ -104,12 +104,12 @@ private fun DrinkListItem(
                 fadeIn = true,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
-                loading = { Box(modifier = Modifier.background(MaterialTheme.colors.primaryVariant)) },
+                loading = { Box(modifier = Modifier.background(MaterialTheme.colors.backgroundVariant)) },
                 modifier = Modifier.fillMaxSize()
             )
             Text(
                 text = buildAnnotatedString {
-                    append(data.name.toLowerCase(Locale.getDefault()))
+                    append(data.displayName)
                     withStyle(
                         SpanStyle(
                             color = MaterialTheme.colors.primary,
