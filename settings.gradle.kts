@@ -11,3 +11,5 @@ rootProject.name = "Barnee"
 
 include(":app")
 include(":shared")
+
+enableFeaturePreview("VERSION_CATALOGS")

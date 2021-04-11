@@ -2,7 +2,7 @@ package com.popalay.barnee.data.remote
 
 import org.jsoup.Jsoup
 
-actual class HtmlExtractor actual constructor() {
+actual class HtmlExtractor {
     actual fun extract(url: String, selector: String): String {
         val document = Jsoup.connect(url).get()
         val scripts = document.head().select(selector)
