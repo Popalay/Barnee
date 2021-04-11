@@ -22,7 +22,6 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -126,12 +125,7 @@ private fun DrinkListItem(
                 textAlign = Start,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(
-                        brush = Brush.verticalGradient(
-                            0.1f to Color.Transparent,
-                            0.7f to Color.Black.copy(alpha = 0.5F)
-                        )
-                    )
+                    .scrim(listOf(Color.Transparent, Color.Black.copy(alpha = 0.7F)))
                     .padding(16.dp)
                     .align(Alignment.BottomStart)
             )
