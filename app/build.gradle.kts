@@ -1,9 +1,12 @@
+import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
+
 plugins {
     id("com.android.application")
     kotlin("android")
 }
 
 dependencies {
+    add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.compose.compiler)
     implementation(project(":shared"))
     implementation(libs.bundles.compose)
     implementation(libs.activity.compose)
@@ -16,6 +19,7 @@ dependencies {
     implementation(libs.youtubeExtractor)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
+    implementation(libs.palette)
 }
 
 android {
@@ -43,11 +47,5 @@ android {
             "-Xopt-in=kotlin.RequiresOptIn",
             "-Xopt-in=kotlin.OptIn"
         )
-    }
-    buildFeatures {
-        compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.0.0-beta03"
     }
 }

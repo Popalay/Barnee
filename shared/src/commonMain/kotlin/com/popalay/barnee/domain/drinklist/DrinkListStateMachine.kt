@@ -28,7 +28,7 @@ sealed class DrinkListOutput : Output {
 class DrinkListStateMachine(
     private val drinkRepository: DrinkRepository
 ) : StateMachine<DrinkListState, DrinkListAction, DrinkListOutput>(DrinkListState()) {
-    override val processor: Processor<DrinkListState, DrinkListOutput> = { state ->
+    override val processor: Processor<DrinkListState, DrinkListOutput> = {
         merge(
             filterIsInstance<ToggleFavorite>()
                 .map { drinkRepository.toggleFavoriteFor(it.alias) }

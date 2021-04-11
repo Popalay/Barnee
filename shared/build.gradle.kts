@@ -6,7 +6,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
     id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
-    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.31")
+    id("org.jetbrains.kotlin.plugin.serialization") version ("1.4.32")
 }
 
 // CocoaPods requires the podspec to have a version.
@@ -41,6 +41,8 @@ kotlin {
         all {
             languageSettings.apply {
                 useExperimentalAnnotation("kotlin.RequiresOptIn")
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
             }
         }
         configurations {
