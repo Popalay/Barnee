@@ -118,7 +118,7 @@ private fun DrinkListItem(
                             fontSize = MaterialTheme.typography.h3.fontSize
                         )
                     ) {
-                        append("  " + (data.rating / 10F).toString())
+                        append("  " + data.displayRating)
                     }
                 },
                 style = MaterialTheme.typography.h2,

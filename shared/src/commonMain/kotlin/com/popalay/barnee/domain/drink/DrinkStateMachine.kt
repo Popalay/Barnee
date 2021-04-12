@@ -1,6 +1,7 @@
 package com.popalay.barnee.domain.drink
 
-import com.popalay.barnee.data.model.Receipt
+import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Output
@@ -13,7 +14,7 @@ import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.drink.DrinkAction.Initial
 import com.popalay.barnee.domain.drink.DrinkAction.ToggleFavorite
 import com.popalay.barnee.domain.drink.DrinkAction.TogglePlaying
-import com.popalay.barnee.domain.drink.DrinkOutput.ReceiptResult
+import com.popalay.barnee.domain.drink.DrinkOutput.DrinkWithRelatedOutput
 import com.popalay.barnee.domain.drink.DrinkOutput.ToggleFavoriteOutput
 import com.popalay.barnee.domain.drink.DrinkOutput.TogglePlayingOutput
 import kotlinx.coroutines.flow.filterIsInstance
@@ -22,7 +23,8 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.take
 
 data class DrinkState(
-    val receipt: Result<Receipt> = Uninitialized(),
+    val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
+    val relatedDrinks: List<Drink> = emptyList(),
     val isPlaying: Boolean = false
 ) : State
 
@@ -33,7 +35,7 @@ sealed class DrinkAction : Action {
 }
 
 sealed class DrinkOutput : Output {
-    data class ReceiptResult(val data: Result<Receipt>) : DrinkOutput()
+    data class DrinkWithRelatedOutput(val data: Result<FullDrinkResponse>) : DrinkOutput()
     data class ToggleFavoriteOutput(val data: Boolean) : DrinkOutput()
     data class TogglePlayingOutput(val data: Boolean) : DrinkOutput()
 }
@@ -45,8 +47,8 @@ class DrinkStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.getReceipt(it.alias) }
-                .map { ReceiptResult(it) },
+                .flatMapToResult { drinkRepository.getFullDrink(it.alias) }
+                .map { DrinkWithRelatedOutput(it) },
             filterIsInstance<ToggleFavorite>()
                 .map { drinkRepository.toggleFavoriteFor(it.alias) }
                 .map { ToggleFavoriteOutput(it) },
@@ -58,7 +60,7 @@ class DrinkStateMachine(
 
     override val reducer: Reducer<DrinkState, DrinkOutput> = { result ->
         when (result) {
-            is ReceiptResult -> copy(receipt = result.data)
+            is DrinkWithRelatedOutput -> copy(drinkWithRelated = result.data)
             is ToggleFavoriteOutput -> this
             is TogglePlayingOutput -> copy(isPlaying = result.data)
         }
