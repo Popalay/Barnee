@@ -4,5 +4,5 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Nutrition(
-    val calories: String
+    val totalCalories: Int
 )

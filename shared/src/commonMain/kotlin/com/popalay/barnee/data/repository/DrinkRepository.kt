@@ -3,7 +3,7 @@ package com.popalay.barnee.data.repository
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.data.model.Receipt
+import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.Api
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -47,10 +47,12 @@ class DrinkRepository(
     fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
         .map { favorites -> api.drinksByAliases(favorites.toList()).map { it.copy(isFavorite = true) } }
 
-    fun getReceipt(alias: String): Flow<Receipt> = flow { emit(api.getReceipt(alias)) }
-        .flatMapLatest { receipt ->
+    fun getFullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
+        .flatMapLatest { response ->
             localStore.getFavoriteDrinks()
-                .map { receipt.copy(isFavorite = alias in it) }
+                .map { favorites ->
+                    response.copy(result = response.result.map { it.copy(isFavorite = it.alias in favorites) })
+                }
         }
 
     suspend fun saveAsFavorite(alias: String) {

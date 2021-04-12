@@ -71,7 +71,6 @@ kotlin {
                 implementation(libs.datastore.runtime)
                 implementation(libs.datastore.preferences)
                 implementation(libs.ktor.android)
-                implementation(libs.jsoup)
                 implementation(libs.settingsdatastore)
             }
         }

@@ -2,7 +2,6 @@ package com.popalay.barnee.di
 
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.remote.Api
-import com.popalay.barnee.data.remote.HtmlExtractor
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.categorydrinks.CategoryDrinksStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
@@ -18,7 +17,7 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 val commonModule = module {
-    single { Api(get(), get()) }
+    single { Api(get()) }
     single { LocalStore(get()) }
     single {
         Json {
@@ -28,7 +27,6 @@ val commonModule = module {
         }
     }
     single { DrinkRepository(get(), get()) }
-    single { HtmlExtractor() }
 
     factory { DiscoveryStateMachine(get()) }
     factory { CategoryDrinksStateMachine(get()) }
