@@ -30,19 +30,12 @@ private val LightColorPalette = lightColors(
     onBackground = Black
 )
 
-val Colors.shadow get() = Color(0xCC15181B)
 val Colors.backgroundVariant get() = Grey
 
 @Composable
 fun BarneeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
-    val colors = if (darkTheme) {
-        DarkColorPalette
-    } else {
-        LightColorPalette
-    }
-
     MaterialTheme(
-        colors = colors,
+        colors = DarkColorPalette,
         typography = Typography,
         shapes = Shapes,
         content = content
