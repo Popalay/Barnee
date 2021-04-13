@@ -34,14 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
-import com.popalay.barnee.ui.common.DrinkList
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
+import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import org.koin.androidx.compose.getViewModel
 
@@ -51,7 +49,6 @@ fun SearchScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val navController: NavController = LocalNavController.current
     val viewModel: SearchViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
     val scaffoldState = rememberBackdropScaffoldState(Concealed)
@@ -110,8 +107,7 @@ fun SearchScreen(
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp)
                 )
-                DrinkList(
-                    navController = navController,
+                DrinkGrid(
                     drinks = state.drinks,
                     emptyMessage = "We currently have no drinks on your request",
                     contentPadding = contentPadding

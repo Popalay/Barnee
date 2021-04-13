@@ -8,14 +8,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.popalay.barnee.R.drawable
+import com.popalay.barnee.ui.screen.navigation.LocalNavController
 
 @Composable
-fun BackButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun BackButton(modifier: Modifier = Modifier) {
+    val navController = LocalNavController.current
     IconButton(
-        onClick = onClick,
+        onClick = { navController.popBackStack() },
         modifier = modifier
     ) {
         Icon(

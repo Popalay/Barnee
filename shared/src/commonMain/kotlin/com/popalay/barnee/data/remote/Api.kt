@@ -34,8 +34,7 @@ class Api(json: Json) {
     suspend fun drinksByTags(tags: List<String>): List<Drink> =
         client.get<DrinksResponse>("${baseUrl}drinks/is/specificImage/InEnvironment/tag/${tags.joinToString(",")}?exactmatch=true&take=100").result
 
-    suspend fun similarDrinks(alias: String): List<Drink> =
-        client.get<DrinksResponse>("${baseUrl}drinks/like/${alias}/is/specificImage/InEnvironment?take=100").result
+    suspend fun similarDrinks(alias: String): List<Drink> = getFullDrink(alias).relatedDrinks
 
     suspend fun searchDrinks(query: String): List<Drink> =
         client.get<DrinksResponse>("${baseUrl}drinks/$query/is/specificImage/InEnvironment?take=100").result

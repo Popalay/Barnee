@@ -41,6 +41,11 @@ data class FullDrink(
 
     @Transient
     val displayRating = (rating / 10F).toString()
+
+    @Transient
+    val keywords = (categories + collections + occasions)
+        .map { it.text.toLowerCase() }
+        .filter { it != "unknown" }
 }
 
 @Serializable
