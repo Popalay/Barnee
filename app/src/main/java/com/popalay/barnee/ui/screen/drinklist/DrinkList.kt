@@ -4,9 +4,11 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -28,10 +30,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign.Start
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.CoilImage
@@ -137,29 +136,29 @@ private fun DrinkListItem(
                 loading = { Box(modifier = Modifier.background(MaterialTheme.colors.backgroundVariant)) },
                 modifier = Modifier.fillMaxSize()
             )
-            Text(
-                text = buildAnnotatedString {
-                    append(data.displayName)
-                    withStyle(
-                        SpanStyle(
-                            color = MaterialTheme.colors.primary,
-                            fontStyle = MaterialTheme.typography.h3.fontStyle,
-                            fontFamily = MaterialTheme.typography.h3.fontFamily,
-                            fontWeight = MaterialTheme.typography.h3.fontWeight,
-                            fontSize = MaterialTheme.typography.h3.fontSize
-                        )
-                    ) {
-                        append("  " + data.displayRating)
-                    }
-                },
-                style = MaterialTheme.typography.h2,
-                textAlign = Start,
+            Row(
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
                     .scrim(listOf(Color.Transparent, Color.Black.copy(alpha = 0.7F)))
                     .padding(16.dp)
                     .align(Alignment.BottomStart)
-            )
+            ) {
+                Text(
+                    text = data.displayName,
+                    style = MaterialTheme.typography.h2,
+                    textAlign = Start,
+                    modifier = Modifier
+                        .fillMaxWidth(fraction = 0.7F)
+                        .padding(end = 8.dp)
+                )
+                Text(
+                    text = data.displayRating,
+                    style = MaterialTheme.typography.h3,
+                    color = MaterialTheme.colors.primary
+                )
+            }
             IconButton(
                 onClick = onHeartClick,
                 modifier = Modifier
