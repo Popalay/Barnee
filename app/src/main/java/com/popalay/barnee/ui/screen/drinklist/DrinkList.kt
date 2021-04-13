@@ -1,10 +1,11 @@
-package com.popalay.barnee.ui.common
+package com.popalay.barnee.ui.screen.drinklist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
@@ -12,7 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells.Fixed
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
@@ -30,28 +33,31 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign.Start
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.CoilImage
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.drinklist.DrinkListAction
-import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
+import com.popalay.barnee.domain.drinklist.DrinkListAction.ToggleFavorite
+import com.popalay.barnee.ui.common.EmptyStateView
+import com.popalay.barnee.ui.common.LoadingStateView
+import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.common.scrim
+import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.backgroundVariant
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun DrinkList(
+fun DrinkGrid(
     drinks: Result<List<Drink>>,
-    navController: NavController,
     emptyMessage: String,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewModel: DrinkListViewModel = getViewModel()
+    val navController = LocalNavController.current
 
     StateLayout(
         value = drinks,
@@ -69,8 +75,8 @@ fun DrinkList(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
-                    onDoubleClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
-                    onHeartClick = { viewModel.processAction(DrinkListAction.ToggleFavorite(item.alias)) },
+                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
+                    onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     modifier = modifier
                         .padding(top = if (index % 2 == 0 && value.size > 1) 24.dp else 0.dp)
                         .padding(start = 12.dp, end = 12.dp, bottom = 0.dp)
@@ -78,6 +84,31 @@ fun DrinkList(
             }
             item { Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding())) }
             item { Spacer(modifier = Modifier.height(contentPadding.calculateBottomPadding())) }
+        }
+    }
+}
+
+@Composable
+fun DrinkHorizontalList(
+    data: List<Drink>,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(0.dp)
+) {
+    val viewModel: DrinkListViewModel = getViewModel()
+    val navController = LocalNavController.current
+
+    BoxWithConstraints {
+        LazyRow(contentPadding = contentPadding) {
+            itemsIndexed(data) { index, item ->
+                DrinkListItem(
+                    item,
+                    onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
+                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
+                    onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
+                    modifier = modifier.width(maxWidth / 3)
+                )
+                if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))
+            }
         }
     }
 }

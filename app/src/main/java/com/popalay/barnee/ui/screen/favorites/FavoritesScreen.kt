@@ -11,11 +11,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.popalay.barnee.ui.common.DrinkList
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.theme.BarneeTheme
 import com.google.accompanist.insets.statusBarsPadding
+import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
+import com.popalay.barnee.ui.theme.BarneeTheme
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -23,7 +21,6 @@ fun FavoritesScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val navController: NavController = LocalNavController.current
     val viewModel: FavoritesViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
 
@@ -33,8 +30,7 @@ fun FavoritesScreen(
             style = MaterialTheme.typography.h1,
             modifier = Modifier.padding(top = 16.dp, start = 16.dp)
         )
-        DrinkList(
-            navController = navController,
+        DrinkGrid(
             drinks = state.drinks,
             emptyMessage = "You don't have favorites drinks yet",
             contentPadding = contentPadding

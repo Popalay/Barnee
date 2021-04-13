@@ -51,17 +51,12 @@ class DrinkRepository(
         .flatMapLatest { response ->
             localStore.getFavoriteDrinks()
                 .map { favorites ->
-                    response.copy(result = response.result.map { it.copy(isFavorite = it.alias in favorites) })
+                    response.copy(
+                        relatedDrinks = response.relatedDrinks.map { it.copy(isFavorite = it.alias in favorites) },
+                        result = response.result.map { it.copy(isFavorite = it.alias in favorites) }
+                    )
                 }
         }
-
-    suspend fun saveAsFavorite(alias: String) {
-        localStore.saveFavorite(alias)
-    }
-
-    suspend fun removeFromFavorites(alias: String) {
-        localStore.removeFavorite(alias)
-    }
 
     suspend fun toggleFavoriteFor(alias: String): Boolean {
         val favorites = localStore.getFavoriteDrinks().first()
@@ -72,6 +67,14 @@ class DrinkRepository(
             saveAsFavorite(alias)
         }
         return !isInFavorites
+    }
+
+    private suspend fun saveAsFavorite(alias: String) {
+        localStore.saveFavorite(alias)
+    }
+
+    private suspend fun removeFromFavorites(alias: String) {
+        localStore.removeFavorite(alias)
     }
 
     private fun mapFavorites(drinks: List<Drink>) = localStore.getFavoriteDrinks()

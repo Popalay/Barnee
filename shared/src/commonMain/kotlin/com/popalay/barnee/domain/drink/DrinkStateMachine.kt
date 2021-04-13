@@ -1,6 +1,5 @@
 package com.popalay.barnee.domain.drink
 
-import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
@@ -24,7 +23,6 @@ import kotlinx.coroutines.flow.take
 
 data class DrinkState(
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
-    val relatedDrinks: List<Drink> = emptyList(),
     val isPlaying: Boolean = false
 ) : State
 

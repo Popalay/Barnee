@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -16,11 +15,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import com.popalay.barnee.ui.common.DrinkList
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.theme.BarneeTheme
 import com.google.accompanist.insets.statusBarsPadding
+import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
+import com.popalay.barnee.ui.theme.BarneeTheme
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -31,7 +28,6 @@ fun SimilarDrinksScreen(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val navController: NavController = LocalNavController.current
     val viewModel: SimilarDrinksViewModel = getViewModel { parametersOf(alias) }
     val state by viewModel.stateFlow.collectAsState()
 
@@ -52,8 +48,7 @@ fun SimilarDrinksScreen(
                 .padding(top = 16.dp)
                 .padding(horizontal = 16.dp)
         )
-        DrinkList(
-            navController = navController,
+        DrinkGrid(
             drinks = state.drinks,
             emptyMessage = "We don't have any drinks for this category",
             contentPadding = contentPadding
