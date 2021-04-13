@@ -44,6 +44,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
+import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.theme.backgroundVariant
 import org.koin.androidx.compose.getViewModel
 
@@ -123,6 +124,7 @@ private fun DrinkListItem(
 ) {
     Card(
         elevation = 4.dp,
+        shape = MediumSquircleShape,
         modifier = modifier.aspectRatio(0.8F)
     ) {
         Box(
