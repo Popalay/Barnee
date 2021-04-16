@@ -169,7 +169,7 @@ private fun DrinkAppBar(
 ) {
     Card(
         elevation = 4.dp,
-        shape = MaterialTheme.shapes.medium.copy(topStart = CornerSize(0), topEnd = CornerSize(0)),
+        shape = MaterialTheme.shapes.large.copy(topStart = CornerSize(0), topEnd = CornerSize(0)),
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(0.8F)

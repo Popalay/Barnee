@@ -17,9 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.GridCells.Fixed
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.LazyVerticalGrid
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -54,6 +56,7 @@ fun DrinkGrid(
     drinks: Result<List<Drink>>,
     emptyMessage: String,
     modifier: Modifier = Modifier,
+    listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewModel: DrinkListViewModel = getViewModel()
@@ -61,13 +64,25 @@ fun DrinkGrid(
 
     StateLayout(
         value = drinks,
-        emptyState = { EmptyStateView(message = emptyMessage) },
-        errorState = { EmptyStateView(message = emptyMessage) },
-        loadingState = { LoadingStateView() }
+        emptyState = {
+            EmptyStateView(
+                message = emptyMessage,
+                modifier = modifier
+            )
+        },
+        errorState = {
+            EmptyStateView(
+                message = emptyMessage,
+                modifier = modifier
+            )
+        },
+        loadingState = { LoadingStateView(modifier = modifier) }
     ) { value ->
         LazyVerticalGrid(
             cells = Fixed(2),
-            contentPadding = PaddingValues(12.dp)
+            state = listState,
+            contentPadding = PaddingValues(12.dp),
+            modifier = modifier
         ) {
             item { Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding())) }
             item { Spacer(modifier = Modifier.height(contentPadding.calculateTopPadding())) }
@@ -77,8 +92,8 @@ fun DrinkGrid(
                     onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
-                    modifier = modifier
-                        .padding(top = if (index % 2 == 0 && value.size > 1) 24.dp else 0.dp)
+                    modifier = Modifier
+                        .padding(top = if (index % 2 == 1 && value.size > 1) 24.dp else 0.dp)
                         .padding(start = 12.dp, end = 12.dp, bottom = 0.dp)
                 )
             }
@@ -98,14 +113,17 @@ fun DrinkHorizontalList(
     val navController = LocalNavController.current
 
     BoxWithConstraints {
-        LazyRow(contentPadding = contentPadding) {
+        LazyRow(
+            contentPadding = contentPadding,
+            modifier = modifier
+        ) {
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
-                    modifier = modifier.width(maxWidth / 3)
+                    modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))
             }

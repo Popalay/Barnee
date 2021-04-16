@@ -1,6 +1,7 @@
 package com.popalay.barnee.data.model
 
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 @Serializable
 data class AggregationResponse(
@@ -24,4 +25,7 @@ data class Aggregation(
 @Serializable
 data class AggregationGroup(
     val values: Map<String, Int>
-)
+) {
+    @Transient
+    val displayNames = values.keys.map { it.replace(' ', '-') to it.toLowerCase().replace('-', ' ') }
+}
