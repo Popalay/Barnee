@@ -48,4 +48,7 @@ android {
             "-Xopt-in=kotlin.OptIn"
         )
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+    }
 }
