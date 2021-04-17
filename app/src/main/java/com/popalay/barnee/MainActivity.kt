@@ -1,6 +1,6 @@
 package com.popalay.barnee
 
-import android.content.res.Configuration.UI_MODE_NIGHT_YES
+import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -99,9 +99,9 @@ fun ComposeApp() {
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
-@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = UI_MODE_NIGHT_YES)
+@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun LightPreview() {
+fun ComposeAppPreview() {
     BarneeTheme {
         ComposeApp()
     }

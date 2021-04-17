@@ -1,5 +1,6 @@
 package com.popalay.barnee.ui.screen.drink
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -405,17 +406,10 @@ fun RecommendedDrinks(
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
+@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun DrinkScreenLightPreview() {
+fun DrinkScreenPreview() {
     BarneeTheme {
-        DrinkScreen("alias", "name", "sample.png")
-    }
-}
-
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
-@Composable
-fun DrinkScreenDarkPreview() {
-    BarneeTheme(darkTheme = true) {
         DrinkScreen("alias", "name", "sample.png")
     }
 }

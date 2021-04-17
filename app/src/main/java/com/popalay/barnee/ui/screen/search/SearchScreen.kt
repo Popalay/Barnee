@@ -1,16 +1,15 @@
 package com.popalay.barnee.ui.screen.search
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -31,7 +30,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -46,13 +44,13 @@ import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
 import com.popalay.barnee.domain.search.SearchAction.QueryChanged
+import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
@@ -176,31 +174,20 @@ private fun SearchAppBar(
     onFilterClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .fillMaxWidth()
-            .statusBarsPadding()
-            .padding(8.dp)
-    ) {
-        BackButton()
-        Text(
-            text = "Search",
-            style = MaterialTheme.typography.h2,
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1F)
-        )
-        IconButton(onClick = onFilterClick) {
-            Icon(
-                painter = painterResource(R.drawable.ic_filter),
-                contentDescription = "Filter",
-                modifier = Modifier.size(32.dp)
-            )
+    ActionsAppBar(
+        title = "Search",
+        modifier = modifier,
+        leadingButtons = { BackButton() },
+        trailingButtons = {
+            IconButton(onClick = onFilterClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_filter),
+                    contentDescription = "Filter",
+                )
+            }
         }
-    }
+    )
 }
-
 
 @Composable
 private fun Filters(
@@ -274,17 +261,10 @@ private fun AggregationGroup(
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
+@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun SearchScreenLightPreview() {
+fun SearchScreenPreview() {
     BarneeTheme {
-        SearchScreen()
-    }
-}
-
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
-@Composable
-fun SearchScreenDarkPreview() {
-    BarneeTheme(darkTheme = true) {
         SearchScreen()
     }
 }
