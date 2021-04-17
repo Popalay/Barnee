@@ -1,19 +1,19 @@
 package com.popalay.barnee.ui.screen.favorites
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.statusBarsPadding
 import com.google.accompanist.insets.toPaddingValues
+import com.popalay.barnee.ui.common.ActionsAppBar
+import com.popalay.barnee.ui.common.BackButton
+import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import org.koin.androidx.compose.getViewModel
@@ -23,18 +23,16 @@ fun FavoritesScreen() {
     val viewModel: FavoritesViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .statusBarsPadding()
-    ) {
-        Text(
-            text = "Favorites",
-            style = MaterialTheme.typography.h1,
-            modifier = Modifier.padding(top = 16.dp, start = 16.dp)
+    Column(modifier = Modifier.fillMaxSize()) {
+        val listState = rememberLazyListState()
+        ActionsAppBar(
+            title = "Favorites",
+            leadingButtons = { BackButton() },
+            modifier = Modifier.liftOnScroll(listState)
         )
         DrinkGrid(
             drinks = state.drinks,
+            listState = listState,
             emptyMessage = "You don't have\nfavorites drinks yet",
             contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues()
         )
@@ -42,17 +40,10 @@ fun FavoritesScreen() {
 }
 
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
+@Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun FavoritesScreenLightPreview() {
+fun FavoritesScreenPreview() {
     BarneeTheme {
-        FavoritesScreen()
-    }
-}
-
-@Preview("Dark Theme", widthDp = 360, heightDp = 640)
-@Composable
-fun FavoritesScreenDarkPreview() {
-    BarneeTheme(darkTheme = true) {
         FavoritesScreen()
     }
 }
