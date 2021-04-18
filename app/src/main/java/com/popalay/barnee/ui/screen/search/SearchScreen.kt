@@ -41,10 +41,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
@@ -115,7 +113,6 @@ fun SearchScreen() {
                     drinks = state.drinks,
                     emptyMessage = "We currently have no drinks\non your request",
                     listState = listState,
-                    contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues(),
                     modifier = Modifier.weight(1F)
                 )
                 SearchTextField(
