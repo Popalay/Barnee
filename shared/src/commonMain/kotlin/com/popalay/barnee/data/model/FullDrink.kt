@@ -31,7 +31,7 @@ data class FullDrink(
     val isFavorite: Boolean = false
 ) {
     @Transient
-    val displayImageUrl = images.last().uri
+    val displayImageUrl = images.lastOrNull()?.uri.orEmpty()
 
     @Transient
     val displayName = name.toLowerCase().removePrefix("absolut ")
@@ -78,5 +78,6 @@ data class InstructionStep(
 @Serializable
 data class Category(
     val text: String,
-    val alias: String
+    val alias: String,
+    val image: String = ""
 )
