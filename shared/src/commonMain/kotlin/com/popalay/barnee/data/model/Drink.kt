@@ -13,7 +13,7 @@ data class Drink(
     val isFavorite: Boolean = false
 ) {
     @Transient
-    val displayImageUrl = images.last().uri
+    val displayImageUrl = images.lastOrNull()?.uri.orEmpty()
 
     @Transient
     val displayName = name.toLowerCase().removePrefix("absolut ")
