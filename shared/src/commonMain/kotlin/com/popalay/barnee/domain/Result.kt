@@ -12,7 +12,8 @@ data class Success<out T>(private val value: T) : Result<T>(complete = true, sho
     override operator fun invoke(): T = value
 }
 
-data class Fail<out T>(val error: Throwable, private val value: T? = null) : Result<T>(complete = true, shouldLoad = true, value = value) {
+data class Fail<out T>(val error: Throwable, private val value: T? = null) :
+    Result<T>(complete = true, shouldLoad = true, value = value) {
     override fun equals(other: Any?): Boolean {
         if (other !is Fail<*>) return false
 
@@ -24,3 +25,9 @@ data class Fail<out T>(val error: Throwable, private val value: T? = null) : Res
 
     override fun hashCode(): Int = arrayOf(error::class, error.message, error.stackTraceToString()).contentHashCode()
 }
+
+val <T : Any?> Result<T>.isEmpty
+    get() = when {
+        this() is List<*> -> (this() as List<*>).isEmpty()
+        else -> this() == null
+    }

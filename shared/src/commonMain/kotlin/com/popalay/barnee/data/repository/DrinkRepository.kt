@@ -29,14 +29,15 @@ class DrinkRepository(
 
     suspend fun searchDrinks(
         query: String,
-        filters: Map<String, List<String>>
+        filters: Map<String, List<String>>,
+        count: Int = 100
     ): Flow<List<Drink>> {
         val searchRequest = filters
             .filter { it.key.isNotBlank() && it.value.isNotEmpty() }
             .map { it.key + "/" + it.value.joinToString(",") }
             .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
 
-        return mapFavorites(api.searchDrinks(searchRequest))
+        return mapFavorites(api.searchDrinks(searchRequest, count))
     }
 
     suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
