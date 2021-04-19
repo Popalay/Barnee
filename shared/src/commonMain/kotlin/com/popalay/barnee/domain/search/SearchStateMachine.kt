@@ -67,7 +67,7 @@ class SearchStateMachine(
                 .map { AggregationMutation(it) },
             filterIsInstance<Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.searchDrinks("", emptyMap()) }
+                .flatMapToResult { drinkRepository.searchDrinks("", emptyMap(), count = 10) }
                 .map { SearchingMutation(it) },
             filterIsInstance<QueryChanged>()
                 .map { QueryChangedMutation(it.query) },
