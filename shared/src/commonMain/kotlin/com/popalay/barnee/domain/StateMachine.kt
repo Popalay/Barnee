@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.scan
@@ -37,17 +38,16 @@ abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) 
     abstract val processor: Processor<S, R>
     abstract val reducer: Reducer<S, R>
 
-    val stateFlow: StateFlow<S> by lazy {
-        processor(actionFlow) { stateFlow.value }
-            .scan(initialState) { state, result -> reducer(state, result) }
-            .stateIn(
-                stateMachineScope,
-                SharingStarted.Eagerly,
-                initialState
-            )
-    }
+    val stateFlow: StateFlow<S> = actionFlow
+        .applyProcessor()
+        .scan(initialState) { state, result -> reducer(state, result) }
+        .stateIn(
+            stateMachineScope,
+            SharingStarted.Eagerly,
+            initialState
+        )
 
-    fun onChange(provideNewState: ((S) -> Unit)): Closeable {
+    fun onChange(provideNewState: (S) -> Unit): Closeable {
         val job = Job()
         stateFlow
             .onEach { provideNewState(it) }
@@ -60,7 +60,7 @@ abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) 
     }
 
     fun process(action: A) {
-        stateMachineScope.launch { actionFlow.emit(action) }
+        stateMachineScope.launch(Dispatchers.Default) { actionFlow.emit(action) }
     }
 
     open fun onCleared() {
@@ -75,6 +75,8 @@ abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) 
             .catch { emit(Fail<R>(it)) }
             .collect { emit(Success(it)) }
     }
+
+    private fun Flow<Action>.applyProcessor() = flatMapConcat { processor(actionFlow) { stateFlow.value } }
 }
 
 typealias Processor<State, Result> = Flow<Action>.(state: () -> State) -> Flow<Result>
