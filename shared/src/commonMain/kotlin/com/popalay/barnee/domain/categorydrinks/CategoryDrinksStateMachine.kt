@@ -3,7 +3,7 @@ package com.popalay.barnee.domain.categorydrinks
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.Output
+import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Processor
 import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
@@ -11,7 +11,7 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.categorydrinks.CategoryDrinksAction.Initial
-import com.popalay.barnee.domain.categorydrinks.CategoryDrinksOutput.DrinksOutput
+import com.popalay.barnee.domain.categorydrinks.CategoryDrinksMutation.DrinksMutation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -25,25 +25,25 @@ sealed class CategoryDrinksAction : Action {
     data class Initial(val tag: String) : CategoryDrinksAction()
 }
 
-sealed class CategoryDrinksOutput : Output {
-    data class DrinksOutput(val data: Result<List<Drink>>) : CategoryDrinksOutput()
+sealed class CategoryDrinksMutation : Mutation {
+    data class DrinksMutation(val data: Result<List<Drink>>) : CategoryDrinksMutation()
 }
 
 class CategoryDrinksStateMachine(
     private val drinkRepository: DrinkRepository
-) : StateMachine<CategoryDrinksState, CategoryDrinksAction, CategoryDrinksOutput>(CategoryDrinksState()) {
-    override val processor: Processor<CategoryDrinksState, CategoryDrinksOutput> = {
+) : StateMachine<CategoryDrinksState, CategoryDrinksAction, CategoryDrinksMutation>(CategoryDrinksState()) {
+    override val processor: Processor<CategoryDrinksState, CategoryDrinksMutation> = {
         merge(
             filterIsInstance<Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getDrinksByTags(listOf(it.tag)) }
-                .map { DrinksOutput(it) }
+                .map { DrinksMutation(it) }
         )
     }
 
-    override val reducer: Reducer<CategoryDrinksState, CategoryDrinksOutput> = { result ->
-        when (result) {
-            is DrinksOutput -> copy(drinks = result.data)
+    override val reducer: Reducer<CategoryDrinksState, CategoryDrinksMutation> = { mutation ->
+        when (mutation) {
+            is DrinksMutation -> copy(drinks = mutation.data)
         }
     }
 }
