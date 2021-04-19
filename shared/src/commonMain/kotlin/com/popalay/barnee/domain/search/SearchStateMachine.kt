@@ -49,7 +49,7 @@ sealed class SearchAction : Action {
 }
 
 sealed class SearchMutation : Mutation {
-    data class AggregationMutation(val data: Aggregation) : SearchMutation()
+    data class AggregationMutation(val data: Result<Aggregation>) : SearchMutation()
     data class SearchingMutation(val data: Result<List<Drink>>) : SearchMutation()
     data class QueryChangedMutation(val data: String) : SearchMutation()
     data class FilterClickedMutation(val data: Set<Pair<String, AggregationGroup>>) : SearchMutation()
@@ -63,7 +63,7 @@ class SearchStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .map { drinkRepository.getAggregation() }
+                .flatMapToResult { drinkRepository.getAggregation() }
                 .map { AggregationMutation(it) },
             filterIsInstance<Initial>()
                 .take(1)
@@ -110,7 +110,7 @@ class SearchStateMachine(
 
     override val reducer: Reducer<SearchState, SearchMutation> = { mutation ->
         when (mutation) {
-            is AggregationMutation -> copy(aggregation = Success(mutation.data))
+            is AggregationMutation -> copy(aggregation = mutation.data)
             is SearchingMutation -> copy(drinks = mutation.data, appliedFilters = selectedFilters, isFiltersShown = false)
             is QueryChangedMutation -> copy(searchQuery = mutation.data)
             is FilterClickedMutation -> copy(selectedFilters = mutation.data)
