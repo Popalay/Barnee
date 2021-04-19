@@ -2,6 +2,7 @@ package com.popalay.barnee.data.repository
 
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Aggregation
+import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.Api
@@ -20,14 +21,11 @@ class DrinkRepository(
     private val api: Api,
     private val localStore: LocalStore
 ) {
-    suspend fun getRandomDrinks(count: Int): Flow<List<Drink>> = flow { emit(api.randomDrinks(count)) }
-        .flatMapLatest { mapFavorites(it) }
+    suspend fun getRandomDrinks(count: Int): Flow<List<Drink>> = mapFavorites(api.randomDrinks(count))
 
-    suspend fun getDrinksByTags(tags: List<String>): Flow<List<Drink>> = flow { emit(api.drinksByTags(tags)) }
-        .flatMapLatest { mapFavorites(it) }
+    suspend fun getDrinksByTags(tags: List<String>): Flow<List<Drink>> = mapFavorites(api.drinksByTags(tags))
 
-    suspend fun getSimilarDrinksFor(alias: String): Flow<List<Drink>> = flow { emit(api.similarDrinks(alias)) }
-        .flatMapLatest { mapFavorites(it) }
+    suspend fun getSimilarDrinksFor(alias: String): Flow<List<Drink>> = mapFavorites(api.similarDrinks(alias))
 
     suspend fun searchDrinks(
         query: String,
@@ -38,8 +36,7 @@ class DrinkRepository(
             .map { it.key + "/" + it.value.joinToString(",") }
             .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
 
-        return flow { emit(api.searchDrinks(searchRequest)) }
-            .flatMapLatest { mapFavorites(it) }
+        return mapFavorites(api.searchDrinks(searchRequest))
     }
 
     suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
