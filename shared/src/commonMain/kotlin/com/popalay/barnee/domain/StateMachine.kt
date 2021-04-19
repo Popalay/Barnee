@@ -24,10 +24,10 @@ import kotlinx.coroutines.launch
 
 interface State
 interface Action
-interface Output
+interface Mutation
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) {
+abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S) {
     private val actionFlow = MutableSharedFlow<A>(
         extraBufferCapacity = 64,
         replay = Int.MAX_VALUE,
@@ -35,12 +35,12 @@ abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) 
     )
     private val stateMachineScope = MainScope()
 
-    abstract val processor: Processor<S, R>
-    abstract val reducer: Reducer<S, R>
+    abstract val processor: Processor<S, M>
+    abstract val reducer: Reducer<S, M>
 
     val stateFlow: StateFlow<S> = actionFlow
         .applyProcessor()
-        .scan(initialState) { state, result -> reducer(state, result) }
+        .scan(initialState) { state, mutation -> reducer(state, mutation) }
         .stateIn(
             stateMachineScope,
             SharingStarted.Eagerly,
@@ -79,5 +79,5 @@ abstract class StateMachine<S : State, A : Action, R : Output>(initialState: S) 
     private fun Flow<Action>.applyProcessor() = flatMapConcat { processor(actionFlow) { stateFlow.value } }
 }
 
-typealias Processor<State, Result> = Flow<Action>.(state: () -> State) -> Flow<Result>
-typealias Reducer<State, R> = State.(result: R) -> State
+typealias Processor<State, Mutation> = Flow<Action>.(state: () -> State) -> Flow<Mutation>
+typealias Reducer<State, Mutation> = State.(mutation: Mutation) -> State

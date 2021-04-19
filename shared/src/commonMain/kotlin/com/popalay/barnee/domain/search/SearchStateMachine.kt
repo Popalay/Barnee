@@ -5,7 +5,7 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.Output
+import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Processor
 import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
@@ -18,11 +18,11 @@ import com.popalay.barnee.domain.search.SearchAction.FiltersDismissed
 import com.popalay.barnee.domain.search.SearchAction.Initial
 import com.popalay.barnee.domain.search.SearchAction.QueryChanged
 import com.popalay.barnee.domain.search.SearchAction.ShowFiltersClicked
-import com.popalay.barnee.domain.search.SearchOutput.AggregationOutput
-import com.popalay.barnee.domain.search.SearchOutput.FilterClickedOutput
-import com.popalay.barnee.domain.search.SearchOutput.QueryChangedOutput
-import com.popalay.barnee.domain.search.SearchOutput.SearchingOutput
-import com.popalay.barnee.domain.search.SearchOutput.ShowFiltersOutput
+import com.popalay.barnee.domain.search.SearchMutation.AggregationMutation
+import com.popalay.barnee.domain.search.SearchMutation.FilterClickedMutation
+import com.popalay.barnee.domain.search.SearchMutation.QueryChangedMutation
+import com.popalay.barnee.domain.search.SearchMutation.SearchingMutation
+import com.popalay.barnee.domain.search.SearchMutation.ShowFiltersMutation
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
@@ -48,29 +48,29 @@ sealed class SearchAction : Action {
     data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction()
 }
 
-sealed class SearchOutput : Output {
-    data class AggregationOutput(val data: Aggregation) : SearchOutput()
-    data class SearchingOutput(val data: Result<List<Drink>>) : SearchOutput()
-    data class QueryChangedOutput(val data: String) : SearchOutput()
-    data class FilterClickedOutput(val data: Set<Pair<String, AggregationGroup>>) : SearchOutput()
-    data class ShowFiltersOutput(val data: Boolean) : SearchOutput()
+sealed class SearchMutation : Mutation {
+    data class AggregationMutation(val data: Aggregation) : SearchMutation()
+    data class SearchingMutation(val data: Result<List<Drink>>) : SearchMutation()
+    data class QueryChangedMutation(val data: String) : SearchMutation()
+    data class FilterClickedMutation(val data: Set<Pair<String, AggregationGroup>>) : SearchMutation()
+    data class ShowFiltersMutation(val data: Boolean) : SearchMutation()
 }
 
 class SearchStateMachine(
     private val drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction, SearchOutput>(SearchState()) {
-    override val processor: Processor<SearchState, SearchOutput> = { state ->
+) : StateMachine<SearchState, SearchAction, SearchMutation>(SearchState()) {
+    override val processor: Processor<SearchState, SearchMutation> = { state ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)
                 .map { drinkRepository.getAggregation() }
-                .map { AggregationOutput(it) },
+                .map { AggregationMutation(it) },
             filterIsInstance<Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.searchDrinks("", emptyMap()) }
-                .map { SearchingOutput(it) },
+                .map { SearchingMutation(it) },
             filterIsInstance<QueryChanged>()
-                .map { QueryChangedOutput(it.query) },
+                .map { QueryChangedMutation(it.query) },
             filterIsInstance<QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
@@ -80,10 +80,10 @@ class SearchStateMachine(
                         getFilters(state().aggregation(), state().selectedFilters)
                     )
                 }
-                .map { SearchingOutput(it) },
+                .map { SearchingMutation(it) },
             filterIsInstance<FilterClicked>()
                 .map {
-                    FilterClickedOutput(
+                    FilterClickedMutation(
                         if (it.value in state().selectedFilters) {
                             state().selectedFilters - it.value
                         } else {
@@ -92,7 +92,7 @@ class SearchStateMachine(
                     )
                 },
             filterIsInstance<ShowFiltersClicked>()
-                .map { ShowFiltersOutput(true) },
+                .map { ShowFiltersMutation(true) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters != it.selectedFilters } }
                 .flatMapToResult {
@@ -101,20 +101,20 @@ class SearchStateMachine(
                         getFilters(state().aggregation(), state().selectedFilters)
                     )
                 }
-                .map { SearchingOutput(it) },
+                .map { SearchingMutation(it) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters == it.selectedFilters } }
-                .map { ShowFiltersOutput(false) }
+                .map { ShowFiltersMutation(false) }
         )
     }
 
-    override val reducer: Reducer<SearchState, SearchOutput> = { result ->
-        when (result) {
-            is AggregationOutput -> copy(aggregation = Success(result.data))
-            is SearchingOutput -> copy(drinks = result.data, appliedFilters = selectedFilters, isFiltersShown = false)
-            is QueryChangedOutput -> copy(searchQuery = result.data)
-            is FilterClickedOutput -> copy(selectedFilters = result.data)
-            is ShowFiltersOutput -> copy(isFiltersShown = result.data)
+    override val reducer: Reducer<SearchState, SearchMutation> = { mutation ->
+        when (mutation) {
+            is AggregationMutation -> copy(aggregation = Success(mutation.data))
+            is SearchingMutation -> copy(drinks = mutation.data, appliedFilters = selectedFilters, isFiltersShown = false)
+            is QueryChangedMutation -> copy(searchQuery = mutation.data)
+            is FilterClickedMutation -> copy(selectedFilters = mutation.data)
+            is ShowFiltersMutation -> copy(isFiltersShown = mutation.data)
         }
     }
 
