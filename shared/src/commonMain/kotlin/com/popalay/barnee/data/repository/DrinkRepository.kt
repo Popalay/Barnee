@@ -5,12 +5,15 @@ import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.Api
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class DrinkRepository(
@@ -18,9 +21,6 @@ class DrinkRepository(
     private val localStore: LocalStore
 ) {
     suspend fun getRandomDrinks(count: Int): Flow<List<Drink>> = flow { emit(api.randomDrinks(count)) }
-        .flatMapLatest { mapFavorites(it) }
-
-    suspend fun getDrinksByAliases(aliases: List<String>): Flow<List<Drink>> = flow { emit(api.drinksByAliases(aliases)) }
         .flatMapLatest { mapFavorites(it) }
 
     suspend fun getDrinksByTags(tags: List<String>): Flow<List<Drink>> = flow { emit(api.drinksByTags(tags)) }
@@ -42,7 +42,7 @@ class DrinkRepository(
             .flatMapLatest { mapFavorites(it) }
     }
 
-    suspend fun getAggregation(): Aggregation = api.getAggregation()
+    suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
 
     fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
         .map { favorites -> api.drinksByAliases(favorites.toList()).map { it.copy(isFavorite = true) } }
@@ -58,7 +58,7 @@ class DrinkRepository(
                 }
         }
 
-    suspend fun toggleFavoriteFor(alias: String): Boolean {
+    suspend fun toggleFavoriteFor(alias: String): Boolean = withContext(Dispatchers.Main) {
         val favorites = localStore.getFavoriteDrinks().first()
         val isInFavorites = alias in favorites
         if (isInFavorites) {
@@ -66,7 +66,7 @@ class DrinkRepository(
         } else {
             saveAsFavorite(alias)
         }
-        return !isInFavorites
+        !isInFavorites
     }
 
     private suspend fun saveAsFavorite(alias: String) {
