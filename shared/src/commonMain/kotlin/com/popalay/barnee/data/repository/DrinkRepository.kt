@@ -6,6 +6,10 @@ import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.repository.DrinksRequest.Favorites
+import com.popalay.barnee.data.repository.DrinksRequest.ForQuery
+import com.popalay.barnee.data.repository.DrinksRequest.ForTags
+import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -22,11 +26,14 @@ class DrinkRepository(
     private val api: Api,
     private val localStore: LocalStore
 ) {
-    suspend fun getRandomDrinks(count: Int): Flow<List<Drink>> = mapFavorites(api.randomDrinks(count))
-
-    suspend fun getDrinksByTags(tags: List<String>): Flow<List<Drink>> = mapFavorites(api.drinksByTags(tags))
-
-    suspend fun getSimilarDrinksFor(alias: String): Flow<List<Drink>> = mapFavorites(api.similarDrinks(alias))
+    suspend fun getDrinks(request: DrinksRequest): Flow<List<Drink>> {
+        return when (request) {
+            is RelatedTo -> mapFavorites(api.similarDrinks(request.alias))
+            is ForTags -> mapFavorites(api.drinksByTags(request.tags))
+            is ForQuery -> mapFavorites(api.drinks(request.query))
+            Favorites -> getFavoriteDrinks()
+        }
+    }
 
     suspend fun searchDrinks(
         query: String,
@@ -42,18 +49,6 @@ class DrinkRepository(
     }
 
     suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
-
-    fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
-        .take(1)
-        .map { favorites -> api.drinksByAliases(favorites.toList()) }
-        .flatMapLatest { drinks ->
-            localStore.getFavoriteDrinks()
-                .map { favorites ->
-                    drinks.filter { it.alias in favorites }
-                        .let { if (it.size == favorites.size) it else api.drinksByAliases(favorites.toList()) }
-                }
-        }
-        .map { drinks -> drinks.map { it.copy(isFavorite = true) } }
 
     fun getFullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
         .flatMapLatest { response ->
@@ -77,6 +72,51 @@ class DrinkRepository(
         !isInFavorites
     }
 
+    fun getCategories(): Flow<List<Category>> = flowOf(
+        listOf(
+            Category(
+                text = "Non-alcoholic",
+                alias = "is/not/alcoholic",
+                imageUrl = "v1618923872/categories/non-alcoholic.webp"
+            ),
+            Category(
+                text = "The most famous",
+                alias = "story/the famous",
+                imageUrl = "v1618925730/categories/most-famous.webp"
+            ),
+            Category(
+                text = "Top rated",
+                alias = "rating/80",
+                imageUrl = "v1618925107/categories/top-rated.jpg"
+            ),
+            Category(
+                text = "Easy to do",
+                alias = "skill/easy",
+                imageUrl = "v1618923610/categories/easy-to-do.webp"
+            ),
+            Category(
+                text = "Hot",
+                alias = "hot",
+                imageUrl = "v1618923901/categories/hot.webp"
+            ),
+            Category(
+                text = "Cold",
+                alias = "not/hot",
+                imageUrl = "v1618925541/categories/cold.webp"
+            ),
+            Category(
+                text = "Carbonated",
+                alias = "carbonated",
+                imageUrl = "v1618923638/categories/carbonated.webp"
+            ),
+            Category(
+                text = "Non-carbonated",
+                alias = "not/carbonated",
+                imageUrl = "v1618923780/categories/non-carbonated.webp"
+            )
+        )
+    )
+
     private suspend fun saveAsFavorite(alias: String) {
         localStore.saveFavorite(alias)
     }
@@ -84,6 +124,18 @@ class DrinkRepository(
     private suspend fun removeFromFavorites(alias: String) {
         localStore.removeFavorite(alias)
     }
+
+    private fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
+        .take(1)
+        .map { favorites -> api.drinksByAliases(favorites) }
+        .flatMapLatest { drinks ->
+            localStore.getFavoriteDrinks()
+                .map { favorites ->
+                    drinks.filter { it.alias in favorites }
+                        .let { if (it.size == favorites.size) it else api.drinksByAliases(favorites) }
+                }
+        }
+        .map { drinks -> drinks.map { it.copy(isFavorite = true) } }
 
     private fun mapFavorites(drinks: List<Drink>) = localStore.getFavoriteDrinks()
         .map { favorites -> drinks.map { it.copy(isFavorite = it.alias in favorites) } }

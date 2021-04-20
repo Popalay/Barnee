@@ -79,5 +79,5 @@ data class InstructionStep(
 data class Category(
     val text: String,
     val alias: String,
-    val image: String = ""
+    val imageUrl: String = ""
 )

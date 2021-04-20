@@ -1,6 +1,6 @@
 package com.popalay.barnee.domain.discovery
 
-import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
@@ -11,14 +11,14 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.discovery.DiscoveryAction.Initial
-import com.popalay.barnee.domain.discovery.DiscoveryMutation.DrinksMutation
+import com.popalay.barnee.domain.discovery.DiscoveryMutation.CategoriesMutation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.take
 
 data class DiscoveryState(
-    val drinks: Result<List<Drink>> = Uninitialized()
+    val categories: Result<List<Category>> = Uninitialized()
 ) : State
 
 sealed class DiscoveryAction : Action {
@@ -26,7 +26,7 @@ sealed class DiscoveryAction : Action {
 }
 
 sealed class DiscoveryMutation : Mutation {
-    data class DrinksMutation(val data: Result<List<Drink>>) : DiscoveryMutation()
+    data class CategoriesMutation(val data: Result<List<Category>>) : DiscoveryMutation()
 }
 
 class DiscoveryStateMachine(
@@ -36,14 +36,14 @@ class DiscoveryStateMachine(
         merge(
             filterIsInstance<Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.getRandomDrinks(10) }
-                .map { DrinksMutation(it) }
+                .flatMapToResult { drinkRepository.getCategories() }
+                .map { CategoriesMutation(it) }
         )
     }
 
     override val reducer: Reducer<DiscoveryState, DiscoveryMutation> = { mutation ->
         when (mutation) {
-            is DrinksMutation -> copy(drinks = mutation.data)
+            is CategoriesMutation -> copy(categories = mutation.data)
         }
     }
 }

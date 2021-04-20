@@ -26,19 +26,17 @@ class Api(json: Json) {
         }
     }
 
-    suspend fun randomDrinks(count: Int): List<Drink> =
-        client.get<DrinksResponse>("${baseUrl}drinks/random/is/specificImage/InEnvironment?take=$count").result
+    suspend fun drinks(query: String): List<Drink> =
+        client.get<DrinksResponse>("${baseUrl}drinks/$query?exactmatch=true&take=100").result
 
-    suspend fun drinksByAliases(aliases: List<String>): List<Drink> =
-        client.get<DrinksResponse>("${baseUrl}drinks/alias/${aliases.joinToString(",")}?exactmatch=true&take=100").result
+    suspend fun drinksByAliases(aliases: Set<String>): List<Drink> = drinks("alias/${aliases.joinToString(",")}")
 
-    suspend fun drinksByTags(tags: List<String>): List<Drink> =
-        client.get<DrinksResponse>("${baseUrl}drinks/tag/${tags.joinToString(",")}?exactmatch=true&take=100").result
+    suspend fun drinksByTags(tags: Set<String>): List<Drink> = drinks("tag/${tags.joinToString(",")}")
 
     suspend fun similarDrinks(alias: String): List<Drink> = getFullDrink(alias).relatedDrinks
 
     suspend fun searchDrinks(query: String, count: Int): List<Drink> = try {
-        client.get<DrinksResponse>("${baseUrl}drinks/$query?take=${count}").result
+        client.get<DrinksResponse>("${baseUrl}drinks/$query/is/specificImage/InEnvironment?take=${count}").result
     } catch (e: NoTransformationFoundException) {
         emptyList()
     }

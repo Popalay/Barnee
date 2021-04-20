@@ -20,7 +20,6 @@ import com.popalay.barnee.R
 import com.popalay.barnee.R.string
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
-import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -34,8 +33,8 @@ fun DiscoveryScreen() {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         DiscoveryAppBar(modifier = Modifier.liftOnScroll(listState))
-        DrinkGrid(
-            drinks = state.drinks,
+        CategoryGrid(
+            categories = state.categories,
             emptyMessage = "We currently have no drinks",
             listState = listState,
             contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues()
