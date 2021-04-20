@@ -22,6 +22,9 @@ dependencies {
     implementation(libs.palette)
 }
 
+val isCI = System.getenv("CI") == "true"
+println("Is CI environment: $isCI")
+
 android {
     compileSdkVersion(30)
     defaultConfig {
@@ -30,16 +33,46 @@ android {
         targetSdkVersion(30)
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
         versionName = "1.0"
-    }
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
+
+        signingConfigs {
+            getByName("debug") {
+                storeFile = file("../release/debug.keystore")
+            }
+            register("release") {
+                storeFile = file("../release/release.keystore")
+                keyAlias = "barnee"
+                storePassword = System.getenv("ANDROID_RELEASE_KEYSTORE_PWD").orEmpty()
+                keyPassword = System.getenv("ANDROID_RELEASE_KEY_PWD").orEmpty()
+            }
+        }
+
+        buildTypes {
+            getByName("debug") {
+                signingConfig = signingConfigs.getByName("debug")
+                versionNameSuffix = "-dev"
+                applicationIdSuffix = ".debug"
+            }
+
+            getByName("release") {
+                signingConfig = if (isCI) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+                isMinifyEnabled = true
+                isShrinkResources = true
+                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            }
+        }
+
+        lint {
+            isCheckReleaseBuilds = false
+            isCheckDependencies = true
+            isIgnoreTestSources = true
         }
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
         jvmTarget = "1.8"
         useIR = true
@@ -48,6 +81,7 @@ android {
             "-Xopt-in=kotlin.OptIn"
         )
     }
+
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
