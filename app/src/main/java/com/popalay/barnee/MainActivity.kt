@@ -8,6 +8,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavType
@@ -15,16 +16,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import coil.ImageLoader
+import coil.util.DebugLogger
+import com.google.accompanist.coil.LocalImageLoader
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.popalay.barnee.ui.screen.categorydrinks.CategoryDrinksScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.favorites.FavoritesScreen
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.FavoriteDrinksScreen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.QueryDrinksScreen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.SimilarDrinksScreen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.TagDrinksScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
-import com.popalay.barnee.ui.screen.similardrinks.SimilarDrinksScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 
 class MainActivity : ComponentActivity() {
@@ -48,7 +53,10 @@ fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
         val navController = rememberNavController()
 
-        CompositionLocalProvider(LocalNavController provides navController) {
+        CompositionLocalProvider(
+            LocalNavController provides navController,
+            LocalImageLoader provides ImageLoader.Builder(LocalContext.current).logger(DebugLogger()).build()
+        ) {
             NavHost(navController, startDestination = "home") {
                 composable("home") {
                     DiscoveryScreen()
@@ -71,7 +79,7 @@ fun ComposeApp() {
                     "drink?tag={tag}",
                     arguments = listOf(navArgument("tag") { type = NavType.StringType })
                 ) {
-                    CategoryDrinksScreen(
+                    TagDrinksScreen(
                         tag = it.arguments?.getString("tag").orEmpty(),
                     )
                 }
@@ -87,11 +95,23 @@ fun ComposeApp() {
                         name = it.arguments?.getString("name").orEmpty(),
                     )
                 }
+                composable(
+                    "drink?query={query}&name={name}",
+                    arguments = listOf(
+                        navArgument("query") { type = NavType.StringType },
+                        navArgument("name") { type = NavType.StringType }
+                    )
+                ) {
+                    QueryDrinksScreen(
+                        query = it.arguments?.getString("query").orEmpty(),
+                        name = it.arguments?.getString("name").orEmpty(),
+                    )
+                }
                 composable(Screen.Search.route) {
                     SearchScreen()
                 }
                 composable(Screen.Favorites.route) {
-                    FavoritesScreen()
+                    FavoriteDrinksScreen()
                 }
             }
         }

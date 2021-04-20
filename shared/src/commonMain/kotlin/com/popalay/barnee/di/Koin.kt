@@ -3,13 +3,11 @@ package com.popalay.barnee.di
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.DrinkRepository
-import com.popalay.barnee.domain.categorydrinks.CategoryDrinksStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
-import com.popalay.barnee.domain.favorites.FavoritesStateMachine
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
-import com.popalay.barnee.domain.similardrinks.SimilarDrinksStateMachine
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -29,11 +27,9 @@ val commonModule = module {
     single { DrinkRepository(get(), get()) }
 
     factory { DiscoveryStateMachine(get()) }
-    factory { CategoryDrinksStateMachine(get()) }
     factory { DrinkStateMachine(get()) }
-    factory { FavoritesStateMachine(get()) }
     factory { SearchStateMachine(get()) }
-    factory { SimilarDrinksStateMachine(get()) }
+    factory { ParameterizedDrinkListStateMachine(get()) }
     factory { DrinkListStateMachine(get()) }
 }
 

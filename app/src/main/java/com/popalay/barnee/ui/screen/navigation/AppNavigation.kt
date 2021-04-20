@@ -21,4 +21,8 @@ sealed class Screen(val route: String) {
         val alias: String,
         val name: String
     ) : Screen("drink?like=$alias&name=$name")
+    data class QueryDrinks(
+        val query: String,
+        val name: String
+    ) : Screen("drink?query=$query&name=$name")
 }
