@@ -79,6 +79,7 @@ import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
+import com.popalay.barnee.ui.util.applyForExtarnalImage
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -188,7 +189,8 @@ private fun DrinkAppBar(
                 )
             } else {
                 CoilImage(
-                    data = image,
+                    data = "",
+                    requestBuilder = { size -> applyForExtarnalImage(image, size) },
                     contentScale = ContentScale.Crop,
                     colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.3F), BlendMode.SrcAtop),
                     contentDescription = null,
