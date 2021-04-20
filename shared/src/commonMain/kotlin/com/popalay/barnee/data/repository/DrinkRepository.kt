@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -43,7 +44,16 @@ class DrinkRepository(
     suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
 
     fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
-        .map { favorites -> api.drinksByAliases(favorites.toList()).map { it.copy(isFavorite = true) } }
+        .take(1)
+        .map { favorites -> api.drinksByAliases(favorites.toList()) }
+        .flatMapLatest { drinks ->
+            localStore.getFavoriteDrinks()
+                .map { favorites ->
+                    drinks.filter { it.alias in favorites }
+                        .let { if (it.size == favorites.size) it else api.drinksByAliases(favorites.toList()) }
+                }
+        }
+        .map { drinks -> drinks.map { it.copy(isFavorite = true) } }
 
     fun getFullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
         .flatMapLatest { response ->
