@@ -47,6 +47,7 @@ import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.theme.backgroundVariant
+import com.popalay.barnee.ui.util.applyForExtarnalImage
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -141,7 +142,8 @@ private fun DrinkListItem(
             modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
         ) {
             CoilImage(
-                data = data.displayImageUrl,
+                data = "",
+                requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
                 fadeIn = true,
                 contentScale = ContentScale.Crop,
                 contentDescription = null,
