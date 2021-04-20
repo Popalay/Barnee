@@ -10,16 +10,20 @@
 Planning to get some drink but don't want to go to the bar? Grab some alcohol and make a cocktail on your own!
 And let this app help you in searching for amazing drinks and cooking steps!
 
+## :rocket: UX/UI Designer
+
+[Alina Muratova](https://www.behance.net/alll_romanovna)
+
 ## :camera_flash: Screenshots
 
 ### :robot: Android
 
-<img src="/art/screenshot_1.png" width="260">&emsp;<img src="/art/screenshot_2.png" width="260">
-&emsp;<img src="/art/screenshot_3.png" width="260">
+<img src="/art/screenshot_1.webp" width="260">&emsp;<img src="/art/screenshot_2.webp" width="260">
+&emsp;<img src="/art/screenshot_3.webp" width="260">
 
 ### :green_apple: iOS
 
-<img src="/art/screenshot_4.png" width="260">
+<img src="/art/screenshot_4.webp" width="260">
 
 ## License
 
