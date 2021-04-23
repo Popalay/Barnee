@@ -60,7 +60,7 @@ data class Instruction(
     @SerialName("stepByStep") val steps: List<InstructionStep>
 )
 
-val regex by lazy { "[\\[][\\w ,-]+[|][\\w]+[|][\\w\\W]{8}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{12}+[]]".toRegex() }
+val regex by lazy { "[\\[][\\w ,'-]+[|][\\w]+[|][\\w\\W]{8}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{12}+[]]".toRegex() }
 
 @Serializable
 data class InstructionStep(
