@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
@@ -79,6 +78,7 @@ import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
+import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
@@ -139,12 +139,14 @@ fun DrinkScreen(
                         modifier = Modifier.padding(horizontal = 32.dp)
                     )
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
-                    Keywords(
-                        keywords = value.drink.keywords,
-                        onClick = { navController.navigate(Screen.CategoryDrinks(it).route) },
-                        modifier = Modifier.padding(horizontal = 24.dp)
-                    )
-                    Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    if (value.drink.keywords.isNotEmpty()) {
+                        Keywords(
+                            keywords = value.drink.keywords,
+                            onClick = { navController.navigate(Screen.CategoryDrinks(it).route) },
+                            modifier = Modifier.padding(horizontal = 24.dp)
+                        )
+                        Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    }
                     RecommendedDrinks(
                         data = value.relatedDrinks,
                         onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, value.drink.name).route) }
@@ -171,7 +173,12 @@ private fun DrinkAppBar(
 ) {
     Card(
         elevation = 4.dp,
-        shape = MaterialTheme.shapes.large.copy(topStart = CornerSize(0), topEnd = CornerSize(0)),
+        shape = SquircleShape(
+            curveTopStart = 0F,
+            curveTopEnd = 0F,
+            curveBottomStart = 0.1F * (1 - scrollFraction),
+            curveBottomEnd = 0.1F * (1 - scrollFraction)
+        ),
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(0.8F)
@@ -374,7 +381,7 @@ fun RecommendedDrinks(
     Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 32.dp, end = 16.dp)
+            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
         ) {
             Text(
                 text = "Recommended",
