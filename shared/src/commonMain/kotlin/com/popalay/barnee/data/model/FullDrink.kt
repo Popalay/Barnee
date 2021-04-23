@@ -37,7 +37,7 @@ data class FullDrink(
     val displayName = name.toLowerCase().removePrefix("absolut ")
 
     @Transient
-    val videoUrl = "https://www.youtube.com/watch?v=" + videos.firstOrNull()?.youtube
+    val videoUrl = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
 
     @Transient
     val displayRating = (rating / 10F).toString()

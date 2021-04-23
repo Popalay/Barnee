@@ -171,6 +171,7 @@ private fun DrinkAppBar(
     onHeartClick: () -> Unit,
     onPlayClick: () -> Unit
 ) {
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     Card(
         elevation = 4.dp,
         shape = SquircleShape(
@@ -181,7 +182,7 @@ private fun DrinkAppBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .aspectRatio(0.8F)
+            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(0.8F))
     ) {
         val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
 

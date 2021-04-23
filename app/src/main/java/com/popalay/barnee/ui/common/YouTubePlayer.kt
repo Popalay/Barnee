@@ -59,12 +59,12 @@ fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
     val playerView = remember {
         val playerView = PlayerView(context)
         lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStart(owner: LifecycleOwner) {
+            override fun onResume(owner: LifecycleOwner) {
                 playerView.onResume()
                 player.playWhenReady = autoPlay
             }
 
-            override fun onStop(owner: LifecycleOwner) {
+            override fun onPause(owner: LifecycleOwner) {
                 updateState()
                 playerView.onPause()
                 player.playWhenReady = false
@@ -85,5 +85,6 @@ fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         playerView.player = player
+        player.play()
     }
 }
