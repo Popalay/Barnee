@@ -26,8 +26,11 @@ class Api(json: Json) {
         }
     }
 
-    suspend fun drinks(query: String): List<Drink> =
+    suspend fun drinks(query: String): List<Drink> = try {
         client.get<DrinksResponse>("${baseUrl}drinks/$query?exactmatch=true&take=100").result
+    } catch (e: NoTransformationFoundException) {
+        emptyList()
+    }
 
     suspend fun drinksByAliases(aliases: Set<String>): List<Drink> = drinks("alias/${aliases.joinToString(",")}")
 

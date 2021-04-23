@@ -18,6 +18,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.withContext
 
@@ -53,7 +54,7 @@ class DrinkRepository(
     fun getFullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
         .flatMapLatest { response ->
             localStore.getFavoriteDrinks()
-                .map { favorites ->
+                .mapLatest { favorites ->
                     response.copy(
                         relatedDrinks = response.relatedDrinks.map { it.copy(isFavorite = it.alias in favorites) },
                         result = response.result.map { it.copy(isFavorite = it.alias in favorites) }
@@ -130,7 +131,7 @@ class DrinkRepository(
         .map { favorites -> api.drinksByAliases(favorites) }
         .flatMapLatest { drinks ->
             localStore.getFavoriteDrinks()
-                .map { favorites ->
+                .mapLatest { favorites ->
                     drinks.filter { it.alias in favorites }
                         .let { if (it.size == favorites.size) it else api.drinksByAliases(favorites) }
                 }
