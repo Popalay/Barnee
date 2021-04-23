@@ -1,6 +1,7 @@
 package com.popalay.barnee.ui.screen.search
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -53,6 +54,7 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -107,6 +109,7 @@ fun SearchScreen() {
                 val listState = rememberLazyListState()
                 SearchAppBar(
                     onFilterClick = { viewModel.processAction(SearchAction.ShowFiltersClicked) },
+                    isFiltersApplied = state.selectedFilters.isNotEmpty(),
                     modifier = Modifier.liftOnScroll(listState)
                 )
                 DrinkGrid(
@@ -169,8 +172,10 @@ private fun SearchTextField(
 @Composable
 private fun SearchAppBar(
     onFilterClick: () -> Unit,
+    isFiltersApplied: Boolean,
     modifier: Modifier = Modifier,
 ) {
+    val badgeRadius by animateDpAsState(if (isFiltersApplied) 3.dp else 0.dp)
     ActionsAppBar(
         title = "Search",
         modifier = modifier,
@@ -180,6 +185,7 @@ private fun SearchAppBar(
                 Icon(
                     painter = painterResource(R.drawable.ic_filter),
                     contentDescription = "Filter",
+                    modifier = Modifier.drawBadge(MaterialTheme.colors.onBackground, badgeRadius)
                 )
             }
         }
