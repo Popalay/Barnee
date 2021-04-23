@@ -61,24 +61,34 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
 
-      - name: Create release for tags
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
+      - name: Generate changellog
+        id: generate-release-changelog
+        uses: heinrichreimer/github-changelog-generator-action@v2.1.1
         with:
-          files: |
-            app/build/outputs/apk/release/app-release.apk
+          token: ${{ secrets.GITHUB_TOKEN }}
+          onlyLastTag: "true"
+          stripHeaders: "true"
+          stripGeneratorNotice: "true"
+
+      - name: Create release for tags
+        uses: actions/create-release@v1
+        if: startsWith(github.ref, 'refs/tags/v')
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: ${{ steps.generate-release-changelog.outputs.changelog }}
 
-      #      - name: Publish to Play store
-      #        if: startsWith(github.ref, 'refs/tags/v')
-      #        uses: r0adkll/upload-google-play@v1
-      #        with:
-      #          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_ACCOUNT_JSON }}
-      #          packageName: com.popalay.barnee
-      #          releaseFile: app/build/outputs/bundle/release/app-release.aab
-      #          track: production
-      #          mappingFile: app/build/outputs/mapping/release/mapping.txt
+      - name: Publish to Play store
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_ACCOUNT_JSON }}
+          packageName: com.popalay.barnee
+          releaseFile: app/build/outputs/bundle/release/app-release.aab
+          track: production
+          mappingFile: app/build/outputs/mapping/release/mapping.txt
 
       - name: Upload build outputs
         if: always()
