@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,15 +26,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign.Start
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
-import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinklist.DrinkListAction.ToggleFavorite
+import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.ShiftedLazyGrid
@@ -171,17 +169,13 @@ private fun DrinkListItem(
                     color = MaterialTheme.colors.primary
                 )
             }
-            IconButton(
-                onClick = onHeartClick,
+            AnimatedHeartButton(
+                onToggle = onHeartClick,
+                isSelected = data.isFavorite,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)
-            ) {
-                Image(
-                    painter = painterResource(id = if (data.isFavorite) R.drawable.ic_heart_filled else R.drawable.ic_heart),
-                    contentDescription = "Like"
-                )
-            }
+            )
         }
     }
 }

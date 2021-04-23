@@ -33,8 +33,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -71,6 +69,7 @@ import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
+import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.StateLayout
@@ -110,8 +109,8 @@ fun DrinkScreen(
                 isPlaying = state.isPlaying,
                 offset = offset,
                 scrollFraction = fraction,
-                onClickLike = { viewModel.processAction(DrinkAction.ToggleFavorite(alias)) },
-                onClickPlay = { viewModel.processAction(DrinkAction.TogglePlaying) },
+                onHeartClick = { viewModel.processAction(DrinkAction.ToggleFavorite(alias)) },
+                onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) },
                 modifier = Modifier.offset { offset }
             )
         }
@@ -167,8 +166,8 @@ private fun DrinkAppBar(
     offset: IntOffset,
     scrollFraction: Float,
     modifier: Modifier = Modifier,
-    onClickLike: () -> Unit,
-    onClickPlay: () -> Unit
+    onHeartClick: () -> Unit,
+    onPlayClick: () -> Unit
 ) {
     Card(
         elevation = 4.dp,
@@ -237,18 +236,14 @@ private fun DrinkAppBar(
                         .align(Alignment.BottomCenter)
                         .alpha(1 - scrollFraction)
                 ) {
-                    IconButton(
-                        onClick = onClickLike,
+                    AnimatedHeartButton(
+                        onToggle = onHeartClick,
+                        isSelected = data?.isFavorite == true,
+                        iconSize = 32.dp,
                         modifier = Modifier
                             .align(Alignment.BottomEnd)
                             .padding(end = 24.dp, bottom = 8.dp)
-                    ) {
-                        Icon(
-                            imageVector = if (data?.isFavorite == true) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
-                            contentDescription = "Like",
-                            modifier = Modifier.size(32.dp)
-                        )
-                    }
+                    )
                     Text(
                         text = data?.displayRating.orEmpty(),
                         style = MaterialTheme.typography.h2,
@@ -258,7 +253,7 @@ private fun DrinkAppBar(
                     )
                     if (!data?.videoUrl.isNullOrBlank()) {
                         IconButton(
-                            onClick = onClickPlay,
+                            onClick = onPlayClick,
                             modifier = Modifier
                                 .size(80.dp)
                                 .clip(CircleShape)
