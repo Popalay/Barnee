@@ -3,17 +3,17 @@
     <style name="Theme.Barnee.Base" parent="android:Theme.Material.Light.NoActionBar" />
 
     <style name="Theme.Barnee" parent="Theme.Barnee.Base">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/status_bar_color</item>
+        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
         <item name="android:windowLightStatusBar">@bool/use_light_status_bar</item>
         <item name="android:windowLightNavigationBar">@bool/use_light_nav_bar</item>
     </style>
 
     <style name="Theme.Barnee.Splash" parent="Theme.Barnee.Base">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:statusBarColor">@color/status_bar_color</item>
+        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
         <item name="android:windowLightStatusBar">@bool/use_light_status_bar</item>
         <item name="android:windowBackground">@drawable/bg_splash</item>
-        <item name="android:windowLightNavigationBar">true</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>
