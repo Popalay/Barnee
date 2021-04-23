@@ -2,7 +2,6 @@ package com.popalay.barnee.ui.screen.drinklist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +31,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign.Start
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
@@ -46,7 +45,6 @@ import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.theme.backgroundVariant
 import com.popalay.barnee.ui.util.applyForExtarnalImage
 import org.koin.androidx.compose.getViewModel
 
@@ -141,14 +139,14 @@ private fun DrinkListItem(
         Box(
             modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
         ) {
-            CoilImage(
-                data = "",
-                requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
-                fadeIn = true,
-                contentScale = ContentScale.Crop,
+            Image(
+                painter = rememberCoilPainter(
+                    request = "",
+                    requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
+                ),
                 contentDescription = null,
-                loading = { Box(modifier = Modifier.background(MaterialTheme.colors.backgroundVariant)) },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
             Row(
                 verticalAlignment = Alignment.Bottom,

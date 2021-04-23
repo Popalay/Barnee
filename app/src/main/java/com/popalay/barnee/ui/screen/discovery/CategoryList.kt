@@ -1,7 +1,7 @@
 package com.popalay.barnee.ui.screen.discovery
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -27,7 +27,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign.Start
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
-import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
@@ -40,7 +40,6 @@ import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.theme.backgroundVariant
 import com.popalay.barnee.ui.util.applyForInternalImage
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -101,14 +100,15 @@ private fun CategoryListItem(
         Box(
             modifier = Modifier.clickable(onClick = onClick)
         ) {
-            CoilImage(
-                data = "",
-                requestBuilder = { size -> applyForInternalImage(data.imageUrl, size) },
-                fadeIn = true,
-                contentScale = ContentScale.Crop,
+            Image(
+                painter = rememberCoilPainter(
+                    request = "",
+                    requestBuilder = { size -> applyForInternalImage(data.imageUrl, size) },
+                    fadeIn = true
+                ),
                 contentDescription = null,
-                loading = { Box(modifier = Modifier.background(MaterialTheme.colors.backgroundVariant)) },
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,

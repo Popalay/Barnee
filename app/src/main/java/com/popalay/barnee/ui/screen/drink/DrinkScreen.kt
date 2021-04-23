@@ -1,6 +1,7 @@
 package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -59,7 +60,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import coil.annotation.ExperimentalCoilApi
-import com.google.accompanist.coil.CoilImage
+import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
@@ -188,13 +189,16 @@ private fun DrinkAppBar(
                         .padding(bottom = 16.dp)
                 )
             } else {
-                CoilImage(
-                    data = "",
-                    requestBuilder = { size -> applyForExtarnalImage(image, size) },
-                    contentScale = ContentScale.Crop,
-                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.3F), BlendMode.SrcAtop),
+                Image(
+                    painter = rememberCoilPainter(
+                        request = "",
+                        requestBuilder = { size -> applyForExtarnalImage(image, size) },
+                        fadeIn = true
+                    ),
                     contentDescription = null,
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
                 )
             }
             Box(
