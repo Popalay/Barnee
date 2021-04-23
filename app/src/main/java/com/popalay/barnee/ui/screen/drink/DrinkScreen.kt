@@ -280,8 +280,8 @@ private fun DrinkAppBar(
             }
             BackButton(
                 modifier = Modifier
+                    .padding(top = 32.dp, start = 12.dp)
                     .align(Alignment.TopStart)
-                    .padding(top = 32.dp, start = 16.dp)
                     .offset { -offset }
             )
         }
