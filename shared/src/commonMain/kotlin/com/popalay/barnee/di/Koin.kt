@@ -3,11 +3,13 @@ package com.popalay.barnee.di
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.DrinkRepository
+import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
-import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
+import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -27,10 +29,11 @@ val commonModule = module {
     single { DrinkRepository(get(), get()) }
 
     factory { DiscoveryStateMachine(get()) }
-    factory { DrinkStateMachine(get()) }
+    factory { (alias: String) -> DrinkStateMachine(alias, get()) }
     factory { SearchStateMachine(get()) }
-    factory { ParameterizedDrinkListStateMachine(get()) }
-    factory { DrinkListStateMachine(get()) }
+    factory { (request: DrinksRequest) -> ParameterizedDrinkListStateMachine(request, get()) }
+    factory { DrinkItemStateMachine(get()) }
+    factory { ShakeToDrinkStateMachine(get(), get()) }
 }
 
 expect val platformModule: Module

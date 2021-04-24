@@ -6,10 +6,5 @@ import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class DrinkViewModel(
-    alias: String,
     stateMachine: DrinkStateMachine
-) : StateMachineWrapperViewModel<DrinkState, DrinkAction>(stateMachine) {
-    init {
-        processAction(DrinkAction.Initial(alias))
-    }
-}
+) : StateMachineWrapperViewModel<DrinkState, DrinkAction>(stateMachine)

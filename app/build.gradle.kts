@@ -19,7 +19,6 @@ dependencies {
     implementation(libs.youtubeExtractor)
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
-    implementation(libs.palette)
 }
 
 val isCI = System.getenv("CI") == "true"

@@ -4,9 +4,10 @@ package com.popalay.barnee.di
 
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
-import com.popalay.barnee.domain.drinklist.DrinkListStateMachine
+import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.russhwolf.settings.AppleSettings
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.coroutines.toFlowSettings
@@ -30,5 +31,6 @@ class DiComponent : KoinComponent {
     fun provideReceiptStateMachine(): DrinkStateMachine = get()
     fun provideSearchStateMachine(): SearchStateMachine = get()
     fun provideSimilarDrinksStateMachine(): ParameterizedDrinkListStateMachine = get()
-    fun provideDrinkListStateMachine(): DrinkListStateMachine = get()
+    fun provideDrinkListStateMachine(): DrinkItemStateMachine = get()
+    fun provideShakeToDrinkStateMachine(): ShakeToDrinkStateMachine = get()
 }

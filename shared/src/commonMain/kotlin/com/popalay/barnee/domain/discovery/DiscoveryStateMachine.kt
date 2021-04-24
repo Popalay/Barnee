@@ -31,7 +31,7 @@ sealed class DiscoveryMutation : Mutation {
 
 class DiscoveryStateMachine(
     private val drinkRepository: DrinkRepository
-) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation>(DiscoveryState()) {
+) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation>(DiscoveryState(), Initial) {
     override val processor: Processor<DiscoveryState, DiscoveryMutation> = {
         merge(
             filterIsInstance<Initial>()

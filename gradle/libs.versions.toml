@@ -18,7 +18,6 @@ coroutines = { strictly = "1.4.3" }
 koin = "3.0.1-beta-1"
 settings = "0.7.4"
 logger = "1.12.5"
-palette = "1.0.0"
 
 [libraries]
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -56,7 +55,6 @@ settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref
 settingscoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
 settingsdatastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
 logger = { module = "io.github.microutils:kotlin-logging", version.ref = "logger" }
-palette = { module = "androidx.palette:palette", version.ref = "palette" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material", "compose-runtime"]

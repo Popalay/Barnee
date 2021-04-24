@@ -1,10 +1,12 @@
 package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -25,7 +27,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -49,6 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -56,24 +58,25 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
-import coil.annotation.ExperimentalCoilApi
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
-import com.popalay.barnee.R.drawable
+import com.google.accompanist.insets.statusBarsPadding
+import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.data.model.FullDrink
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
+import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
+import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -91,26 +94,54 @@ fun DrinkScreen(
 ) {
     val navController: NavController = LocalNavController.current
     val viewModel: DrinkViewModel = getViewModel { parametersOf(alias) }
+    val drinkItemViewModel: DrinkListViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
+    val drink = remember(state) { state.drinkWithRelated()?.drink }
 
     val configuration = LocalConfiguration.current
     val toolbarHeight = remember { Dp(configuration.screenWidthDp / 0.8F) }
-    val collapsedToolbarHeight = 96.dp + with(LocalDensity.current) { LocalWindowInsets.current.statusBars.bottom.toDp() }
+    val collapsedToolbarHeight = 88.dp + with(LocalDensity.current) { LocalWindowInsets.current.statusBars.bottom.toDp() }
 
     CollapsingScaffold(
         maxHeight = toolbarHeight,
         minHeight = collapsedToolbarHeight,
         isEnabled = state.drinkWithRelated is Success,
         appBarContent = { fraction, offset ->
+            val secondaryElementsAlpha = if (state.isPlaying) 0F else 1 - fraction * 1.5F
+
             DrinkAppBar(
-                title = name,
-                image = image,
-                data = state.drinkWithRelated()?.drink,
                 isPlaying = state.isPlaying,
-                offset = offset,
+                imageContent = {
+                    ImageContent(
+                        image = image,
+                        rating = drink?.displayRating.orEmpty(),
+                        showPlayButton = !drink?.videoUrl.isNullOrBlank(),
+                        isHeartButtonSelected = drink?.isFavorite == true,
+                        secondaryElementsAlpha = secondaryElementsAlpha,
+                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(alias)) },
+                        onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
+                    )
+                },
+                videoContent = {
+                    YouTubePlayer(
+                        uri = drink?.videoUrl.orEmpty(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color.Black)
+                            .padding(bottom = 16.dp)
+                    )
+                },
+                sharedContent = {
+                    SharedContent(
+                        title = name,
+                        nutrition = drink?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
+                        isPlaying = state.isPlaying,
+                        secondaryElementsAlpha = secondaryElementsAlpha,
+                        offset = offset,
+                        scrollFraction = fraction
+                    )
+                },
                 scrollFraction = fraction,
-                onHeartClick = { viewModel.processAction(DrinkAction.ToggleFavorite(alias)) },
-                onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) },
                 modifier = Modifier.offset { offset }
             )
         }
@@ -158,18 +189,14 @@ fun DrinkScreen(
     }
 }
 
-@OptIn(ExperimentalCoilApi::class)
 @Composable
 private fun DrinkAppBar(
-    title: String,
-    image: String,
-    data: FullDrink?,
     isPlaying: Boolean,
-    offset: IntOffset,
+    videoContent: @Composable BoxScope.() -> Unit,
+    imageContent: @Composable BoxScope.() -> Unit,
+    sharedContent: @Composable BoxScope.() -> Unit,
     scrollFraction: Float,
     modifier: Modifier = Modifier,
-    onHeartClick: () -> Unit,
-    onPlayClick: () -> Unit
 ) {
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
     Card(
@@ -184,112 +211,149 @@ private fun DrinkAppBar(
             .fillMaxWidth()
             .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(0.8F))
     ) {
-        val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
-
         Box {
-            if (isPlaying) {
-                YouTubePlayer(
-                    uri = data?.videoUrl.orEmpty(),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.Black)
-                        .padding(bottom = 16.dp)
-                )
-            } else {
-                Image(
-                    painter = rememberCoilPainter(
-                        request = "",
-                        requestBuilder = { size -> applyForExtarnalImage(image, size) },
-                        fadeIn = true
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
-                )
-            }
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .alpha(scrollFraction)
-                    .background(MaterialTheme.colors.background)
-            )
-            if (!isPlaying) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.TopStart)
-                        .padding(start = 32.dp, end = 88.dp, top = 88.dp)
-                ) {
-                    Text(
-                        text = title,
-                        style = MaterialTheme.typography.h1.copy(fontSize = titleTextSize.sp),
-                        modifier = Modifier
-                            .offset { -offset }
-                            .offset(
-                                x = 32.dp * scrollFraction,
-                                y = (-50).dp * scrollFraction
-                            )
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = data?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
-                        style = MaterialTheme.typography.h3,
-                        modifier = Modifier.alpha(1 - scrollFraction)
-                    )
-                }
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(0.4F)
-                        .align(Alignment.BottomCenter)
-                        .alpha(1 - scrollFraction)
-                ) {
-                    AnimatedHeartButton(
-                        onToggle = onHeartClick,
-                        isSelected = data?.isFavorite == true,
-                        iconSize = 32.dp,
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(end = 24.dp, bottom = 8.dp)
-                    )
-                    Text(
-                        text = data?.displayRating.orEmpty(),
-                        style = MaterialTheme.typography.h2,
-                        modifier = Modifier
-                            .align(Alignment.BottomStart)
-                            .padding(start = 32.dp, bottom = 16.dp)
-                    )
-                    if (!data?.videoUrl.isNullOrBlank()) {
-                        IconButton(
-                            onClick = onPlayClick,
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(CircleShape)
-                                .align(Alignment.TopCenter)
-                                .background(LocalContentColor.current.copy(alpha = ContentAlpha.disabled))
-                                .padding(8.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.PlayArrow,
-                                contentDescription = "Play",
-                                modifier = Modifier.fillMaxSize()
-                            )
-                        }
-                    }
+            Crossfade(isPlaying) {
+                if (it) {
+                    videoContent()
+                } else {
+                    imageContent()
                 }
             }
-            BackButton(
-                modifier = Modifier
-                    .padding(top = 32.dp, start = 12.dp)
-                    .align(Alignment.TopStart)
-                    .offset { -offset }
-            )
+            sharedContent()
         }
     }
 }
 
 @Composable
-fun Ingredients(
+private fun SharedContent(
+    title: String,
+    nutrition: String,
+    isPlaying: Boolean,
+    offset: IntOffset,
+    scrollFraction: Float,
+    secondaryElementsAlpha: Float
+) {
+    val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
+    val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else 3 }
+    val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
+    val titleOffset = with(LocalDensity.current) {
+        IntOffset(
+            x = (32.dp.toPx() * scrollFraction).toInt(),
+            y = ((-42).dp.toPx() * scrollFraction).toInt()
+        ) - offset
+    }
+
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .alpha(scrollFraction)
+            .background(MaterialTheme.colors.background)
+    )
+    Column(modifier = Modifier.statusBarsPadding()) {
+        BackButton(
+            modifier = Modifier
+                .padding(top = 8.dp, start = 12.dp)
+                .offset { -offset }
+        )
+        Text(
+            text = title,
+            style = MaterialTheme.typography.h1.copy(fontSize = titleTextSize.sp),
+            maxLines = titleMaxLines,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .padding(start = 32.dp)
+                .fillMaxWidth(0.7F)
+                .offset { titleOffset }
+                .alpha(titleAlpha)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = nutrition,
+            style = MaterialTheme.typography.h3,
+            modifier = Modifier
+                .padding(start = 32.dp)
+                .alpha(secondaryElementsAlpha)
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.ImageContent(
+    image: String,
+    rating: String,
+    showPlayButton: Boolean,
+    isHeartButtonSelected: Boolean,
+    secondaryElementsAlpha: Float,
+    onPlayClick: () -> Unit,
+    onHeartClick: () -> Unit
+) {
+    Image(
+        painter = rememberCoilPainter(
+            request = "",
+            requestBuilder = { size -> applyForExtarnalImage(image, size) },
+            fadeIn = true
+        ),
+        contentDescription = null,
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop,
+        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
+    )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .align(Alignment.BottomStart)
+            .padding(start = 32.dp, end = 24.dp, bottom = 8.dp)
+            .alpha(secondaryElementsAlpha)
+    ) {
+        Text(
+            text = rating,
+            style = MaterialTheme.typography.h2,
+        )
+        Spacer(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1F)
+        )
+        AnimatedHeartButton(
+            onToggle = onHeartClick,
+            isSelected = isHeartButtonSelected,
+            iconSize = 32.dp,
+        )
+    }
+    if (showPlayButton) {
+        PlayButton(
+            onClick = onPlayClick,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 100.dp)
+                .alpha(secondaryElementsAlpha)
+        )
+    }
+}
+
+@Composable
+private fun PlayButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+            .background(LocalContentColor.current.copy(alpha = ContentAlpha.disabled))
+            .size(72.dp)
+    ) {
+        Icon(
+            imageVector = Icons.Default.PlayArrow,
+            contentDescription = "Play",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun Ingredients(
     ingredient: List<Ingredient>,
     modifier: Modifier = Modifier
 ) {
@@ -311,7 +375,7 @@ fun Ingredients(
 }
 
 @Composable
-fun Steps(
+private fun Steps(
     instruction: Instruction,
     modifier: Modifier = Modifier
 ) {
@@ -344,7 +408,7 @@ fun Steps(
 }
 
 @Composable
-fun Keywords(
+private fun Keywords(
     keywords: List<String>,
     onClick: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -374,7 +438,7 @@ fun Keywords(
 }
 
 @Composable
-fun RecommendedDrinks(
+private fun RecommendedDrinks(
     data: List<Drink>,
     onShowMoreClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -401,9 +465,9 @@ fun RecommendedDrinks(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Icon(
-                    painter = painterResource(drawable.ic_arrow_back),
+                    painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = "More",
-                    modifier = Modifier.size(16.dp).rotate(180F)
+                    modifier = Modifier.size(8.dp).rotate(180F)
                 )
             }
         }
@@ -417,7 +481,7 @@ fun RecommendedDrinks(
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun DrinkScreenPreview() {
+private fun DrinkScreenPreview() {
     BarneeTheme {
         DrinkScreen("alias", "name", "sample.png")
     }

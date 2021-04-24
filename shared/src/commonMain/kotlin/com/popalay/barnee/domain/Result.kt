@@ -31,3 +31,11 @@ val <T : Any?> Result<T>.isEmpty
         this() is List<*> -> (this() as List<*>).isEmpty()
         else -> this() == null
     }
+
+inline fun <T : Any?, R : Any?> Result<T>.map(crossinline transform: (value: T) -> R): Result<R> =
+    when (this) {
+        is Uninitialized -> Uninitialized()
+        is Loading -> Loading()
+        is Success -> Success(transform(this()))
+        is Fail -> Fail(error)
+    }
