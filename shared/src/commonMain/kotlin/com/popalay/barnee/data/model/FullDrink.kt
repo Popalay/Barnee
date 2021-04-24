@@ -44,6 +44,7 @@ data class FullDrink(
 
     @Transient
     val keywords = (categories + collections + occasions)
+        .filter { it.alias.isNotBlank() }
         .map { it.text.toLowerCase() }
         .filter { it != "unknown" }
 }
@@ -78,6 +79,6 @@ data class InstructionStep(
 @Serializable
 data class Category(
     val text: String,
-    val alias: String,
+    val alias: String = "",
     val imageUrl: String = ""
 )

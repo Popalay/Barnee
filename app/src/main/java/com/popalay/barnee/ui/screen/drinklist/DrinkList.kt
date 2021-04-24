@@ -26,13 +26,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.style.TextAlign.Start
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.drinklist.DrinkListAction.ToggleFavorite
+import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
@@ -151,16 +151,17 @@ private fun DrinkListItem(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .scrim(listOf(Color.Transparent, Color.Black.copy(alpha = 0.7F)))
+                    .scrim(listOf(Color.Transparent, Color.Black.copy(alpha = 0.9F)))
                     .padding(16.dp)
                     .align(Alignment.BottomStart)
             ) {
                 Text(
                     text = data.displayName,
                     style = MaterialTheme.typography.h2,
-                    textAlign = Start,
+                    overflow = TextOverflow.Ellipsis,
                     modifier = Modifier
                         .fillMaxWidth(fraction = 0.7F)
+                        .weight(1F)
                         .padding(end = 8.dp)
                 )
                 Text(

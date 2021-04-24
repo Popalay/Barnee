@@ -27,7 +27,7 @@ interface Action
 interface Mutation
 
 @OptIn(ExperimentalCoroutinesApi::class)
-abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S) {
+abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S, initialAction: A? = null) {
     private val actionFlow = MutableSharedFlow<A>(
         extraBufferCapacity = 64,
         replay = Int.MAX_VALUE,
@@ -37,6 +37,10 @@ abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S
 
     abstract val processor: Processor<S, M>
     abstract val reducer: Reducer<S, M>
+
+    init {
+        initialAction?.let { process(it) }
+    }
 
     val stateFlow: StateFlow<S> = actionFlow
         .applyProcessor()
@@ -74,7 +78,7 @@ abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S
         transform(value).collect { emit(Success(it)) }
     }.catch { emit(Fail(it)) }
 
-    private fun Flow<Action>.applyProcessor() = flatMapConcat { processor(actionFlow) { stateFlow.value } }
+    private fun Flow<Action>.applyProcessor() = flatMapConcat { processor(this) { stateFlow.value } }
 }
 
 typealias Processor<State, Mutation> = Flow<Action>.(state: () -> State) -> Flow<Mutation>

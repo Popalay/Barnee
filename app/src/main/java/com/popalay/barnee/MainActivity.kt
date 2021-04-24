@@ -30,6 +30,7 @@ import com.popalay.barnee.ui.screen.parameterizeddrinklist.QueryDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.SimilarDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.TagDrinksScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
+import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 
 class MainActivity : ComponentActivity() {
@@ -57,6 +58,7 @@ fun ComposeApp() {
             LocalNavController provides navController,
             LocalImageLoader provides ImageLoader.Builder(LocalContext.current).logger(DebugLogger()).build()
         ) {
+            ShakeToDrinkScreen()
             NavHost(navController, startDestination = "home") {
                 composable("home") {
                     DiscoveryScreen()

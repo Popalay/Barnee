@@ -19,5 +19,7 @@ data class Drink(
     val displayName = name.toLowerCase().removePrefix("absolut ")
 
     @Transient
-    val displayRating = (rating / 10F).toString()
+    val displayRating = (rating / 10F).let {
+        if (it.toInt() - it == 0F) it.toInt().toString() else it.toString()
+    }
 }

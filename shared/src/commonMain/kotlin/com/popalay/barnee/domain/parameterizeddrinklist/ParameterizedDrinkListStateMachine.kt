@@ -31,9 +31,11 @@ sealed class ParameterizedDrinkListMutation : Mutation {
 }
 
 class ParameterizedDrinkListStateMachine(
+    request: DrinksRequest,
     private val drinkRepository: DrinkRepository
 ) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation>(
-    ParameterizedDrinkListState()
+    ParameterizedDrinkListState(),
+    Initial(request)
 ) {
     override val processor: Processor<ParameterizedDrinkListState, ParameterizedDrinkListMutation> = {
         merge(

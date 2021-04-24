@@ -58,7 +58,7 @@ sealed class SearchMutation : Mutation {
 
 class SearchStateMachine(
     private val drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction, SearchMutation>(SearchState()) {
+) : StateMachine<SearchState, SearchAction, SearchMutation>(SearchState(), Initial) {
     override val processor: Processor<SearchState, SearchMutation> = { state ->
         merge(
             filterIsInstance<Initial>()

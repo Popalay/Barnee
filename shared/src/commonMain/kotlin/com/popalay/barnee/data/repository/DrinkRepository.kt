@@ -9,6 +9,7 @@ import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.DrinksRequest.Favorites
 import com.popalay.barnee.data.repository.DrinksRequest.ForQuery
 import com.popalay.barnee.data.repository.DrinksRequest.ForTags
+import com.popalay.barnee.data.repository.DrinksRequest.Random
 import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -32,6 +33,7 @@ class DrinkRepository(
             is RelatedTo -> mapFavorites(api.similarDrinks(request.alias))
             is ForTags -> mapFavorites(api.drinksByTags(request.tags))
             is ForQuery -> mapFavorites(api.drinks(request.query))
+            is Random -> mapFavorites(api.random(request.count))
             Favorites -> getFavoriteDrinks()
         }
     }
