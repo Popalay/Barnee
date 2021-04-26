@@ -5,6 +5,8 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -33,9 +35,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
+import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -46,6 +51,7 @@ import org.koin.androidx.compose.getViewModel
 @Composable
 fun ShakeToDrinkScreen() {
     val viewModel: ShakeToDrinkViewModel = getViewModel()
+    val drinkItemViewModel: DrinkItemViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
     val navController = LocalNavController.current
 
@@ -81,7 +87,8 @@ fun ShakeToDrinkScreen() {
                             navController.navigate(
                                 Screen.Drink(value.alias, value.displayName, value.displayImageUrl).route
                             )
-                        }
+                        },
+                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value.alias)) }
                     )
                 }
             }
@@ -92,8 +99,9 @@ fun ShakeToDrinkScreen() {
 @Composable
 private fun RandomDrink(
     data: Drink,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit,
+    onHeartClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Card(
         elevation = 4.dp,
@@ -124,10 +132,22 @@ private fun RandomDrink(
                         .fillMaxHeight()
                         .weight(1F)
                 )
-                Text(
-                    text = data.displayRating,
-                    style = MaterialTheme.typography.h2,
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = data.displayRating,
+                        style = MaterialTheme.typography.h2,
+                    )
+                    Spacer(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .weight(1F)
+                    )
+                    AnimatedHeartButton(
+                        onToggle = onHeartClick,
+                        isSelected = data.isFavorite,
+                        iconSize = 32.dp,
+                    )
+                }
             }
         }
     }

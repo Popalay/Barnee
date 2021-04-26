@@ -11,12 +11,14 @@ import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.DialogDismissed
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.Initial
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkMutation.RandomDrinkMutation
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
@@ -41,16 +43,13 @@ class ShakeToDrinkStateMachine(
     private val drinkRepository: DrinkRepository,
     private val shakeDetector: ShakeDetector
 ) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, ShakeToDrinkMutation>(ShakeToDrinkState(), Initial) {
-    override val processor: Processor<ShakeToDrinkState, ShakeToDrinkMutation> = {
+    override val processor: Processor<ShakeToDrinkState, ShakeToDrinkMutation> = { state ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)
                 .flatMapMerge { detectShakes() }
-                .flatMapToResult {
-                    drinkRepository.getDrinks(DrinksRequest.Random(1))
-                        .map { it.first() }
-                        .take(1)
-                }
+                .flatMapToResult { drinkRepository.getDrinks(DrinksRequest.Random(1)).map { it.first() } }
+                .filter { !(it is Success<Drink> && state().randomDrink is Uninitialized) }
                 .map { RandomDrinkMutation(it) },
             filterIsInstance<DialogDismissed>()
                 .map { RandomDrinkMutation(Uninitialized()) },

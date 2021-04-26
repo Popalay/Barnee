@@ -3,7 +3,7 @@ package com.popalay.barnee.di
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.ui.screen.discovery.DiscoveryViewModel
 import com.popalay.barnee.ui.screen.drink.DrinkViewModel
-import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
+import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListViewModel
 import com.popalay.barnee.ui.screen.search.SearchViewModel
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkViewModel
@@ -16,6 +16,6 @@ val uiModule = module {
     viewModel { (alias: String) -> DrinkViewModel(get { parametersOf(alias) }) }
     viewModel { SearchViewModel(get()) }
     viewModel { (request: DrinksRequest) -> ParameterizedDrinkListViewModel(get { parametersOf(request) }) }
-    viewModel { DrinkListViewModel(get()) }
+    viewModel { DrinkItemViewModel(get()) }
     viewModel { ShakeToDrinkViewModel(get()) }
 }

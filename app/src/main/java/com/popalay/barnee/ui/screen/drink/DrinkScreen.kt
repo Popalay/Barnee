@@ -80,7 +80,7 @@ import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
-import com.popalay.barnee.ui.screen.drinklist.DrinkListViewModel
+import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
 import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -98,7 +98,7 @@ fun DrinkScreen(
 ) {
     val navController: NavController = LocalNavController.current
     val viewModel: DrinkViewModel = getViewModel { parametersOf(alias) }
-    val drinkItemViewModel: DrinkListViewModel = getViewModel()
+    val drinkItemViewModel: DrinkItemViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
     val drink = remember(state) { state.drinkWithRelated()?.drink }
 

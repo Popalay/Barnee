@@ -5,6 +5,6 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemState
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
-class DrinkListViewModel(
+class DrinkItemViewModel(
     stateMachine: DrinkItemStateMachine
 ) : StateMachineWrapperViewModel<DrinkItemState, DrinkItemAction>(stateMachine)

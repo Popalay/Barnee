@@ -55,7 +55,7 @@ fun DrinkGrid(
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val viewModel: DrinkListViewModel = getViewModel()
+    val viewModel: DrinkItemViewModel = getViewModel()
     val navController = LocalNavController.current
 
     StateLayout(
@@ -98,7 +98,7 @@ fun DrinkHorizontalList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val viewModel: DrinkListViewModel = getViewModel()
+    val viewModel: DrinkItemViewModel = getViewModel()
     val navController = LocalNavController.current
 
     BoxWithConstraints {
