@@ -2,6 +2,7 @@ package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +38,10 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -160,6 +164,13 @@ fun DrinkScreen(
                     },
                 ) { value ->
                     Spacer(modifier = Modifier.height(32.dp))
+                    if (value.drink.story.isNotBlank()) {
+                        Story(
+                            story = value.drink.displayStory,
+                            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
+                        )
+                        Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    }
                     Ingredients(
                         ingredient = value.drink.ingredients,
                         modifier = Modifier.padding(horizontal = 32.dp)
@@ -180,7 +191,7 @@ fun DrinkScreen(
                     }
                     RecommendedDrinks(
                         data = value.relatedDrinks,
-                        onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, value.drink.name).route) }
+                        onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, value.drink.name).route) },
                     )
                     Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                 }
@@ -371,6 +382,48 @@ private fun Ingredients(
                 color = LightGrey
             )
         }
+    }
+}
+
+@Composable
+private fun Story(
+    story: String,
+    modifier: Modifier = Modifier
+) {
+    var isTextCollapsed by rememberSaveable { mutableStateOf(true) }
+    val textLength by animateIntAsState(if (isTextCollapsed) 100 else story.length)
+    val arrowRotation by animateIntAsState(if (isTextCollapsed) 270 else 90)
+
+    Column(modifier = modifier) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Text(
+                text = "Story",
+                style = MaterialTheme.typography.subtitle1,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1F)
+            )
+            TextButton(
+                onClick = { isTextCollapsed = !isTextCollapsed },
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onBackground)
+            ) {
+                Text(
+                    text = if (isTextCollapsed) "More" else "Less",
+                    style = MaterialTheme.typography.subtitle2,
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Icon(
+                    painter = painterResource(R.drawable.ic_arrow_back),
+                    contentDescription = if (isTextCollapsed) "More" else "Less",
+                    modifier = Modifier.size(8.dp).rotate(arrowRotation.toFloat())
+                )
+            }
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = story.take(textLength) + if (isTextCollapsed) "..." else "",
+            style = MaterialTheme.typography.body2
+        )
     }
 }
 

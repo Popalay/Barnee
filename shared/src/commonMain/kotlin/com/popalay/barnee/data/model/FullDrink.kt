@@ -48,6 +48,9 @@ data class FullDrink(
         .filter { it.alias.isNotBlank() }
         .map { it.text.toLowerCase() }
         .filter { it != "unknown" }
+
+    @Transient
+    val displayStory = story.trim().removeSuffix(".")
 }
 
 @Serializable
