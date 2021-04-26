@@ -1,5 +1,6 @@
 package com.popalay.barnee.data.model
 
+import com.popalay.barnee.util.toIntIfInt
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
@@ -40,7 +41,7 @@ data class FullDrink(
     val videoUrl = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
 
     @Transient
-    val displayRating = (rating / 10F).toString()
+    val displayRating = "${(rating / 10F).toIntIfInt()}/10"
 
     @Transient
     val keywords = (categories + collections + occasions)
@@ -68,12 +69,13 @@ data class InstructionStep(
     val action: String,
     val container: String,
     val text: String,
-    val textReference: String
+    val textReference: String,
+    val milliliters: Double = 0.0
 ) {
     @Transient
     val displayText = text.replace(regex) {
         it.groups.firstOrNull()?.value.orEmpty().substringAfter("[").substringBefore("|")
-    }.removeSuffix(".")
+    }.removeSuffix(".") + milliliters.takeIf { it > 0 }?.let { " (${it.toIntIfInt()}ml)" }.orEmpty()
 }
 
 @Serializable

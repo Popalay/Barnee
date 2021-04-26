@@ -1,5 +1,6 @@
 package com.popalay.barnee.data.model
 
+import com.popalay.barnee.util.toIntIfInt
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
@@ -19,7 +20,5 @@ data class Drink(
     val displayName = name.toLowerCase().removePrefix("absolut ")
 
     @Transient
-    val displayRating = (rating / 10F).let {
-        if (it.toInt() - it == 0F) it.toInt().toString() else it.toString()
-    }
+    val displayRating = (rating / 10F).toIntIfInt().toString()
 }
