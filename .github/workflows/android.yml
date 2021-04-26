@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - master
+    tags:
+      - v**
   pull_request:
     branches:
       - master
@@ -27,6 +29,8 @@ jobs:
         run: echo "BUILD_NUMBER=$(expr $GITHUB_RUN_NUMBER + 5210)" >> $GITHUB_ENV
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
 
       - name: set up JDK
         uses: actions/setup-java@v1
