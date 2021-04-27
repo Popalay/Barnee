@@ -249,8 +249,8 @@ private fun SharedContent(
     val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
     val titleOffset = with(LocalDensity.current) {
         IntOffset(
-            x = (32.dp.toPx() * scrollFraction).toInt(),
-            y = ((-42).dp.toPx() * scrollFraction).toInt()
+            x = (28.dp.toPx() * scrollFraction).toInt(),
+            y = ((-40).dp.toPx() * scrollFraction).toInt()
         ) - offset
     }
 
@@ -263,7 +263,7 @@ private fun SharedContent(
     Column(modifier = Modifier.statusBarsPadding()) {
         BackButton(
             modifier = Modifier
-                .padding(top = 8.dp, start = 12.dp)
+                .padding(top = 8.dp, start = 8.dp)
                 .offset { -offset }
         )
         Text(
@@ -272,7 +272,7 @@ private fun SharedContent(
             maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(start = 32.dp)
+                .padding(start = 24.dp)
                 .fillMaxWidth(0.7F)
                 .offset { titleOffset }
                 .alpha(titleAlpha)

@@ -64,7 +64,7 @@ fun ActionsAppBar(
             .fillMaxWidth()
             .statusBarsPadding()
             .padding(8.dp)
-            .padding(start = if (leadingButtons != null) 4.dp else 16.dp)
+            .padding(start = if (leadingButtons != null) 0.dp else 16.dp)
     ) {
         leadingButtons?.invoke(this)
         Box(

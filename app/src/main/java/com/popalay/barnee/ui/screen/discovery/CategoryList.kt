@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -31,10 +31,14 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
+import com.popalay.barnee.ui.common.DefaultColumns
+import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
+import com.popalay.barnee.ui.common.DefaultItemShift
+import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
-import com.popalay.barnee.ui.common.ShiftedLazyGrid
 import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
@@ -69,16 +73,22 @@ fun CategoryGrid(
         },
         loadingState = { LoadingStateView(modifier = modifier) }
     ) { value ->
-        ShiftedLazyGrid(
-            listState = listState,
-            contentPadding = PaddingValues(12.dp) + contentPadding,
+        val fullContentPadding = PaddingValues(16.dp) + contentPadding
+        LazyColumn(
+            state = listState,
             modifier = modifier
-        ) { itemContentPaddingResolver ->
-            itemsIndexed(value) { index, item ->
+        ) {
+            itemsInGridIndexed(
+                items = value,
+                columns = DefaultColumns,
+                contentPadding = fullContentPadding,
+                horizontalItemPadding = DefaultHorizontalItemPadding,
+                verticalItemPadding = DefaultVerticalItemPadding,
+            ) { index, item ->
                 CategoryListItem(
                     item,
                     onClick = { navController.navigate(Screen.QueryDrinks(item.alias, item.text).route) },
-                    modifier = Modifier.padding(itemContentPaddingResolver(index, value.size))
+                    modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
                 )
             }
         }
