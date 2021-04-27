@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -34,10 +35,14 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.DefaultColumns
+import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
+import com.popalay.barnee.ui.common.DefaultItemShift
+import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
-import com.popalay.barnee.ui.common.ShiftedLazyGrid
 import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.screen.navigation.LocalNavController
@@ -74,18 +79,24 @@ fun DrinkGrid(
         },
         loadingState = { LoadingStateView(modifier = modifier) }
     ) { value ->
-        ShiftedLazyGrid(
-            listState = listState,
-            contentPadding = PaddingValues(12.dp) + contentPadding,
+        val fullContentPadding = PaddingValues(16.dp) + contentPadding
+        LazyColumn(
+            state = listState,
             modifier = modifier
-        ) { itemContentPaddingResolver ->
-            itemsIndexed(value) { index, item ->
+        ) {
+            itemsInGridIndexed(
+                items = value,
+                columns = DefaultColumns,
+                contentPadding = fullContentPadding,
+                horizontalItemPadding = DefaultHorizontalItemPadding,
+                verticalItemPadding = DefaultVerticalItemPadding,
+            ) { index, item ->
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
-                    modifier = Modifier.padding(itemContentPaddingResolver(index, value.size))
+                    modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
                 )
             }
         }
