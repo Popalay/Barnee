@@ -35,7 +35,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.ui.common.AnimatedHeartButton
-import com.popalay.barnee.ui.common.DefaultColumns
+import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
@@ -86,7 +86,7 @@ fun DrinkGrid(
         ) {
             itemsInGridIndexed(
                 items = value,
-                columns = DefaultColumns,
+                columns = DEFAULT_COLUMNS,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
