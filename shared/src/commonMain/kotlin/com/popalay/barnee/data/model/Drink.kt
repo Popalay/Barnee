@@ -26,7 +26,7 @@ data class Drink(
     val displayImageUrl = images.lastOrNull()?.uri.orEmpty()
 
     @Transient
-    val displayName = name.toLowerCase().removePrefix("absolut ")
+    val displayName = name.toLowerCase().removePrefix("absolut").trim()
 
     @Transient
     val videoUrl = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }

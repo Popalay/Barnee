@@ -139,6 +139,7 @@ fun DrinkScreen(
                         title = name,
                         nutrition = drink?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
                         isPlaying = state.isPlaying,
+                        shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = offset,
                         scrollFraction = fraction
@@ -239,12 +240,14 @@ private fun SharedContent(
     title: String,
     nutrition: String,
     isPlaying: Boolean,
+    shouldCutTitle: Boolean,
     offset: IntOffset,
     scrollFraction: Float,
     secondaryElementsAlpha: Float
 ) {
     val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
-    val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else 3 }
+    val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
+    val titleWidthFraction = remember(scrollFraction) { if (scrollFraction > 0.9F) 1F else 0.7F }
     val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
     val titleOffset = with(LocalDensity.current) {
         IntOffset(
@@ -271,8 +274,8 @@ private fun SharedContent(
             maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(start = 24.dp)
-                .fillMaxWidth(0.7F)
+                .padding(start = 24.dp, end = 16.dp)
+                .fillMaxWidth(titleWidthFraction)
                 .offset { titleOffset }
                 .alpha(titleAlpha)
         )
@@ -281,7 +284,7 @@ private fun SharedContent(
             text = nutrition,
             style = MaterialTheme.typography.h3,
             modifier = Modifier
-                .padding(start = 32.dp)
+                .padding(start = 24.dp)
                 .alpha(secondaryElementsAlpha)
         )
     }
