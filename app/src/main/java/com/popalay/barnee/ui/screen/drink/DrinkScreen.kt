@@ -102,9 +102,8 @@ fun DrinkScreen(
     val state by viewModel.stateFlow.collectAsState()
     val drink = remember(state) { state.drinkWithRelated()?.drink }
 
-    val configuration = LocalConfiguration.current
-    val toolbarHeight = remember { Dp(configuration.screenWidthDp / 0.8F) }
-    val collapsedToolbarHeight = 88.dp + with(LocalDensity.current) { LocalWindowInsets.current.statusBars.bottom.toDp() }
+    val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
+    val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
 
     CollapsingScaffold(
         maxHeight = toolbarHeight,
@@ -118,7 +117,7 @@ fun DrinkScreen(
                 imageContent = {
                     ImageContent(
                         image = image,
-                        rating = drink?.displayRating.orEmpty(),
+                        rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite == true,
                         secondaryElementsAlpha = secondaryElementsAlpha,

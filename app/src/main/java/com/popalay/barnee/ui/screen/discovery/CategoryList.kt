@@ -31,7 +31,7 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.ui.common.DefaultColumns
+import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
@@ -80,7 +80,7 @@ fun CategoryGrid(
         ) {
             itemsInGridIndexed(
                 items = value,
-                columns = DefaultColumns,
+                columns = DEFAULT_COLUMNS,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
