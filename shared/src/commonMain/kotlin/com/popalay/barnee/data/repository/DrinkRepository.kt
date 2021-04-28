@@ -59,7 +59,7 @@ class DrinkRepository(
                 .mapLatest { favorites ->
                     response.copy(
                         relatedDrinks = response.relatedDrinks.map { it.copy(isFavorite = it.alias in favorites) },
-                        result = response.result.map { it.copy(isFavorite = it.alias in favorites) }
+                        drink = response.drink.copy(isFavorite = response.drink.alias in favorites)
                     )
                 }
         }

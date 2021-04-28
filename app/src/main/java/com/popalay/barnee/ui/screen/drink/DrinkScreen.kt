@@ -163,7 +163,7 @@ fun DrinkScreen(
                     },
                 ) { value ->
                     Spacer(modifier = Modifier.height(32.dp))
-                    if (value.drink.story.isNotBlank()) {
+                    if (value.drink.displayStory.isNotBlank()) {
                         Story(
                             story = value.drink.displayStory,
                             modifier = Modifier.padding(start = 32.dp, end = 24.dp)
@@ -190,7 +190,7 @@ fun DrinkScreen(
                     }
                     RecommendedDrinks(
                         data = value.relatedDrinks,
-                        onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, value.drink.name).route) },
+                        onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, name).route) },
                     )
                     Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                 }
@@ -441,7 +441,7 @@ private fun Steps(
             if (index > 0) Spacer(modifier = Modifier.height(8.dp))
             Row {
                 Text(
-                    text = item.displayText,
+                    text = item.text,
                     style = MaterialTheme.typography.body1,
                     color = MaterialTheme.colors.primary,
                     modifier = Modifier

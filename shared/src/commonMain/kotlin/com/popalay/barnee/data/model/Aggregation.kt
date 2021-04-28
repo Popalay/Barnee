@@ -24,7 +24,7 @@ data class Aggregation(
 
 @Serializable
 data class AggregationGroup(
-    val values: Map<String, Int>
+    private val values: Map<String, Int>
 ) {
     @Transient
     val displayNames = values.keys.map { it.replace(' ', '-') to it.toLowerCase().replace('-', ' ') }
