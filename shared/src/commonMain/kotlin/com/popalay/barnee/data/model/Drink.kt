@@ -6,22 +6,13 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.Transient
 
 @Serializable
-data class FullDrinkResponse(
-    val relatedDrinks: List<Drink>,
-    val result: List<Drink>
-) {
-    @Transient
-    val drink = result.first()
-}
-
-@Serializable
 data class Drink(
     val id: String,
-    val name: String,
+    private val name: String,
     val alias: String,
-    val rating: Int,
+    private val rating: Int,
     val images: List<Image>,
-    val story: String = "",
+    private val story: String = "",
     val ingredients: List<Ingredient> = emptyList(),
     val categories: List<Category> = emptyList(),
     val occasions: List<Category> = emptyList(),
@@ -52,38 +43,3 @@ data class Drink(
     @Transient
     val displayStory = story.trim().removeSuffix(".")
 }
-
-@Serializable
-data class Ingredient(
-    val text: String,
-    val name: String,
-    val nutrition: Int = 0
-)
-
-@Serializable
-data class Instruction(
-    @SerialName("stepByStep") val steps: List<InstructionStep>
-)
-
-val regex by lazy { "[\\[][\\w ,'-]+[|][\\w]+[|][\\w\\W]{8}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{12}+[]]".toRegex() }
-
-@Serializable
-data class InstructionStep(
-    val action: String,
-    val container: String,
-    val text: String,
-    val textReference: String,
-    val milliliters: Double = 0.0
-) {
-    @Transient
-    val displayText = text.replace(regex) {
-        it.groups.firstOrNull()?.value.orEmpty().substringAfter("[").substringBefore("|")
-    }.removeSuffix(".") + milliliters.takeIf { it > 0 }?.let { " (${it.toIntIfInt()}ml)" }.orEmpty()
-}
-
-@Serializable
-data class Category(
-    val text: String,
-    val alias: String = "",
-    val imageUrl: String = ""
-)
