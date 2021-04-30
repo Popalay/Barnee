@@ -25,11 +25,11 @@ val isCI = System.getenv("CI") == "true"
 println("Is CI environment: $isCI")
 
 android {
-    compileSdkVersion(30)
+    compileSdk = 30
     defaultConfig {
         applicationId = "com.popalay.barnee"
-        minSdkVersion(28)
-        targetSdkVersion(30)
+        minSdk = 28
+        targetSdk = 30
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
         versionName = "1.0.3"
 
@@ -55,7 +55,6 @@ android {
             getByName("release") {
                 signingConfig = if (isCI) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
                 isMinifyEnabled = true
-                isShrinkResources = true
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             }
         }
