@@ -17,6 +17,7 @@ import com.popalay.barnee.domain.search.SearchAction.FilterClicked
 import com.popalay.barnee.domain.search.SearchAction.FiltersDismissed
 import com.popalay.barnee.domain.search.SearchAction.Initial
 import com.popalay.barnee.domain.search.SearchAction.QueryChanged
+import com.popalay.barnee.domain.search.SearchAction.Retry
 import com.popalay.barnee.domain.search.SearchAction.ShowFiltersClicked
 import com.popalay.barnee.domain.search.SearchMutation.AggregationMutation
 import com.popalay.barnee.domain.search.SearchMutation.FilterClickedMutation
@@ -42,6 +43,7 @@ data class SearchState(
 
 sealed class SearchAction : Action {
     object Initial : SearchAction()
+    object Retry : SearchAction()
     object ShowFiltersClicked : SearchAction()
     object FiltersDismissed : SearchAction()
     data class QueryChanged(val query: String) : SearchAction()
@@ -67,19 +69,20 @@ class SearchStateMachine(
                 .map { AggregationMutation(it) },
             filterIsInstance<Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.searchDrinks("", emptyMap(), count = 10) }
+                .flatMapToResult { state().searchRequest() }
+                .map { SearchingMutation(it) },
+            filterIsInstance<Retry>()
+                .flatMapToResult { drinkRepository.getAggregation() }
+                .map { AggregationMutation(it) },
+            filterIsInstance<Retry>()
+                .flatMapToResult { state().searchRequest() }
                 .map { SearchingMutation(it) },
             filterIsInstance<QueryChanged>()
                 .map { QueryChangedMutation(it.query) },
             filterIsInstance<QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
-                .flatMapToResult {
-                    drinkRepository.searchDrinks(
-                        it.query,
-                        getFilters(state().aggregation(), state().selectedFilters)
-                    )
-                }
+                .flatMapToResult { state().searchRequest(it.query) }
                 .map { SearchingMutation(it) },
             filterIsInstance<FilterClicked>()
                 .map {
@@ -95,12 +98,7 @@ class SearchStateMachine(
                 .map { ShowFiltersMutation(true) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters != it.selectedFilters } }
-                .flatMapToResult {
-                    drinkRepository.searchDrinks(
-                        state().searchQuery,
-                        getFilters(state().aggregation(), state().selectedFilters)
-                    )
-                }
+                .flatMapToResult { state().searchRequest() }
                 .map { SearchingMutation(it) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters == it.selectedFilters } }
@@ -117,6 +115,13 @@ class SearchStateMachine(
             is ShowFiltersMutation -> copy(isFiltersShown = mutation.data)
         }
     }
+
+    private fun SearchState.searchRequest(query: String? = null) =
+        drinkRepository.searchDrinks(
+            query ?: searchQuery,
+            getFilters(aggregation(), selectedFilters),
+            count = if (searchQuery.isBlank()) 10 else 100
+        )
 
     private fun getFilters(
         aggregation: Aggregation?,

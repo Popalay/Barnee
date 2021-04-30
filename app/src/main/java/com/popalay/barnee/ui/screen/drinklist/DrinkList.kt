@@ -40,6 +40,7 @@ import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
+import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
@@ -56,6 +57,7 @@ import org.koin.androidx.compose.getViewModel
 fun DrinkGrid(
     drinks: Result<List<Drink>>,
     emptyMessage: String,
+    onRetry: () -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
@@ -72,8 +74,8 @@ fun DrinkGrid(
             )
         },
         errorState = {
-            EmptyStateView(
-                message = emptyMessage,
+            ErrorAndRetryStateView(
+                onRetry = onRetry,
                 modifier = modifier
             )
         },
@@ -150,7 +152,7 @@ private fun DrinkListItem(
         ) {
             Image(
                 painter = rememberCoilPainter(
-                    request = "",
+                    request = data.displayImageUrl,
                     requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
                 ),
                 contentDescription = null,

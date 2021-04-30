@@ -115,6 +115,7 @@ fun SearchScreen() {
                 DrinkGrid(
                     drinks = state.drinks,
                     emptyMessage = "We currently have no drinks\non your request",
+                    onRetry = { viewModel.processAction(SearchAction.Retry) },
                     listState = listState,
                     modifier = Modifier.weight(1F)
                 )

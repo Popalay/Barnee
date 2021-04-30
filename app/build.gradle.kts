@@ -16,7 +16,9 @@ dependencies {
     implementation(libs.accompanist.flowlayout)
     implementation(libs.lottie.compose)
     implementation(libs.exoplayer)
-    implementation(libs.youtubeExtractor)
+    implementation(libs.youtubeExtractor) {
+        exclude("com.android.support", "support-annotations")
+    }
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
 }
