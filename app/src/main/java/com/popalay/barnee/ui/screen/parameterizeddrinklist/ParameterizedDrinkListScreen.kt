@@ -16,6 +16,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
@@ -49,6 +50,7 @@ fun ParameterizedDrinkListScreen(
             drinks = state.drinks,
             listState = listState,
             emptyMessage = "We don't have any drinks\nfor this category",
+            onRetry = { viewModel.processAction(ParameterizedDrinkListAction.Retry) },
             contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues()
         )
     }

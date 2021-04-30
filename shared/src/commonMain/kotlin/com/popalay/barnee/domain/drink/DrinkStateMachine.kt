@@ -11,6 +11,7 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.drink.DrinkAction.Initial
+import com.popalay.barnee.domain.drink.DrinkAction.Retry
 import com.popalay.barnee.domain.drink.DrinkAction.TogglePlaying
 import com.popalay.barnee.domain.drink.DrinkMutation.DrinkWithRelatedMutation
 import com.popalay.barnee.domain.drink.DrinkMutation.TogglePlayingMutation
@@ -27,6 +28,7 @@ data class DrinkState(
 sealed class DrinkAction : Action {
     data class Initial(val alias: String) : DrinkAction()
     object TogglePlaying : DrinkAction()
+    object Retry : DrinkAction()
 }
 
 sealed class DrinkMutation : Mutation {
@@ -43,6 +45,9 @@ class DrinkStateMachine(
             filterIsInstance<Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getFullDrink(it.alias) }
+                .map { DrinkWithRelatedMutation(it) },
+            filterIsInstance<Retry>()
+                .flatMapToResult { drinkRepository.getFullDrink(alias) }
                 .map { DrinkWithRelatedMutation(it) },
             filterIsInstance<TogglePlaying>()
                 .map { !state().isPlaying }

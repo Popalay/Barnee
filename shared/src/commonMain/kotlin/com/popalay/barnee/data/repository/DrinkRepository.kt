@@ -28,17 +28,17 @@ class DrinkRepository(
     private val api: Api,
     private val localStore: LocalStore
 ) {
-    suspend fun getDrinks(request: DrinksRequest): Flow<List<Drink>> {
+    fun getDrinks(request: DrinksRequest): Flow<List<Drink>> {
         return when (request) {
-            is RelatedTo -> mapFavorites(api.similarDrinks(request.alias))
-            is ForTags -> mapFavorites(api.drinksByTags(request.tags))
-            is ForQuery -> mapFavorites(api.drinks(request.query))
-            is Random -> mapFavorites(api.random(request.count))
+            is RelatedTo -> mapFavorites { api.similarDrinks(request.alias) }
+            is ForTags -> mapFavorites { api.drinksByTags(request.tags) }
+            is ForQuery -> mapFavorites { api.drinks(request.query) }
+            is Random -> mapFavorites { api.random(request.count) }
             Favorites -> getFavoriteDrinks()
         }
     }
 
-    suspend fun searchDrinks(
+    fun searchDrinks(
         query: String,
         filters: Map<String, List<String>>,
         count: Int = 100
@@ -48,10 +48,10 @@ class DrinkRepository(
             .map { it.key + "/" + it.value.joinToString(",") }
             .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
 
-        return mapFavorites(api.searchDrinks(searchRequest, count))
+        return mapFavorites { api.searchDrinks(searchRequest, count) }
     }
 
-    suspend fun getAggregation(): Flow<Aggregation> = flowOf(api.getAggregation())
+    fun getAggregation(): Flow<Aggregation> = flow { emit(api.getAggregation()) }
 
     fun getFullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
         .flatMapLatest { response ->
@@ -121,6 +121,7 @@ class DrinkRepository(
     )
 
     private suspend fun saveAsFavorite(alias: String) {
+        if (alias.isBlank()) return
         localStore.saveFavorite(alias)
     }
 
@@ -128,11 +129,14 @@ class DrinkRepository(
         localStore.removeFavorite(alias)
     }
 
-    private fun getFavoriteDrinks(): Flow<List<Drink>> = localStore.getFavoriteDrinks()
+    private fun getFavoriteAliases(): Flow<Set<String>> = localStore.getFavoriteDrinks()
+        .map { favorites -> favorites.filter { it.isNotBlank() }.toSet() }
+
+    private fun getFavoriteDrinks(): Flow<List<Drink>> = getFavoriteAliases()
         .take(1)
-        .map { favorites -> api.drinksByAliases(favorites) }
+        .map { api.drinksByAliases(it) }
         .flatMapLatest { drinks ->
-            localStore.getFavoriteDrinks()
+            getFavoriteAliases()
                 .mapLatest { favorites ->
                     drinks.filter { it.alias in favorites }
                         .let { if (it.size == favorites.size) it else api.drinksByAliases(favorites) }
@@ -140,6 +144,10 @@ class DrinkRepository(
         }
         .map { drinks -> drinks.map { it.copy(isFavorite = true) } }
 
-    private fun mapFavorites(drinks: List<Drink>) = localStore.getFavoriteDrinks()
-        .map { favorites -> drinks.map { it.copy(isFavorite = it.alias in favorites) } }
+    private fun mapFavorites(drinksRequest: suspend () -> List<Drink>): Flow<List<Drink>> =
+        flow { emit(drinksRequest()) }
+            .flatMapLatest { drinks ->
+                getFavoriteAliases()
+                    .map { favorites -> drinks.map { it.copy(isFavorite = it.alias in favorites) } }
+            }
 }

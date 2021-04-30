@@ -1,7 +1,9 @@
 package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -77,6 +79,7 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
+import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
@@ -119,7 +122,7 @@ fun DrinkScreen(
                         image = image,
                         rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
-                        isHeartButtonSelected = drink?.isFavorite == true,
+                        isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(alias)) },
                         onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
@@ -162,38 +165,46 @@ fun DrinkScreen(
                                 .offset(y = (-8).dp)
                         )
                     },
+                    errorState = {
+                        ErrorAndRetryStateView(
+                            onRetry = { viewModel.processAction(DrinkAction.Retry) },
+                            modifier = Modifier.padding(top = 32.dp)
+                        )
+                    }
                 ) { value ->
-                    Spacer(modifier = Modifier.height(32.dp))
-                    if (value.drink.displayStory.isNotBlank()) {
-                        Story(
-                            story = value.drink.displayStory,
-                            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
+                    Column {
+                        Spacer(modifier = Modifier.height(32.dp))
+                        if (value.drink.displayStory.isNotBlank()) {
+                            Story(
+                                story = value.drink.displayStory,
+                                modifier = Modifier.padding(start = 32.dp, end = 24.dp)
+                            )
+                            Divider(modifier = Modifier.padding(vertical = 24.dp))
+                        }
+                        Ingredients(
+                            ingredient = value.drink.ingredients,
+                            modifier = Modifier.padding(horizontal = 32.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
-                    }
-                    Ingredients(
-                        ingredient = value.drink.ingredients,
-                        modifier = Modifier.padding(horizontal = 32.dp)
-                    )
-                    Divider(modifier = Modifier.padding(vertical = 24.dp))
-                    Steps(
-                        instruction = value.drink.instruction,
-                        modifier = Modifier.padding(horizontal = 32.dp)
-                    )
-                    Divider(modifier = Modifier.padding(vertical = 24.dp))
-                    if (value.drink.keywords.isNotEmpty()) {
-                        Keywords(
-                            keywords = value.drink.keywords,
-                            onClick = { navController.navigate(Screen.CategoryDrinks(it).route) },
-                            modifier = Modifier.padding(horizontal = 24.dp)
+                        Steps(
+                            instruction = value.drink.instruction,
+                            modifier = Modifier.padding(horizontal = 32.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
+                        if (value.drink.keywords.isNotEmpty()) {
+                            Keywords(
+                                keywords = value.drink.keywords,
+                                onClick = { navController.navigate(Screen.CategoryDrinks(it).route) },
+                                modifier = Modifier.padding(horizontal = 24.dp)
+                            )
+                            Divider(modifier = Modifier.padding(vertical = 24.dp))
+                        }
+                        RecommendedDrinks(
+                            data = value.relatedDrinks,
+                            onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, name).route) },
+                        )
+                        Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
-                    RecommendedDrinks(
-                        data = value.relatedDrinks,
-                        onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, name).route) },
-                    )
-                    Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                 }
             }
         }
@@ -290,19 +301,20 @@ private fun SharedContent(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoxScope.ImageContent(
     image: String,
     rating: String,
     showPlayButton: Boolean,
-    isHeartButtonSelected: Boolean,
+    isHeartButtonSelected: Boolean?,
     secondaryElementsAlpha: Float,
     onPlayClick: () -> Unit,
     onHeartClick: () -> Unit
 ) {
     Image(
         painter = rememberCoilPainter(
-            request = "",
+            request = image,
             requestBuilder = { size -> applyForExtarnalImage(image, size) },
             fadeIn = true
         ),
@@ -328,11 +340,13 @@ private fun BoxScope.ImageContent(
                 .fillMaxWidth()
                 .weight(1F)
         )
-        AnimatedHeartButton(
-            onToggle = onHeartClick,
-            isSelected = isHeartButtonSelected,
-            iconSize = 32.dp,
-        )
+        AnimatedVisibility(isHeartButtonSelected != null){
+            AnimatedHeartButton(
+                onToggle = onHeartClick,
+                isSelected = isHeartButtonSelected == true,
+                iconSize = 32.dp,
+            )
+        }
     }
     if (showPlayButton) {
         PlayButton(

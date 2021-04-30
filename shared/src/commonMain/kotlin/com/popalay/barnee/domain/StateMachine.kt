@@ -74,8 +74,10 @@ abstract class StateMachine<S : State, A : Action, M : Mutation>(initialState: S
     protected inline fun <T : Any, R : Any> Flow<T>.flatMapToResult(
         crossinline transform: suspend (value: T) -> Flow<R>
     ): Flow<Result<R>> = transformLatest { value ->
-        emit(Loading<R>())
-        transform(value).collect { emit(Success(it)) }
+        emit(Loading())
+        transform(value)
+            .catch { emit(Fail<R>(it) as Result<R>) }
+            .collect { emit(Success(it)) }
     }.catch { emit(Fail(it)) }
 
     private fun Flow<Action>.applyProcessor() = flatMapConcat { processor(this) { stateFlow.value } }

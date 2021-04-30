@@ -112,7 +112,7 @@ private fun CategoryListItem(
         ) {
             Image(
                 painter = rememberCoilPainter(
-                    request = "",
+                    request = data.imageUrl,
                     requestBuilder = { size -> applyForInternalImage(data.imageUrl, size) },
                     fadeIn = true
                 ),

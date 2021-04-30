@@ -12,6 +12,7 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Initial
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Retry
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListMutation.DrinksMutation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -24,6 +25,7 @@ data class ParameterizedDrinkListState(
 
 sealed class ParameterizedDrinkListAction : Action {
     data class Initial(val request: DrinksRequest) : ParameterizedDrinkListAction()
+    object Retry : ParameterizedDrinkListAction()
 }
 
 sealed class ParameterizedDrinkListMutation : Mutation {
@@ -42,6 +44,9 @@ class ParameterizedDrinkListStateMachine(
             filterIsInstance<Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getDrinks(it.request) }
+                .map { DrinksMutation(it) },
+            filterIsInstance<Retry>()
+                .flatMapToResult { drinkRepository.getDrinks(request) }
                 .map { DrinksMutation(it) },
         )
     }

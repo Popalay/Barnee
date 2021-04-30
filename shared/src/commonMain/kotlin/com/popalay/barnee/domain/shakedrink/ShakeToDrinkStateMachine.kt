@@ -15,6 +15,7 @@ import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.DialogDismissed
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.Initial
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.Retry
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkMutation.RandomDrinkMutation
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
@@ -33,6 +34,7 @@ data class ShakeToDrinkState(
 sealed class ShakeToDrinkAction : Action {
     object Initial : ShakeToDrinkAction()
     object DialogDismissed : ShakeToDrinkAction()
+    object Retry : ShakeToDrinkAction()
 }
 
 sealed class ShakeToDrinkMutation : Mutation {
@@ -50,6 +52,9 @@ class ShakeToDrinkStateMachine(
                 .flatMapMerge { detectShakes() }
                 .flatMapToResult { drinkRepository.getDrinks(DrinksRequest.Random(1)).map { it.first() } }
                 .filter { !(it is Success<Drink> && state().randomDrink is Uninitialized) }
+                .map { RandomDrinkMutation(it) },
+            filterIsInstance<Retry>()
+                .flatMapToResult { drinkRepository.getDrinks(DrinksRequest.Random(1)).map { it.first() } }
                 .map { RandomDrinkMutation(it) },
             filterIsInstance<DialogDismissed>()
                 .map { RandomDrinkMutation(Uninitialized()) },

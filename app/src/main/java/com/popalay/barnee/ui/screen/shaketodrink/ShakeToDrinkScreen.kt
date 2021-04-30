@@ -22,7 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.BlendMode.SrcAtop
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -38,6 +38,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
@@ -62,34 +63,45 @@ fun ShakeToDrinkScreen() {
         }
 
         Dialog(onDismissRequest = { viewModel.processAction(ShakeToDrinkAction.DialogDismissed) }) {
-            StateLayout(
-                value = state.randomDrink,
-                loadingState = { LoadingStateView() }
-            ) { value ->
-                Column(
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                Text(
+                    text = "Check it out! \uD83D\uDE32\uD83D\uDE0B",
+                    style = MaterialTheme.typography.h2,
+                    textAlign = TextAlign.Center,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp)
+                        .align(Alignment.CenterHorizontally)
+                        .padding(bottom = 16.dp)
+                )
+                Card(
+                    elevation = 4.dp,
+                    shape = MediumSquircleShape,
+                    modifier = Modifier.aspectRatio(0.8F)
                 ) {
-                    Text(
-                        text = "Check it out! \uD83D\uDE32\uD83D\uDE0B",
-                        style = MaterialTheme.typography.h2,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.CenterHorizontally)
-                            .padding(bottom = 16.dp)
-                    )
-                    RandomDrink(
-                        data = value,
-                        onClick = {
-                            viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
-                            navController.navigate(
-                                Screen.Drink(value.alias, value.displayName, value.displayImageUrl).route
+                    StateLayout(
+                        value = state.randomDrink,
+                        loadingState = { LoadingStateView() },
+                        errorState = {
+                            ErrorAndRetryStateView(
+                                onRetry = { viewModel.processAction(ShakeToDrinkAction.Retry) }
                             )
-                        },
-                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value.alias)) }
-                    )
+                        }
+                    ) { value ->
+                        RandomDrink(
+                            data = value,
+                            onClick = {
+                                viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
+                                navController.navigate(
+                                    Screen.Drink(value.alias, value.displayName, value.displayImageUrl).route
+                                )
+                            },
+                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value.alias)) }
+                        )
+                    }
                 }
             }
         }
@@ -103,51 +115,45 @@ private fun RandomDrink(
     onHeartClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        elevation = 4.dp,
-        shape = MediumSquircleShape,
-        modifier = modifier.aspectRatio(0.8F)
-    ) {
-        Box(modifier = Modifier.clickable(onClick = onClick)) {
-            Image(
-                painter = rememberCoilPainter(
-                    request = "",
-                    requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop,
-                colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
-            )
-            Column(
+    Box(modifier = modifier.clickable(onClick = onClick)) {
+        Image(
+            painter = rememberCoilPainter(
+                request = data.displayImageUrl,
+                requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
+            ),
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop,
+            colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), SrcAtop)
+        )
+        Column(
+            modifier = Modifier
+                .padding(start = 32.dp, end = 16.dp)
+                .padding(top = 32.dp, bottom = 16.dp)
+        ) {
+            Text(
+                text = data.displayName,
+                style = MaterialTheme.typography.h1,
                 modifier = Modifier
-                    .padding(start = 32.dp, end = 16.dp)
-                    .padding(top = 32.dp, bottom = 16.dp)
-            ) {
+                    .fillMaxWidth(0.7F)
+                    .fillMaxHeight()
+                    .weight(1F)
+            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = data.displayName,
-                    style = MaterialTheme.typography.h1,
+                    text = data.displayRating,
+                    style = MaterialTheme.typography.h2,
+                )
+                Spacer(
                     modifier = Modifier
-                        .fillMaxWidth(0.7F)
-                        .fillMaxHeight()
+                        .fillMaxWidth()
                         .weight(1F)
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(
-                        text = data.displayRating,
-                        style = MaterialTheme.typography.h2,
-                    )
-                    Spacer(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .weight(1F)
-                    )
-                    AnimatedHeartButton(
-                        onToggle = onHeartClick,
-                        isSelected = data.isFavorite,
-                        iconSize = 32.dp,
-                    )
-                }
+                AnimatedHeartButton(
+                    onToggle = onHeartClick,
+                    isSelected = data.isFavorite,
+                    iconSize = 32.dp,
+                )
             }
         }
     }
