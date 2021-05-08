@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "1096789206789",
+    "project_id": "barnee-919cf",
+    "storage_bucket": "barnee-919cf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096789206789:android:34df4347418f26aa20b96c",
+        "android_client_info": {
+          "package_name": "com.popalay.barnee"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096789206789-j535eddkihsvd63clbfr2r93a8g92rog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRu8_xDH6I9kWe5Q7Wq4T_IXuh22Fkpyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096789206789-j535eddkihsvd63clbfr2r93a8g92rog.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096789206789:android:251521199f6013d020b96c",
+        "android_client_info": {
+          "package_name": "com.popalay.barnee.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096789206789-j535eddkihsvd63clbfr2r93a8g92rog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBRu8_xDH6I9kWe5Q7Wq4T_IXuh22Fkpyw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096789206789-j535eddkihsvd63clbfr2r93a8g92rog.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

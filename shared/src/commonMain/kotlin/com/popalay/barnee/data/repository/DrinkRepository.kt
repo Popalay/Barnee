@@ -109,7 +109,7 @@ class DrinkRepository(
             ),
             Category(
                 text = "Carbonated",
-                alias = "carbonated",
+                alias = "is/carbonated",
                 imageUrl = "v1618923638/categories/carbonated.webp"
             ),
             Category(
