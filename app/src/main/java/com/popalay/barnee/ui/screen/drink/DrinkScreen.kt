@@ -30,6 +30,7 @@ import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -54,6 +55,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -62,7 +64,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
@@ -90,6 +91,7 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
+import com.popalay.barnee.ui.util.shareDrink
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -99,7 +101,8 @@ fun DrinkScreen(
     image: String,
     name: String,
 ) {
-    val navController: NavController = LocalNavController.current
+    val navController = LocalNavController.current
+    val context = LocalContext.current
     val viewModel: DrinkViewModel = getViewModel { parametersOf(alias) }
     val drinkItemViewModel: DrinkItemViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
@@ -107,6 +110,9 @@ fun DrinkScreen(
 
     val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
     val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
+
+    val displayName = name.ifBlank { drink?.displayName.orEmpty() }
+    val displayImage = image.ifBlank { drink?.displayImageUrl.orEmpty() }
 
     CollapsingScaffold(
         maxHeight = toolbarHeight,
@@ -119,7 +125,7 @@ fun DrinkScreen(
                 isPlaying = state.isPlaying,
                 imageContent = {
                     ImageContent(
-                        image = image,
+                        image = displayImage,
                         rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
@@ -139,13 +145,14 @@ fun DrinkScreen(
                 },
                 sharedContent = {
                     SharedContent(
-                        title = name,
+                        title = displayName,
                         nutrition = drink?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
                         isPlaying = state.isPlaying,
                         shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = offset,
-                        scrollFraction = fraction
+                        scrollFraction = fraction,
+                        onShareClick = { context.shareDrink(displayName, alias) }
                     )
                 },
                 scrollFraction = fraction,
@@ -201,7 +208,7 @@ fun DrinkScreen(
                         }
                         RecommendedDrinks(
                             data = value.relatedDrinks,
-                            onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, name).route) },
+                            onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, displayName).route) },
                         )
                         Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
@@ -254,7 +261,8 @@ private fun SharedContent(
     shouldCutTitle: Boolean,
     offset: IntOffset,
     scrollFraction: Float,
-    secondaryElementsAlpha: Float
+    secondaryElementsAlpha: Float,
+    onShareClick: () -> Unit
 ) {
     val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
     val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
@@ -274,11 +282,20 @@ private fun SharedContent(
             .background(MaterialTheme.colors.background)
     )
     Column(modifier = Modifier.statusBarsPadding()) {
-        BackButton(
+        Row(
             modifier = Modifier
-                .padding(top = 8.dp, start = 8.dp)
+                .padding(top = 8.dp, start = 8.dp, end = 16.dp)
                 .offset { -offset }
-        )
+        ) {
+            BackButton()
+            Spacer(modifier = Modifier.fillMaxWidth().weight(1F))
+            IconButton(onClick = onShareClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_share),
+                    contentDescription = "Share",
+                )
+            }
+        }
         Text(
             text = title,
             style = MaterialTheme.typography.h1.copy(fontSize = titleTextSize.sp),
@@ -340,7 +357,7 @@ private fun BoxScope.ImageContent(
                 .fillMaxWidth()
                 .weight(1F)
         )
-        AnimatedVisibility(isHeartButtonSelected != null){
+        AnimatedVisibility(isHeartButtonSelected != null) {
             AnimatedHeartButton(
                 onToggle = onHeartClick,
                 isSelected = isHeartButtonSelected == true,

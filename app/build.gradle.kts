@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
 plugins {
     id("com.android.application")
     kotlin("android")
+    id("com.google.gms.google-services")
 }
 
 dependencies {
@@ -21,6 +22,7 @@ dependencies {
     }
     implementation(libs.koin.android)
     implementation(libs.koin.compose)
+    implementation(libs.firebase.dynamicLinks)
 }
 
 val isCI = System.getenv("CI") == "true"
