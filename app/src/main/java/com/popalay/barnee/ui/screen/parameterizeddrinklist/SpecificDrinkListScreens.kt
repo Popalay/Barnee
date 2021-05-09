@@ -2,17 +2,17 @@ package com.popalay.barnee.ui.screen.parameterizeddrinklist
 
 import androidx.compose.runtime.Composable
 import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.navigation.QueryDrinksScreenArgs
+import com.popalay.barnee.navigation.SimilarDrinksScreenArgs
+import com.popalay.barnee.navigation.TagDrinksScreenArgs
 import java.util.Locale
 
 @Composable
-fun SimilarDrinksScreen(
-    alias: String,
-    name: String
-) {
+fun SimilarDrinksScreen(args: SimilarDrinksScreenArgs) {
     ParameterizedDrinkListScreen(
-        request = DrinksRequest.RelatedTo(alias),
+        request = DrinksRequest.RelatedTo(args.alias),
         title = "Cocktails like ",
-        titleHighlighted = name
+        titleHighlighted = args.name
     )
 }
 
@@ -25,20 +25,17 @@ fun FavoriteDrinksScreen() {
 }
 
 @Composable
-fun TagDrinksScreen(tag: String) {
+fun TagDrinksScreen(args: TagDrinksScreenArgs) {
     ParameterizedDrinkListScreen(
-        request = DrinksRequest.ForTags(setOf(tag)),
-        title = tag.capitalize(Locale.getDefault())
+        request = DrinksRequest.ForTags(setOf(args.tag)),
+        title = args.tag.capitalize(Locale.getDefault())
     )
 }
 
 @Composable
-fun QueryDrinksScreen(
-    query: String,
-    name: String
-) {
+fun QueryDrinksScreen(args: QueryDrinksScreenArgs) {
     ParameterizedDrinkListScreen(
-        request = DrinksRequest.ForQuery(query),
-        title = name.capitalize(Locale.getDefault())
+        request = DrinksRequest.ForQuery(args.query),
+        title = args.name.capitalize(Locale.getDefault())
     )
 }

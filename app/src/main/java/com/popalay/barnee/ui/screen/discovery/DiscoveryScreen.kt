@@ -18,18 +18,28 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
+import com.popalay.barnee.domain.discovery.DiscoveryState
+import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun DiscoveryScreen() {
     val viewModel: DiscoveryViewModel = getViewModel()
-    val state by viewModel.stateFlow.collectAsState()
+    DiscoveryScreen(viewModel)
+}
 
+@Composable
+private fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
+    val state by viewModel.stateFlow.collectAsState()
+    DiscoveryScreen(state)
+}
+
+@Composable
+private fun DiscoveryScreen(state: DiscoveryState) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         DiscoveryAppBar(modifier = Modifier.liftOnScroll(listState))
@@ -49,13 +59,13 @@ private fun DiscoveryAppBar(modifier: Modifier = Modifier) {
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
-            IconButton(onClick = { navController.navigate(Screen.Favorites.route) }) {
+            IconButton(onClick = { navController.navigate(AppNavigation.favorites()) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_favorites),
                     contentDescription = "Favorites",
                 )
             }
-            IconButton(onClick = { navController.navigate(Screen.Search.route) }) {
+            IconButton(onClick = { navController.navigate(AppNavigation.search()) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),
                     contentDescription = "Search",

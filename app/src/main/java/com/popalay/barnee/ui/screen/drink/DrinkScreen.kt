@@ -77,6 +77,9 @@ import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
+import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.DrinkScreenArgs
+import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
@@ -85,8 +88,6 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
@@ -96,14 +97,10 @@ import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun DrinkScreen(
-    alias: String,
-    image: String,
-    name: String,
-) {
+fun DrinkScreen(args: DrinkScreenArgs) {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val viewModel: DrinkViewModel = getViewModel { parametersOf(alias) }
+    val viewModel: DrinkViewModel = getViewModel { parametersOf(args.alias) }
     val drinkItemViewModel: DrinkItemViewModel = getViewModel()
     val state by viewModel.stateFlow.collectAsState()
     val drink = remember(state) { state.drinkWithRelated()?.drink }
@@ -111,8 +108,8 @@ fun DrinkScreen(
     val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
     val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
 
-    val displayName = name.ifBlank { drink?.displayName.orEmpty() }
-    val displayImage = image.ifBlank { drink?.displayImageUrl.orEmpty() }
+    val displayName = args.name.ifBlank { drink?.displayName.orEmpty() }
+    val displayImage = args.image.ifBlank { drink?.displayImageUrl.orEmpty() }
 
     CollapsingScaffold(
         maxHeight = toolbarHeight,
@@ -130,7 +127,7 @@ fun DrinkScreen(
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(alias)) },
+                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(args.alias)) },
                         onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
                     )
                 },
@@ -152,7 +149,7 @@ fun DrinkScreen(
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = offset,
                         scrollFraction = fraction,
-                        onShareClick = { context.shareDrink(displayName, alias) }
+                        onShareClick = { context.shareDrink(displayName, args.alias) }
                     )
                 },
                 scrollFraction = fraction,
@@ -201,14 +198,14 @@ fun DrinkScreen(
                         if (value.drink.keywords.isNotEmpty()) {
                             Keywords(
                                 keywords = value.drink.keywords,
-                                onClick = { navController.navigate(Screen.CategoryDrinks(it).route) },
+                                onClick = { navController.navigate(AppNavigation.tagDrinks(it)) },
                                 modifier = Modifier.padding(horizontal = 24.dp)
                             )
                             Divider(modifier = Modifier.padding(vertical = 24.dp))
                         }
                         RecommendedDrinks(
                             data = value.relatedDrinks,
-                            onShowMoreClick = { navController.navigate(Screen.SimilarDrinks(alias, displayName).route) },
+                            onShowMoreClick = { navController.navigate(AppNavigation.similarDrinks(args.alias, displayName)) },
                         )
                         Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
@@ -569,6 +566,6 @@ private fun RecommendedDrinks(
 @Composable
 private fun DrinkScreenPreview() {
     BarneeTheme {
-        DrinkScreen("alias", "name", "sample.png")
+        DrinkScreen(DrinkScreenArgs("alias", "name", "sample.png"))
     }
 }

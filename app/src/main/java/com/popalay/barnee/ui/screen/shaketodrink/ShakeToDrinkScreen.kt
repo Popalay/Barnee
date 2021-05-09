@@ -37,13 +37,13 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
+import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
@@ -95,9 +95,7 @@ fun ShakeToDrinkScreen() {
                             data = value,
                             onClick = {
                                 viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
-                                navController.navigate(
-                                    Screen.Drink(value.alias, value.displayName, value.displayImageUrl).route
-                                )
+                                navController.navigate(AppNavigation.drink(value.alias, value.displayName, value.displayImageUrl))
                             },
                             onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value.alias)) }
                         )
