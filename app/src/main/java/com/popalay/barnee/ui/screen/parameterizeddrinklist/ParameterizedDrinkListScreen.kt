@@ -13,6 +13,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.toPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
@@ -51,7 +52,9 @@ fun ParameterizedDrinkListScreen(
             listState = listState,
             emptyMessage = "We don't have any drinks\nfor this category",
             onRetry = { viewModel.processAction(ParameterizedDrinkListAction.Retry) },
-            contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues()
+            contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues(
+                additionalHorizontal = 8.dp
+            )
         )
     }
 

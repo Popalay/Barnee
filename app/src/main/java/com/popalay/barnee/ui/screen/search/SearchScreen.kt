@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -117,7 +118,8 @@ fun SearchScreen() {
                     emptyMessage = "We currently have no drinks\non your request",
                     onRetry = { viewModel.processAction(SearchAction.Retry) },
                     listState = listState,
-                    modifier = Modifier.weight(1F)
+                    modifier = Modifier.weight(1F),
+                    contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                 )
                 SearchTextField(
                     value = state.searchQuery,
