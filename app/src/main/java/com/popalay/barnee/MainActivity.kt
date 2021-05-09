@@ -12,12 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navDeepLink
 import coil.ImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.coil.LocalImageLoader
@@ -25,10 +21,18 @@ import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
+import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.DiscoveryNavigationCommand
+import com.popalay.barnee.navigation.DrinkNavigationCommand
+import com.popalay.barnee.navigation.FavoriteDrinksNavigationCommand
+import com.popalay.barnee.navigation.LocalNavController
+import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
+import com.popalay.barnee.navigation.SearchNavigationCommand
+import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
+import com.popalay.barnee.navigation.TagDrinksNavigationCommand
+import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.FavoriteDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.QueryDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.SimilarDrinksScreen
@@ -72,62 +76,27 @@ class MainActivity : ComponentActivity() {
                 LocalImageLoader provides ImageLoader.Builder(LocalContext.current).logger(DebugLogger()).build()
             ) {
                 ShakeToDrinkScreen()
-                NavHost(navController, startDestination = "home") {
-                    composable("home") {
+                NavHost(navController, startDestination = AppNavigation.root()) {
+                    navigationNode(DiscoveryNavigationCommand) {
                         DiscoveryScreen()
                     }
-                    composable(
-                        "drink/{alias}?image={image}&name={name}",
-                        deepLinks = listOf(navDeepLink { uriPattern = "https://barnee.com/drink/{alias}" }),
-                        arguments = listOf(
-                            navArgument("alias") { type = NavType.StringType },
-                            navArgument("image") { type = NavType.StringType },
-                            navArgument("name") { type = NavType.StringType }
-                        )
-                    ) {
-                        DrinkScreen(
-                            alias = it.arguments?.getString("alias").orEmpty(),
-                            image = it.arguments?.getString("image").orEmpty(),
-                            name = it.arguments?.getString("name").orEmpty()
-                        )
+                    navigationNode(DrinkNavigationCommand) {
+                        DrinkScreen(DrinkNavigationCommand.parseArgs(it))
                     }
-                    composable(
-                        "drink?tag={tag}",
-                        arguments = listOf(navArgument("tag") { type = NavType.StringType })
-                    ) {
-                        TagDrinksScreen(
-                            tag = it.arguments?.getString("tag").orEmpty(),
-                        )
+                    navigationNode(TagDrinksNavigationCommand) {
+                        TagDrinksScreen(TagDrinksNavigationCommand.parseArgs(it))
                     }
-                    composable(
-                        "drink?like={alias}&name={name}",
-                        arguments = listOf(
-                            navArgument("alias") { type = NavType.StringType },
-                            navArgument("name") { type = NavType.StringType }
-                        )
-                    ) {
-                        SimilarDrinksScreen(
-                            alias = it.arguments?.getString("alias").orEmpty(),
-                            name = it.arguments?.getString("name").orEmpty(),
-                        )
+                    navigationNode(SimilarDrinksNavigationCommand) {
+                        SimilarDrinksScreen(SimilarDrinksNavigationCommand.parseArgs(it))
                     }
-                    composable(
-                        "drink?query={query}&name={name}",
-                        arguments = listOf(
-                            navArgument("query") { type = NavType.StringType },
-                            navArgument("name") { type = NavType.StringType }
-                        )
-                    ) {
-                        QueryDrinksScreen(
-                            query = it.arguments?.getString("query").orEmpty(),
-                            name = it.arguments?.getString("name").orEmpty(),
-                        )
+                    navigationNode(QueryDrinksNavigationCommand) {
+                        QueryDrinksScreen(QueryDrinksNavigationCommand.parseArgs(it))
                     }
-                    composable(Screen.Search.route) {
-                        SearchScreen()
-                    }
-                    composable(Screen.Favorites.route) {
+                    navigationNode(FavoriteDrinksNavigationCommand) {
                         FavoriteDrinksScreen()
+                    }
+                    navigationNode(SearchNavigationCommand) {
+                        SearchScreen()
                     }
                 }
             }

@@ -34,6 +34,8 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
+import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -46,8 +48,6 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
-import com.popalay.barnee.ui.screen.navigation.Screen
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
 import org.koin.androidx.compose.getViewModel
@@ -95,7 +95,7 @@ fun DrinkGrid(
             ) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
+                    onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
@@ -122,7 +122,7 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { navController.navigate(Screen.Drink(item.alias, item.displayName, item.displayImageUrl).route) },
+                    onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
                     modifier = Modifier.width(maxWidth / 3)

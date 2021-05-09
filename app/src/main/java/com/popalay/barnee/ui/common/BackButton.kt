@@ -6,7 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.popalay.barnee.R.drawable
-import com.popalay.barnee.ui.screen.navigation.LocalNavController
+import com.popalay.barnee.navigation.LocalNavController
 
 @Composable
 fun BackButton(modifier: Modifier = Modifier) {
