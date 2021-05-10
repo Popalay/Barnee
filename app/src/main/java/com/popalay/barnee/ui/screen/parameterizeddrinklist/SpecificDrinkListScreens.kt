@@ -17,10 +17,10 @@ fun SimilarDrinksScreen(args: SimilarDrinksScreenArgs) {
 }
 
 @Composable
-fun FavoriteDrinksScreen() {
+fun CollectionsScreen() {
     ParameterizedDrinkListScreen(
         request = DrinksRequest.Favorites,
-        title = "Favorites",
+        title = "Collections",
     )
 }
 

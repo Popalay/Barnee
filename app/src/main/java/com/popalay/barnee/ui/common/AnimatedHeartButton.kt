@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.popalay.barnee.R.drawable
 
 @Composable
-fun AnimatedHeartButton(
+fun AddToCollectionButton(
     onToggle: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
@@ -30,8 +30,8 @@ fun AnimatedHeartButton(
         modifier = modifier
     ) {
         Image(
-            painter = painterResource(id = if (isSelected) drawable.ic_heart_filled else drawable.ic_heart),
-            contentDescription = "Like",
+            painter = painterResource(id = if (isSelected) drawable.ic_bookmark else drawable.ic_bookmark_border),
+            contentDescription = "Save",
             modifier = Modifier.size(transitionData.size)
         )
     }
@@ -43,7 +43,7 @@ private class TransitionData(size: State<Dp>) {
 
 @Composable
 private fun updateTransitionData(actualSize: Dp, isSelected: Boolean): TransitionData {
-    val transition = updateTransition(isSelected, label = "Heart button transition")
+    val transition = updateTransition(isSelected, label = "Save button transition")
     val size = transition.animateDp(
         transitionSpec = {
             keyframes {
@@ -52,7 +52,7 @@ private fun updateTransitionData(actualSize: Dp, isSelected: Boolean): Transitio
                 actualSize at 200
             }
         },
-        label = "Heart button size"
+        label = "Save button size"
     ) { state -> if (state) actualSize else actualSize }
     return remember(transition) { TransitionData(size) }
 }

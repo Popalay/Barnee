@@ -62,9 +62,9 @@ private fun DiscoveryAppBar(modifier: Modifier = Modifier) {
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
-            IconButton(onClick = { navController.navigate(AppNavigation.favorites()) }) {
+            IconButton(onClick = { navController.navigate(AppNavigation.collections()) }) {
                 Icon(
-                    painter = painterResource(R.drawable.ic_favorites),
+                    painter = painterResource(R.drawable.ic_collections),
                     contentDescription = "Favorites",
                 )
             }

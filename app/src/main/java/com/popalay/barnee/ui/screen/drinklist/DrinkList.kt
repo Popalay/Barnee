@@ -33,10 +33,10 @@ import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
+import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleIsInCollection
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.LocalNavController
-import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.AddToCollectionButton
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
@@ -96,8 +96,8 @@ fun DrinkGrid(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onDoubleClick = { viewModel.processAction(ToggleIsInCollection(item)) },
+                    onHeartClick = { viewModel.processAction(ToggleIsInCollection(item)) },
                     modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
                 )
             }
@@ -123,8 +123,8 @@ fun DrinkHorizontalList(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onDoubleClick = { viewModel.processAction(ToggleIsInCollection(item)) },
+                    onHeartClick = { viewModel.processAction(ToggleIsInCollection(item)) },
                     modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))
@@ -183,7 +183,7 @@ private fun DrinkListItem(
                     color = MaterialTheme.colors.primary
                 )
             }
-            AnimatedHeartButton(
+            AddToCollectionButton(
                 onToggle = onHeartClick,
                 isSelected = data.isFavorite,
                 modifier = Modifier

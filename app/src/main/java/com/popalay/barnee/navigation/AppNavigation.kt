@@ -28,7 +28,7 @@ object AppNavigation {
         image: String
     ) = DrinkNavigationCommand.destination(alias, name, image)
 
-    fun favorites() = FavoriteDrinksNavigationCommand.destination
+    fun collections() = CollectionsNavigationCommand.destination
 
     fun search() = SearchNavigationCommand.destination
 

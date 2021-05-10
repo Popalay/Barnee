@@ -39,7 +39,7 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.LocalNavController
-import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.AddToCollectionButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
@@ -97,7 +97,7 @@ fun ShakeToDrinkScreen() {
                                 viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
                                 navController.navigate(AppNavigation.drink(value.alias, value.displayName, value.displayImageUrl))
                             },
-                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value)) }
+                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleIsInCollection(value)) }
                         )
                     }
                 }
@@ -147,7 +147,7 @@ private fun RandomDrink(
                         .fillMaxWidth()
                         .weight(1F)
                 )
-                AnimatedHeartButton(
+                AddToCollectionButton(
                     onToggle = onHeartClick,
                     isSelected = data.isFavorite,
                     iconSize = 32.dp,

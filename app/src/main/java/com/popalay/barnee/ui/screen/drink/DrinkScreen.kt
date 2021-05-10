@@ -80,7 +80,7 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.DrinkScreenArgs
 import com.popalay.barnee.navigation.LocalNavController
-import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.AddToCollectionButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
@@ -127,7 +127,7 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(drink!!)) },
+                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleIsInCollection(drink!!)) },
                         onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
                     )
                 },
@@ -354,7 +354,7 @@ private fun BoxScope.ImageContent(
                 .weight(1F)
         )
         AnimatedVisibility(isHeartButtonSelected != null) {
-            AnimatedHeartButton(
+            AddToCollectionButton(
                 onToggle = onHeartClick,
                 isSelected = isHeartButtonSelected == true,
                 iconSize = 32.dp,

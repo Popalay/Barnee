@@ -24,7 +24,7 @@ import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.FavoriteDrinksNavigationCommand
+import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
@@ -34,7 +34,7 @@ import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.FavoriteDrinksScreen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.CollectionsScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.QueryDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.SimilarDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.TagDrinksScreen
@@ -101,8 +101,8 @@ class MainActivity : ComponentActivity() {
             navigationNode(QueryDrinksNavigationCommand) {
                 QueryDrinksScreen(QueryDrinksNavigationCommand.parseArgs(it))
             }
-            navigationNode(FavoriteDrinksNavigationCommand) {
-                FavoriteDrinksScreen()
+            navigationNode(CollectionsNavigationCommand) {
+                CollectionsScreen()
             }
             navigationNode(SearchNavigationCommand) {
                 SearchScreen()
