@@ -127,7 +127,7 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(args.alias)) },
+                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(drink!!)) },
                         onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
                     )
                 },
@@ -263,7 +263,6 @@ private fun SharedContent(
 ) {
     val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
     val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
-    val titleWidthFraction = remember(scrollFraction) { if (scrollFraction > 0.9F) 1F else 0.7F }
     val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
     val titleOffset = with(LocalDensity.current) {
         IntOffset(
@@ -300,7 +299,7 @@ private fun SharedContent(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .padding(start = 24.dp, end = 16.dp)
-                .fillMaxWidth(titleWidthFraction)
+                .fillMaxWidth(0.7F)
                 .offset { titleOffset }
                 .alpha(titleAlpha)
         )

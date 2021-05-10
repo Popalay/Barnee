@@ -31,6 +31,7 @@ import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
 import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigationNode
+import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.FavoriteDrinksScreen
@@ -75,30 +76,36 @@ class MainActivity : ComponentActivity() {
                 LocalNavController provides navController,
                 LocalImageLoader provides ImageLoader.Builder(LocalContext.current).logger(DebugLogger()).build()
             ) {
+                NavigationGraph()
+                AddToCollectionScreen()
                 ShakeToDrinkScreen()
-                NavHost(navController, startDestination = AppNavigation.root()) {
-                    navigationNode(DiscoveryNavigationCommand) {
-                        DiscoveryScreen()
-                    }
-                    navigationNode(DrinkNavigationCommand) {
-                        DrinkScreen(DrinkNavigationCommand.parseArgs(it))
-                    }
-                    navigationNode(TagDrinksNavigationCommand) {
-                        TagDrinksScreen(TagDrinksNavigationCommand.parseArgs(it))
-                    }
-                    navigationNode(SimilarDrinksNavigationCommand) {
-                        SimilarDrinksScreen(SimilarDrinksNavigationCommand.parseArgs(it))
-                    }
-                    navigationNode(QueryDrinksNavigationCommand) {
-                        QueryDrinksScreen(QueryDrinksNavigationCommand.parseArgs(it))
-                    }
-                    navigationNode(FavoriteDrinksNavigationCommand) {
-                        FavoriteDrinksScreen()
-                    }
-                    navigationNode(SearchNavigationCommand) {
-                        SearchScreen()
-                    }
-                }
+            }
+        }
+    }
+
+    @Composable
+    private fun NavigationGraph() {
+        NavHost(LocalNavController.current, startDestination = AppNavigation.root()) {
+            navigationNode(DiscoveryNavigationCommand) {
+                DiscoveryScreen()
+            }
+            navigationNode(DrinkNavigationCommand) {
+                DrinkScreen(DrinkNavigationCommand.parseArgs(it))
+            }
+            navigationNode(TagDrinksNavigationCommand) {
+                TagDrinksScreen(TagDrinksNavigationCommand.parseArgs(it))
+            }
+            navigationNode(SimilarDrinksNavigationCommand) {
+                SimilarDrinksScreen(SimilarDrinksNavigationCommand.parseArgs(it))
+            }
+            navigationNode(QueryDrinksNavigationCommand) {
+                QueryDrinksScreen(QueryDrinksNavigationCommand.parseArgs(it))
+            }
+            navigationNode(FavoriteDrinksNavigationCommand) {
+                FavoriteDrinksScreen()
+            }
+            navigationNode(SearchNavigationCommand) {
+                SearchScreen()
             }
         }
     }

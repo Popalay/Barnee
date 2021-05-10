@@ -97,7 +97,7 @@ fun ShakeToDrinkScreen() {
                                 viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
                                 navController.navigate(AppNavigation.drink(value.alias, value.displayName, value.displayImageUrl))
                             },
-                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value.alias)) }
+                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value)) }
                         )
                     }
                 }

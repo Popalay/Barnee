@@ -1,5 +1,6 @@
 package com.popalay.barnee.domain.drinkitem
 
+import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
@@ -14,15 +15,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 
 data class DrinkItemState(
-    val isFavorite: Boolean = false
+    val isFavorite: Boolean = false,
+    val drinkAddedToCollection: Drink? = null
 ) : State
 
 sealed class DrinkItemAction : Action {
-    data class ToggleFavorite(val alias: String) : DrinkItemAction()
+    data class ToggleFavorite(val drink: Drink) : DrinkItemAction()
 }
 
 sealed class DrinkItemMutation : Mutation {
-    data class ToggleFavoriteMutation(val data: Boolean) : DrinkItemMutation()
+    data class ToggleFavoriteMutation(val data: Pair<Drink, Boolean>) : DrinkItemMutation()
 }
 
 class DrinkItemStateMachine(
@@ -31,14 +33,17 @@ class DrinkItemStateMachine(
     override val processor: Processor<DrinkItemState, DrinkItemMutation> = {
         merge(
             filterIsInstance<ToggleFavorite>()
-                .map { drinkRepository.toggleFavoriteFor(it.alias) }
+                .map { it.drink to drinkRepository.toggleFavoriteFor(it.drink.alias) }
                 .map { ToggleFavoriteMutation(it) },
         )
     }
 
     override val reducer: Reducer<DrinkItemState, DrinkItemMutation> = { mutation ->
         when (mutation) {
-            is ToggleFavoriteMutation -> copy(isFavorite = mutation.data)
+            is ToggleFavoriteMutation -> copy(
+                isFavorite = mutation.data.second,
+                drinkAddedToCollection = if (mutation.data.second) mutation.data.first else null
+            )
         }
     }
 }

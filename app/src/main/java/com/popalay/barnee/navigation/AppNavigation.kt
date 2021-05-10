@@ -3,13 +3,13 @@ package com.popalay.barnee.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 
-val LocalNavController = staticCompositionLocalOf<NavController> {
+val LocalNavController = staticCompositionLocalOf<NavHostController> {
     error("No local navigator found!")
 }
 

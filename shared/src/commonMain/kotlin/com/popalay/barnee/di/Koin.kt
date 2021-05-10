@@ -28,12 +28,12 @@ val commonModule = module {
     }
     single { DrinkRepository(get(), get()) }
 
-    factory { DiscoveryStateMachine(get()) }
-    factory { (alias: String) -> DrinkStateMachine(alias, get()) }
-    factory { SearchStateMachine(get()) }
-    factory { (request: DrinksRequest) -> ParameterizedDrinkListStateMachine(request, get()) }
-    factory { DrinkItemStateMachine(get()) }
-    factory { ShakeToDrinkStateMachine(get(), get()) }
+    single { DiscoveryStateMachine(get()) }
+    single { (alias: String) -> DrinkStateMachine(alias, get()) }
+    single { SearchStateMachine(get()) }
+    single { (request: DrinksRequest) -> ParameterizedDrinkListStateMachine(request, get()) }
+    single { DrinkItemStateMachine(get()) }
+    single { ShakeToDrinkStateMachine(get(), get()) }
 }
 
 expect val platformModule: Module
