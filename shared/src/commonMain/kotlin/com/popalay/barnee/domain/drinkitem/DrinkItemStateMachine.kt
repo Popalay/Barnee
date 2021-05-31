@@ -3,8 +3,6 @@ package com.popalay.barnee.domain.drinkitem
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
-import com.popalay.barnee.domain.Processor
-import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
@@ -26,19 +24,19 @@ sealed class DrinkItemMutation : Mutation {
 }
 
 class DrinkItemStateMachine(
-    private val drinkRepository: DrinkRepository
-) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation>(DrinkItemState()) {
-    override val processor: Processor<DrinkItemState, DrinkItemMutation> = {
+    drinkRepository: DrinkRepository
+) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation>(
+    initialState = DrinkItemState(),
+    processor = {
         merge(
             filterIsInstance<ToggleFavorite>()
                 .map { drinkRepository.toggleFavoriteFor(it.alias) }
                 .map { ToggleFavoriteMutation(it) },
         )
-    }
-
-    override val reducer: Reducer<DrinkItemState, DrinkItemMutation> = { mutation ->
+    },
+    reducer = { mutation ->
         when (mutation) {
             is ToggleFavoriteMutation -> copy(isFavorite = mutation.data)
         }
     }
-}
+)

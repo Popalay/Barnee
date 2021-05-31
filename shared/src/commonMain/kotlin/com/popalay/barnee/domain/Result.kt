@@ -1,5 +1,10 @@
 package com.popalay.barnee.domain
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.transformLatest
+
 sealed class Result<out T>(val complete: Boolean, val shouldLoad: Boolean, private val value: T?) {
     open operator fun invoke(): T? = value
 }
@@ -39,3 +44,12 @@ inline fun <T : Any?, R : Any?> Result<T>.map(crossinline transform: (value: T) 
         is Success -> Success(transform(this()))
         is Fail -> Fail(error)
     }
+
+inline fun <T : Any, R : Any> Flow<T>.flatMapToResult(
+    crossinline transform: suspend (value: T) -> Flow<R>
+): Flow<Result<R>> = transformLatest { value ->
+    emit(Loading())
+    transform(value)
+        .catch { emit(Fail<R>(it) as Result<R>) }
+        .collect { emit(Success(it)) }
+}.catch { emit(Fail(it)) }
