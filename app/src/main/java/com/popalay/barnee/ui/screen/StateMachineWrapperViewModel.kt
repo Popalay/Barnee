@@ -18,6 +18,6 @@ abstract class StateMachineWrapperViewModel<S : State, A : Action>(
 
     override fun onCleared() {
         super.onCleared()
-        stateMachine.onCleared()
+        stateMachine.clear()
     }
 }

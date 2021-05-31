@@ -5,12 +5,11 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
-import com.popalay.barnee.domain.Processor
-import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
+import com.popalay.barnee.domain.flatMapToResult
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Initial
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Retry
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListMutation.DrinksMutation
@@ -34,12 +33,11 @@ sealed class ParameterizedDrinkListMutation : Mutation {
 
 class ParameterizedDrinkListStateMachine(
     request: DrinksRequest,
-    private val drinkRepository: DrinkRepository
+    drinkRepository: DrinkRepository
 ) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation>(
-    ParameterizedDrinkListState(),
-    Initial(request)
-) {
-    override val processor: Processor<ParameterizedDrinkListState, ParameterizedDrinkListMutation> = {
+    initialState = ParameterizedDrinkListState(),
+    initialAction = Initial(request),
+    processor = {
         merge(
             filterIsInstance<Initial>()
                 .take(1)
@@ -49,11 +47,10 @@ class ParameterizedDrinkListStateMachine(
                 .flatMapToResult { drinkRepository.getDrinks(request) }
                 .map { DrinksMutation(it) },
         )
-    }
-
-    override val reducer: Reducer<ParameterizedDrinkListState, ParameterizedDrinkListMutation> = { mutation ->
+    },
+    reducer = { mutation ->
         when (mutation) {
             is DrinksMutation -> copy(drinks = mutation.data)
         }
     }
-}
+)

@@ -6,13 +6,12 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
-import com.popalay.barnee.domain.Processor
-import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
+import com.popalay.barnee.domain.flatMapToResult
 import com.popalay.barnee.domain.search.SearchAction.FilterClicked
 import com.popalay.barnee.domain.search.SearchAction.FiltersDismissed
 import com.popalay.barnee.domain.search.SearchAction.Initial
@@ -59,9 +58,11 @@ sealed class SearchMutation : Mutation {
 }
 
 class SearchStateMachine(
-    private val drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction, SearchMutation>(SearchState(), Initial) {
-    override val processor: Processor<SearchState, SearchMutation> = { state ->
+    drinkRepository: DrinkRepository
+) : StateMachine<SearchState, SearchAction, SearchMutation>(
+    initialState = SearchState(),
+    initialAction = Initial,
+    processor = { state ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)
@@ -69,20 +70,20 @@ class SearchStateMachine(
                 .map { AggregationMutation(it) },
             filterIsInstance<Initial>()
                 .take(1)
-                .flatMapToResult { state().searchRequest() }
+                .flatMapToResult { state().searchRequest(drinkRepository) }
                 .map { SearchingMutation(it) },
             filterIsInstance<Retry>()
                 .flatMapToResult { drinkRepository.getAggregation() }
                 .map { AggregationMutation(it) },
             filterIsInstance<Retry>()
-                .flatMapToResult { state().searchRequest() }
+                .flatMapToResult { state().searchRequest(drinkRepository) }
                 .map { SearchingMutation(it) },
             filterIsInstance<QueryChanged>()
                 .map { QueryChangedMutation(it.query) },
             filterIsInstance<QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
-                .flatMapToResult { state().searchRequest(it.query) }
+                .flatMapToResult { state().searchRequest(drinkRepository, it.query) }
                 .map { SearchingMutation(it) },
             filterIsInstance<FilterClicked>()
                 .map {
@@ -98,15 +99,14 @@ class SearchStateMachine(
                 .map { ShowFiltersMutation(true) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters != it.selectedFilters } }
-                .flatMapToResult { state().searchRequest() }
+                .flatMapToResult { state().searchRequest(drinkRepository) }
                 .map { SearchingMutation(it) },
             filterIsInstance<FiltersDismissed>()
                 .filter { state().let { it.appliedFilters == it.selectedFilters } }
                 .map { ShowFiltersMutation(false) }
         )
-    }
-
-    override val reducer: Reducer<SearchState, SearchMutation> = { mutation ->
+    },
+    reducer = { mutation ->
         when (mutation) {
             is AggregationMutation -> copy(aggregation = mutation.data)
             is SearchingMutation -> copy(drinks = mutation.data, appliedFilters = selectedFilters, isFiltersShown = false)
@@ -115,29 +115,29 @@ class SearchStateMachine(
             is ShowFiltersMutation -> copy(isFiltersShown = mutation.data)
         }
     }
+)
 
-    private fun SearchState.searchRequest(query: String? = null) =
-        drinkRepository.searchDrinks(
-            query ?: searchQuery,
-            getFilters(aggregation(), selectedFilters),
-            count = if (searchQuery.isBlank()) 10 else 100
-        )
-
-    private fun getFilters(
-        aggregation: Aggregation?,
-        selectedGroups: Set<Pair<String, AggregationGroup>>,
-    ): Map<String, List<String>> = selectedGroups.map {
-        val aggregationName = when (it.second) {
-            aggregation?.tasting -> "tasting"
-            aggregation?.skill -> "skill"
-            aggregation?.servedIn -> "servedIn"
-            aggregation?.colored -> "colored"
-            aggregation?.withType -> "withtype"
-            else -> ""
-        }
-        aggregationName to it.first
-    }.groupBy(
-        keySelector = { it.first },
-        valueTransform = { it.second }
+private fun SearchState.searchRequest(drinkRepository: DrinkRepository, query: String? = null) =
+    drinkRepository.searchDrinks(
+        query ?: searchQuery,
+        getFilters(aggregation(), selectedFilters),
+        count = if (searchQuery.isBlank()) 10 else 100
     )
-}
+
+private fun getFilters(
+    aggregation: Aggregation?,
+    selectedGroups: Set<Pair<String, AggregationGroup>>,
+): Map<String, List<String>> = selectedGroups.map {
+    val aggregationName = when (it.second) {
+        aggregation?.tasting -> "tasting"
+        aggregation?.skill -> "skill"
+        aggregation?.servedIn -> "servedIn"
+        aggregation?.colored -> "colored"
+        aggregation?.withType -> "withtype"
+        else -> ""
+    }
+    aggregationName to it.first
+}.groupBy(
+    keySelector = { it.first },
+    valueTransform = { it.second }
+)

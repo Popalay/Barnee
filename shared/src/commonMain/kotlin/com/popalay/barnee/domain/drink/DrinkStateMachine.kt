@@ -4,8 +4,6 @@ import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
-import com.popalay.barnee.domain.Processor
-import com.popalay.barnee.domain.Reducer
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -15,6 +13,7 @@ import com.popalay.barnee.domain.drink.DrinkAction.Retry
 import com.popalay.barnee.domain.drink.DrinkAction.TogglePlaying
 import com.popalay.barnee.domain.drink.DrinkMutation.DrinkWithRelatedMutation
 import com.popalay.barnee.domain.drink.DrinkMutation.TogglePlayingMutation
+import com.popalay.barnee.domain.flatMapToResult
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -38,9 +37,11 @@ sealed class DrinkMutation : Mutation {
 
 class DrinkStateMachine(
     alias: String,
-    private val drinkRepository: DrinkRepository
-) : StateMachine<DrinkState, DrinkAction, DrinkMutation>(DrinkState(), Initial(alias)) {
-    override val processor: Processor<DrinkState, DrinkMutation> = { state ->
+    drinkRepository: DrinkRepository
+) : StateMachine<DrinkState, DrinkAction, DrinkMutation>(
+    initialState = DrinkState(),
+    initialAction = Initial(alias),
+    processor = { state ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)
@@ -53,12 +54,11 @@ class DrinkStateMachine(
                 .map { !state().isPlaying }
                 .map { TogglePlayingMutation(it) },
         )
-    }
-
-    override val reducer: Reducer<DrinkState, DrinkMutation> = { mutation ->
+    },
+    reducer = { mutation ->
         when (mutation) {
             is DrinkWithRelatedMutation -> copy(drinkWithRelated = mutation.data)
             is TogglePlayingMutation -> copy(isPlaying = mutation.data)
         }
     }
-}
+)
