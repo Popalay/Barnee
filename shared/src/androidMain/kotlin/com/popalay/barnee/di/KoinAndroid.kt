@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalSettingsImplementation::class)
-
 package com.popalay.barnee.di
 
 import android.content.Context
@@ -14,7 +12,7 @@ import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore("Settings")
 
-@OptIn(ExperimentalSettingsApi::class)
+@OptIn(ExperimentalSettingsApi::class, ExperimentalSettingsImplementation::class)
 actual val platformModule = module {
     single<FlowSettings> { DataStoreSettings(get<Context>().dataStore) }
     single { ShakeDetector(get<Context>().getSystemService(SensorManager::class.java)) }

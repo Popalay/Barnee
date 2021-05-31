@@ -9,21 +9,36 @@ import kotlinx.coroutines.flow.map
 class LocalStore(
     private val settings: FlowSettings
 ) {
-    fun getFavoriteDrinks(): Flow<Set<String>> = settings.getStringFlow(KEY_FAVORITE_DRINKS, "")
+    suspend fun saveToSet(
+        value: String,
+        key: String,
+        doOnEmpty: suspend () -> Unit = {}
+    ) {
+        val currentItems = settings.getStringOrNull(key)?.split(STRING_SEPARATOR)?.toSet() ?: emptySet()
+        val newItems = (currentItems + value).joinToString(STRING_SEPARATOR)
+        settings.putString(key, newItems)
+        if (currentItems.isEmpty()) doOnEmpty()
+    }
+
+    suspend fun removeFromSet(
+        value: String,
+        key: String,
+        doOnEmpty: suspend () -> Unit = {}
+    ) {
+        val currentItems = settings.getStringOrNull(key)?.split(STRING_SEPARATOR)?.toSet() ?: emptySet()
+        val newItems = (currentItems - value).joinToString(STRING_SEPARATOR)
+        if (newItems.isEmpty()) {
+            settings.remove(key)
+            doOnEmpty()
+        } else {
+            settings.putString(key, newItems)
+        }
+    }
+
+    fun getSetFlow(key: String): Flow<Set<String>> = settings.getStringFlow(key, "")
         .map { it.split(STRING_SEPARATOR).toSet() }
 
-    suspend fun saveFavorite(alias: String) {
-        val currentFavorites = settings.getStringOrNull(KEY_FAVORITE_DRINKS)?.split(STRING_SEPARATOR)?.toSet() ?: emptySet()
-        settings.putString(KEY_FAVORITE_DRINKS, (currentFavorites + alias).joinToString(STRING_SEPARATOR))
-    }
-
-    suspend fun removeFavorite(alias: String) {
-        val currentFavorites = settings.getStringOrNull(KEY_FAVORITE_DRINKS)?.split(STRING_SEPARATOR)?.toSet() ?: emptySet()
-        settings.putString(KEY_FAVORITE_DRINKS, (currentFavorites - alias).joinToString(STRING_SEPARATOR))
-    }
-
     companion object {
-        private const val KEY_FAVORITE_DRINKS = "KEY_FAVORITE_DRINKS"
         private const val STRING_SEPARATOR = "::"
     }
 }

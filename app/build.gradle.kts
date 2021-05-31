@@ -15,7 +15,6 @@ dependencies {
     implementation(libs.accompanist.coil)
     implementation(libs.accompanist.insets)
     implementation(libs.accompanist.flowlayout)
-    implementation(libs.lottie.compose)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor) {
         exclude("com.android.support", "support-annotations")
