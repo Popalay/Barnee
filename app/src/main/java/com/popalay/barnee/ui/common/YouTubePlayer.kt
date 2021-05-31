@@ -1,5 +1,6 @@
 package com.popalay.barnee.ui.common
 
+import android.content.Context
 import android.util.SparseArray
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -22,6 +23,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
+import com.google.android.exoplayer2.util.Util
 
 @Composable
 fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
@@ -32,59 +34,61 @@ fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
     var window by rememberSaveable { mutableStateOf(0) }
     var position by rememberSaveable { mutableStateOf(0L) }
 
-    val player = remember(uri) {
-        SimpleExoPlayer.Builder(context).build().apply {
-            val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("barnee")
-            object : YouTubeExtractor(context) {
-                override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
-                    val videoUrl = ytFiles?.get(22)?.url.orEmpty()
-                    setMediaSource(
-                        ProgressiveMediaSource.Factory(defaultHttpDataSourceFactory)
-                            .createMediaSource(MediaItem.fromUri(videoUrl))
-                    )
-                }
-            }.extract(uri, true, true)
-            playWhenReady = autoPlay
-            seekTo(window, position)
-        }
+    val exoPlayer = remember {
+        SimpleExoPlayer.Builder(context).build()
     }
 
     fun updateState() {
-        autoPlay = player.playWhenReady
-        window = player.currentWindowIndex
-        position = 0L.coerceAtLeast(player.contentPosition)
+        autoPlay = exoPlayer.playWhenReady
+        window = exoPlayer.currentWindowIndex
+        position = 0L.coerceAtLeast(exoPlayer.contentPosition)
     }
 
-    val playerView = remember {
-        val playerView = PlayerView(context)
-        lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onResume(owner: LifecycleOwner) {
-                playerView.onResume()
-                player.playWhenReady = autoPlay
-            }
+    DisposableEffect(uri) {
+        val defaultHttpDataSourceFactory = DefaultHttpDataSource.Factory()
+            .setUserAgent(Util.getUserAgent(context, context.packageName))
+        uri.extractYouTubeUrl(context) { videoUrl ->
+            val source = ProgressiveMediaSource.Factory(defaultHttpDataSourceFactory)
+                .createMediaSource(MediaItem.fromUri(videoUrl))
+            exoPlayer.setMediaSource(source)
+            exoPlayer.prepare()
+        }
+        exoPlayer.playWhenReady = autoPlay
+        exoPlayer.seekTo(window, position)
 
-            override fun onPause(owner: LifecycleOwner) {
-                updateState()
-                playerView.onPause()
-                player.playWhenReady = false
-            }
-        })
-        playerView
-    }
-
-    DisposableEffect(Unit) {
         onDispose {
             updateState()
-            player.release()
+            exoPlayer.release()
         }
     }
 
     AndroidView(
-        factory = { playerView },
+        factory = {
+            PlayerView(context).also { playerView ->
+                playerView.player = exoPlayer
+                lifecycle.addObserver(object : DefaultLifecycleObserver {
+                    override fun onResume(owner: LifecycleOwner) {
+                        playerView.onResume()
+                        exoPlayer.playWhenReady = autoPlay
+                    }
+
+                    override fun onPause(owner: LifecycleOwner) {
+                        updateState()
+                        playerView.onPause()
+                        exoPlayer.playWhenReady = false
+                    }
+                })
+            }
+        },
         modifier = modifier
-    ) {
-        playerView.player = player
-        player.play()
-    }
+    )
+}
+
+private fun String.extractYouTubeUrl(context: Context, onResult: (String) -> Unit) {
+    object : YouTubeExtractor(context) {
+        override fun onExtractionComplete(ytFiles: SparseArray<YtFile>?, videoMeta: VideoMeta?) {
+            val videoUrl = ytFiles?.get(22)?.url.orEmpty()
+            onResult(videoUrl)
+        }
+    }.extract(this, true, true)
 }
