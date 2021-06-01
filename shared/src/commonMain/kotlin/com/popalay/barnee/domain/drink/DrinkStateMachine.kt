@@ -38,10 +38,10 @@ sealed class DrinkMutation : Mutation {
 class DrinkStateMachine(
     alias: String,
     drinkRepository: DrinkRepository
-) : StateMachine<DrinkState, DrinkAction, DrinkMutation>(
+) : StateMachine<DrinkState, DrinkAction, DrinkMutation, Nothing>(
     initialState = DrinkState(),
     initialAction = Initial(alias),
-    processor = { state ->
+    processor = { state, _ ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)

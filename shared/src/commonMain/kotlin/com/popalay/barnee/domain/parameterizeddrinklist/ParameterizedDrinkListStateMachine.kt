@@ -34,10 +34,10 @@ sealed class ParameterizedDrinkListMutation : Mutation {
 class ParameterizedDrinkListStateMachine(
     request: DrinksRequest,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation>(
+) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation, Nothing>(
     initialState = ParameterizedDrinkListState(),
     initialAction = Initial(request),
-    processor = {
+    processor = { _, _ ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)

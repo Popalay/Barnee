@@ -96,8 +96,8 @@ fun DrinkGrid(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
+                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
                     modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
                 )
             }
@@ -123,8 +123,8 @@ fun DrinkHorizontalList(
                 DrinkListItem(
                     item,
                     onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item.alias)) },
+                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))

@@ -30,10 +30,10 @@ sealed class DiscoveryMutation : Mutation {
 
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
-) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation>(
+) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, Nothing>(
     initialState = DiscoveryState(),
     initialAction = Initial,
-    processor = {
+    processor = { _, _ ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)

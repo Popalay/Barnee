@@ -59,10 +59,10 @@ sealed class SearchMutation : Mutation {
 
 class SearchStateMachine(
     drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction, SearchMutation>(
+) : StateMachine<SearchState, SearchAction, SearchMutation, Nothing>(
     initialState = SearchState(),
     initialAction = Initial,
-    processor = { state ->
+    processor = { state, _ ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)

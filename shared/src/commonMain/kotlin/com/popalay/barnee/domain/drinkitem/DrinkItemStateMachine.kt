@@ -1,5 +1,6 @@
 package com.popalay.barnee.domain.drinkitem
 
+import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Mutation
@@ -16,7 +17,7 @@ data class DrinkItemState(
 ) : State
 
 sealed class DrinkItemAction : Action {
-    data class ToggleFavorite(val alias: String) : DrinkItemAction()
+    data class ToggleFavorite(val drink: Drink) : DrinkItemAction()
 }
 
 sealed class DrinkItemMutation : Mutation {
@@ -25,12 +26,12 @@ sealed class DrinkItemMutation : Mutation {
 
 class DrinkItemStateMachine(
     drinkRepository: DrinkRepository
-) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation>(
+) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation, Nothing>(
     initialState = DrinkItemState(),
-    processor = {
+    processor = { _, _ ->
         merge(
             filterIsInstance<ToggleFavorite>()
-                .map { drinkRepository.toggleFavoriteFor(it.alias) }
+                .map { drinkRepository.toggleFavoriteFor(it.drink.alias) }
                 .map { ToggleFavoriteMutation(it) },
         )
     },
