@@ -7,4 +7,4 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class ParameterizedDrinkListViewModel(
     stateMachine: ParameterizedDrinkListStateMachine
-) : StateMachineWrapperViewModel<ParameterizedDrinkListState, ParameterizedDrinkListAction>(stateMachine)
+) : StateMachineWrapperViewModel<ParameterizedDrinkListState, ParameterizedDrinkListAction, Nothing>(stateMachine)

@@ -7,4 +7,4 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class SearchViewModel(
     stateMachine: SearchStateMachine
-) : StateMachineWrapperViewModel<SearchState, SearchAction>(stateMachine)
+) : StateMachineWrapperViewModel<SearchState, SearchAction, Nothing>(stateMachine)

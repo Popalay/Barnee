@@ -7,4 +7,4 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class DiscoveryViewModel(
     stateMachine: DiscoveryStateMachine
-) : StateMachineWrapperViewModel<DiscoveryState, DiscoveryAction>(stateMachine)
+) : StateMachineWrapperViewModel<DiscoveryState, DiscoveryAction, Nothing>(stateMachine)

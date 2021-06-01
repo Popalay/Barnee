@@ -127,7 +127,7 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(args.alias)) },
+                        onHeartClick = { drink?.let { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(it)) } },
                         onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
                     )
                 },

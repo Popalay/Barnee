@@ -43,10 +43,10 @@ sealed class ShakeToDrinkMutation : Mutation {
 class ShakeToDrinkStateMachine(
     drinkRepository: DrinkRepository,
     shakeDetector: ShakeDetector
-) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, ShakeToDrinkMutation>(
+) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, ShakeToDrinkMutation, Nothing>(
     initialState = ShakeToDrinkState(),
     initialAction = Initial,
-    processor = { state ->
+    processor = { state, _ ->
         merge(
             filterIsInstance<Initial>()
                 .take(1)
