@@ -64,7 +64,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
@@ -93,7 +92,7 @@ import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
 import com.popalay.barnee.ui.util.shareDrink
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.ui.util.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable

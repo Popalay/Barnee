@@ -64,7 +64,7 @@ import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.ui.util.getViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

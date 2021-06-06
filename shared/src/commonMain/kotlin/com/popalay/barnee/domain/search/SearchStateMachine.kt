@@ -29,22 +29,22 @@ data class SearchState(
     val isFiltersShown: Boolean = false
 ) : State
 
-sealed class SearchAction : Action {
-    object Initial : SearchAction()
-    object Retry : SearchAction()
-    object ShowFiltersClicked : SearchAction()
-    object FiltersDismissed : SearchAction()
-    object ClearSearchQuery : SearchAction()
-    data class QueryChanged(val query: String) : SearchAction()
-    data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction()
+sealed interface SearchAction : Action {
+    object Initial : SearchAction
+    object Retry : SearchAction
+    object ShowFiltersClicked : SearchAction
+    object FiltersDismissed : SearchAction
+    object ClearSearchQuery : SearchAction
+    data class QueryChanged(val query: String) : SearchAction
+    data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction
 }
 
-sealed class SearchMutation : Mutation {
-    data class AggregationResult(val data: Result<Aggregation>) : SearchMutation()
-    data class Searching(val data: Result<List<Drink>>) : SearchMutation()
-    data class Query(val data: String) : SearchMutation()
-    data class Filters(val data: Set<Pair<String, AggregationGroup>>) : SearchMutation()
-    data class ShowFilters(val data: Boolean) : SearchMutation()
+sealed interface SearchMutation : Mutation {
+    data class AggregationResult(val data: Result<Aggregation>) : SearchMutation
+    data class Searching(val data: Result<List<Drink>>) : SearchMutation
+    data class Query(val data: String) : SearchMutation
+    data class Filters(val data: Set<Pair<String, AggregationGroup>>) : SearchMutation
+    data class ShowFilters(val data: Boolean) : SearchMutation
 }
 
 class SearchStateMachine(
@@ -97,7 +97,7 @@ class SearchStateMachine(
             filterIsInstance<SearchAction.ClearSearchQuery>()
                 .map { SearchMutation.Query("") },
             filterIsInstance<SearchAction.ClearSearchQuery>()
-                .flatMapToResult { state().searchRequest(drinkRepository) }
+                .flatMapToResult { state().searchRequest(drinkRepository, query = "") }
                 .map { SearchMutation.Searching(it) },
         )
     },

@@ -5,7 +5,7 @@ import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.navigation.QueryDrinksScreenArgs
 import com.popalay.barnee.navigation.SimilarDrinksScreenArgs
 import com.popalay.barnee.navigation.TagDrinksScreenArgs
-import java.util.Locale
+import com.popalay.barnee.ui.util.capitalizeFirstChar
 
 @Composable
 fun SimilarDrinksScreen(args: SimilarDrinksScreenArgs) {
@@ -28,7 +28,7 @@ fun FavoriteDrinksScreen() {
 fun TagDrinksScreen(args: TagDrinksScreenArgs) {
     ParameterizedDrinkListScreen(
         request = DrinksRequest.ForTags(setOf(args.tag)),
-        title = args.tag.capitalize(Locale.getDefault())
+        title = args.tag.capitalizeFirstChar()
     )
 }
 
@@ -36,6 +36,6 @@ fun TagDrinksScreen(args: TagDrinksScreenArgs) {
 fun QueryDrinksScreen(args: QueryDrinksScreenArgs) {
     ParameterizedDrinkListScreen(
         request = DrinksRequest.ForQuery(args.query),
-        title = args.name.capitalize(Locale.getDefault())
+        title = args.name.capitalizeFirstChar()
     )
 }

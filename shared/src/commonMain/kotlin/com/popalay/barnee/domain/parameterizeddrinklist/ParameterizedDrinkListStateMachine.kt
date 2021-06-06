@@ -19,13 +19,13 @@ data class ParameterizedDrinkListState(
     val drinks: Result<List<Drink>> = Uninitialized()
 ) : State
 
-sealed class ParameterizedDrinkListAction : Action {
-    data class Initial(val request: DrinksRequest) : ParameterizedDrinkListAction()
-    object Retry : ParameterizedDrinkListAction()
+sealed interface ParameterizedDrinkListAction : Action {
+    data class Initial(val request: DrinksRequest) : ParameterizedDrinkListAction
+    object Retry : ParameterizedDrinkListAction
 }
 
-sealed class ParameterizedDrinkListMutation : Mutation {
-    data class Drinks(val data: Result<List<Drink>>) : ParameterizedDrinkListMutation()
+sealed interface ParameterizedDrinkListMutation : Mutation {
+    data class Drinks(val data: Result<List<Drink>>) : ParameterizedDrinkListMutation
 }
 
 class ParameterizedDrinkListStateMachine(

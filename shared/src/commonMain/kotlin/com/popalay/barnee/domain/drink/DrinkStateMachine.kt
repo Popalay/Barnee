@@ -19,15 +19,15 @@ data class DrinkState(
     val isPlaying: Boolean = false
 ) : State
 
-sealed class DrinkAction : Action {
-    data class Initial(val alias: String) : DrinkAction()
-    object TogglePlaying : DrinkAction()
-    object Retry : DrinkAction()
+sealed interface DrinkAction : Action {
+    data class Initial(val alias: String) : DrinkAction
+    object TogglePlaying : DrinkAction
+    object Retry : DrinkAction
 }
 
-sealed class DrinkMutation : Mutation {
-    data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation()
-    data class TogglePlaying(val data: Boolean) : DrinkMutation()
+sealed interface DrinkMutation : Mutation {
+    data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation
+    data class TogglePlaying(val data: Boolean) : DrinkMutation
 }
 
 class DrinkStateMachine(

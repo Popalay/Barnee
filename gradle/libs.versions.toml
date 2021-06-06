@@ -1,25 +1,25 @@
 [versions]
-kotlin = "1.4.32"
+kotlin = "1.5.10"
 android-gradlePlugin = "7.1.0-alpha01"
-google-services-gradlePlugin = "4.3.3"
-compose = "1.0.0-beta05"
-androidx-activity = "1.3.0-alpha07"
-androidx-navigation = "1.0.0-alpha10"
-accompanist = "0.8.1"
+google-services-gradlePlugin = "4.3.8"
+dependencyUpdatesPlugin = "0.39.0"
+compose = "1.0.0-beta08"
+androidx-activity = "1.3.0-beta01"
+androidx-navigation = "2.4.0-alpha02"
+androidx-lifecycle = "2.4.0-alpha01"
+accompanist = "0.11.1"
 datastore = "1.0.0-beta01"
-lottie = "1.0.0-alpha07-SNAPSHOT"
-ktor = "1.5.3"
-exoplayer = "2.13.3"
+ktor = "1.6.0"
+exoplayer = "2.14.0"
 youtubeExtractor = "master-SNAPSHOT"
 junit = "4.13.2"
 androidx-test = "1.1.2"
 espresso = "3.3.0"
 logback = "1.2.3"
-coroutines = "1.4.3-native-mt"
-koin = "3.0.1-beta-1"
-settings = "0.7.5"
-logger = "1.12.5"
-firebase-dynamicLinks = "19.1.1"
+coroutines = "1.5.0-native-mt"
+koin = "3.0.2"
+settings = "0.7.7"
+firebase-dynamicLinks = "20.1.0"
 
 [libraries]
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -32,13 +32,13 @@ compose-material = { module = "androidx.compose.material:material", version.ref 
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose" }
 activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 accompanist-coil = { module = "com.google.accompanist:accompanist-coil", version.ref = "accompanist" }
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 datastore-runtime = { module = "androidx.datastore:datastore", version.ref = "datastore" }
 datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "datastore" }
 datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
-lottie-compose = { module = "com.airbnb.android:lottie-compose", version.ref = "lottie" }
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
 ktor-ios = { module = "io.ktor:ktor-client-ios", version.ref = "ktor" }
@@ -57,8 +57,10 @@ koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = 
 settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "settings" }
 settingscoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
 settingsdatastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
-logger = { module = "io.github.microutils:kotlin-logging", version.ref = "logger" }
 firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.ref = "firebase-dynamicLinks" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material", "compose-runtime"]
+ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
+accompanist = ["accompanist-coil", "accompanist-insets", "accompanist-flowlayout"]
+koin = ["koin-android", "koin-core"]

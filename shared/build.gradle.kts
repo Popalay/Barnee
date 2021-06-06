@@ -2,26 +2,13 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.4.32"
+    kotlin("plugin.serialization") version "1.5.10"
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
-    id("com.chromaticnoise.multiplatform-swiftpackage") version "2.0.3"
 }
 
 // CocoaPods requires the podspec to have a version.
 version = "1.0"
-
-// workaround for https://youtrack.jetbrains.com/issue/KT-43944
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
 
 kotlin {
     val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
@@ -60,7 +47,6 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.settings)
                 implementation(libs.settingscoroutines)
-                implementation(libs.logger)
             }
         }
 
@@ -88,13 +74,5 @@ android {
     defaultConfig {
         minSdk = 28
         targetSdk = 30
-    }
-}
-
-multiplatformSwiftPackage {
-    packageName("BarneeShared")
-    swiftToolsVersion("5.3")
-    targetPlatforms {
-        iOS { v("13.5") }
     }
 }

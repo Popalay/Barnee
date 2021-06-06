@@ -9,20 +9,17 @@ plugins {
 dependencies {
     add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.compose.compiler)
     implementation(project(":shared"))
-    implementation(libs.bundles.compose)
     implementation(libs.activity.compose)
     implementation(libs.navigation.compose)
-    implementation(libs.accompanist.coil)
-    implementation(libs.accompanist.insets)
-    implementation(libs.accompanist.flowlayout)
-    implementation(libs.lottie.compose)
+    implementation(libs.lifecycle.runtime.ktx)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor) {
         exclude("com.android.support", "support-annotations")
     }
-    implementation(libs.koin.android)
-    implementation(libs.koin.compose)
     implementation(libs.firebase.dynamicLinks)
+    implementation(libs.bundles.koin)
+    implementation(libs.bundles.compose)
+    implementation(libs.bundles.accompanist)
 }
 
 val isCI = System.getenv("CI") == "true"
@@ -77,7 +74,6 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        useIR = true
         kotlinOptions.freeCompilerArgs += listOf(
             "-Xopt-in=kotlin.RequiresOptIn",
             "-Xopt-in=kotlin.OptIn"

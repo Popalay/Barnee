@@ -22,7 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.BlendMode.SrcAtop
+import androidx.compose.ui.graphics.BlendMode.Companion.SrcAtop
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
@@ -32,7 +32,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.compose.navigate
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
@@ -47,7 +46,7 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.ui.util.getViewModel
 
 @Composable
 fun ShakeToDrinkScreen() {

@@ -26,7 +26,7 @@ data class Drink(
     val displayImageUrl = images.lastOrNull()?.uri.orEmpty()
 
     @Transient
-    val displayName = name.toLowerCase().removePrefix("absolut").trim()
+    val displayName = name.lowercase().removePrefix("absolut").trim()
 
     @Transient
     val videoUrl = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
@@ -37,7 +37,7 @@ data class Drink(
     @Transient
     val keywords = (categories + collections + occasions)
         .filter { it.alias.isNotBlank() }
-        .map { it.text.toLowerCase() }
+        .map { it.text.lowercase() }
         .filter { it != "unknown" }
 
     @Transient

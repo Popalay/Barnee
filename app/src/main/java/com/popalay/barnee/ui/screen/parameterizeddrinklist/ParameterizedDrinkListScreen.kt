@@ -15,7 +15,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.toPaddingValues
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction
 import com.popalay.barnee.ui.common.ActionsAppBar
@@ -23,7 +23,7 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.ui.util.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -52,8 +52,10 @@ fun ParameterizedDrinkListScreen(
             listState = listState,
             emptyMessage = "We don't have any drinks\nfor this category",
             onRetry = { viewModel.processAction(ParameterizedDrinkListAction.Retry) },
-            contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues(
-                additionalHorizontal = 8.dp
+            contentPadding = rememberInsetsPaddingValues(
+                insets = LocalWindowInsets.current.navigationBars,
+                additionalStart = 8.dp,
+                additionalEnd = 8.dp
             )
         )
     }
