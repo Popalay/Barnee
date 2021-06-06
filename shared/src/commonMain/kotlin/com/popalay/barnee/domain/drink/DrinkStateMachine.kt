@@ -8,11 +8,6 @@ import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
-import com.popalay.barnee.domain.drink.DrinkAction.Initial
-import com.popalay.barnee.domain.drink.DrinkAction.Retry
-import com.popalay.barnee.domain.drink.DrinkAction.TogglePlaying
-import com.popalay.barnee.domain.drink.DrinkMutation.DrinkWithRelatedMutation
-import com.popalay.barnee.domain.drink.DrinkMutation.TogglePlayingMutation
 import com.popalay.barnee.domain.flatMapToResult
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -31,8 +26,8 @@ sealed class DrinkAction : Action {
 }
 
 sealed class DrinkMutation : Mutation {
-    data class DrinkWithRelatedMutation(val data: Result<FullDrinkResponse>) : DrinkMutation()
-    data class TogglePlayingMutation(val data: Boolean) : DrinkMutation()
+    data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation()
+    data class TogglePlaying(val data: Boolean) : DrinkMutation()
 }
 
 class DrinkStateMachine(
@@ -40,25 +35,25 @@ class DrinkStateMachine(
     drinkRepository: DrinkRepository
 ) : StateMachine<DrinkState, DrinkAction, DrinkMutation, Nothing>(
     initialState = DrinkState(),
-    initialAction = Initial(alias),
+    initialAction = DrinkAction.Initial(alias),
     processor = { state, _ ->
         merge(
-            filterIsInstance<Initial>()
+            filterIsInstance<DrinkAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getFullDrink(it.alias) }
-                .map { DrinkWithRelatedMutation(it) },
-            filterIsInstance<Retry>()
+                .map { DrinkMutation.DrinkWithRelated(it) },
+            filterIsInstance<DrinkAction.Retry>()
                 .flatMapToResult { drinkRepository.getFullDrink(alias) }
-                .map { DrinkWithRelatedMutation(it) },
-            filterIsInstance<TogglePlaying>()
+                .map { DrinkMutation.DrinkWithRelated(it) },
+            filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
-                .map { TogglePlayingMutation(it) },
+                .map { DrinkMutation.TogglePlaying(it) },
         )
     },
     reducer = { mutation ->
         when (mutation) {
-            is DrinkWithRelatedMutation -> copy(drinkWithRelated = mutation.data)
-            is TogglePlayingMutation -> copy(isPlaying = mutation.data)
+            is DrinkMutation.DrinkWithRelated -> copy(drinkWithRelated = mutation.data)
+            is DrinkMutation.TogglePlaying -> copy(isPlaying = mutation.data)
         }
     }
 )
