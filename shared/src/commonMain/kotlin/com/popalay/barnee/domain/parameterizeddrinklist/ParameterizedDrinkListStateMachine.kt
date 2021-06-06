@@ -10,9 +10,6 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Initial
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction.Retry
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListMutation.DrinksMutation
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -28,7 +25,7 @@ sealed class ParameterizedDrinkListAction : Action {
 }
 
 sealed class ParameterizedDrinkListMutation : Mutation {
-    data class DrinksMutation(val data: Result<List<Drink>>) : ParameterizedDrinkListMutation()
+    data class Drinks(val data: Result<List<Drink>>) : ParameterizedDrinkListMutation()
 }
 
 class ParameterizedDrinkListStateMachine(
@@ -36,21 +33,21 @@ class ParameterizedDrinkListStateMachine(
     drinkRepository: DrinkRepository
 ) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation, Nothing>(
     initialState = ParameterizedDrinkListState(),
-    initialAction = Initial(request),
+    initialAction = ParameterizedDrinkListAction.Initial(request),
     processor = { _, _ ->
         merge(
-            filterIsInstance<Initial>()
+            filterIsInstance<ParameterizedDrinkListAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getDrinks(it.request) }
-                .map { DrinksMutation(it) },
-            filterIsInstance<Retry>()
+                .map { ParameterizedDrinkListMutation.Drinks(it) },
+            filterIsInstance<ParameterizedDrinkListAction.Retry>()
                 .flatMapToResult { drinkRepository.getDrinks(request) }
-                .map { DrinksMutation(it) },
+                .map { ParameterizedDrinkListMutation.Drinks(it) },
         )
     },
     reducer = { mutation ->
         when (mutation) {
-            is DrinksMutation -> copy(drinks = mutation.data)
+            is ParameterizedDrinkListMutation.Drinks -> copy(drinks = mutation.data)
         }
     }
 )

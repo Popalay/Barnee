@@ -1,7 +1,11 @@
 package com.popalay.barnee.ui.screen.search
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -27,6 +31,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -49,7 +55,6 @@ import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
-import com.popalay.barnee.domain.search.SearchAction.QueryChanged
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.EmptyStateView
@@ -123,7 +128,8 @@ fun SearchScreen() {
                 )
                 SearchTextField(
                     value = state.searchQuery,
-                    onValueChange = { viewModel.processAction(QueryChanged(it)) },
+                    onValueChange = { viewModel.processAction(SearchAction.QueryChanged(it)) },
+                    onClearClicked = { viewModel.processAction(SearchAction.ClearSearchQuery) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(1.dp)
@@ -134,10 +140,12 @@ fun SearchScreen() {
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun SearchTextField(
     value: String,
     onValueChange: (String) -> Unit,
+    onClearClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     TextField(
@@ -147,6 +155,20 @@ private fun SearchTextField(
                 painter = painterResource(R.drawable.ic_search),
                 contentDescription = "Search"
             )
+        },
+        trailingIcon = {
+            AnimatedVisibility(
+                visible = value.isNotEmpty(),
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                IconButton(onClick = onClearClicked) {
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "Clear"
+                    )
+                }
+            }
         },
         placeholder = {
             Text(

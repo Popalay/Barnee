@@ -8,8 +8,6 @@ import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
-import com.popalay.barnee.domain.discovery.DiscoveryAction.Initial
-import com.popalay.barnee.domain.discovery.DiscoveryMutation.CategoriesMutation
 import com.popalay.barnee.domain.flatMapToResult
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -25,25 +23,25 @@ sealed class DiscoveryAction : Action {
 }
 
 sealed class DiscoveryMutation : Mutation {
-    data class CategoriesMutation(val data: Result<List<Category>>) : DiscoveryMutation()
+    data class Categories(val data: Result<List<Category>>) : DiscoveryMutation()
 }
 
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
 ) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, Nothing>(
     initialState = DiscoveryState(),
-    initialAction = Initial,
+    initialAction = DiscoveryAction.Initial,
     processor = { _, _ ->
         merge(
-            filterIsInstance<Initial>()
+            filterIsInstance<DiscoveryAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.getCategories() }
-                .map { CategoriesMutation(it) }
+                .map { DiscoveryMutation.Categories(it) }
         )
     },
     reducer = { mutation ->
         when (mutation) {
-            is CategoriesMutation -> copy(categories = mutation.data)
+            is DiscoveryMutation.Categories -> copy(categories = mutation.data)
         }
     }
 )

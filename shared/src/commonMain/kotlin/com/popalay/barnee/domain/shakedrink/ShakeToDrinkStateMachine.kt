@@ -12,10 +12,6 @@ import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.DialogDismissed
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.Initial
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction.Retry
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkMutation.RandomDrinkMutation
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filter
@@ -37,7 +33,7 @@ sealed class ShakeToDrinkAction : Action {
 }
 
 sealed class ShakeToDrinkMutation : Mutation {
-    data class RandomDrinkMutation(val data: Result<Drink>) : ShakeToDrinkMutation()
+    data class RandomDrink(val data: Result<Drink>) : ShakeToDrinkMutation()
 }
 
 class ShakeToDrinkStateMachine(
@@ -45,25 +41,25 @@ class ShakeToDrinkStateMachine(
     shakeDetector: ShakeDetector
 ) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, ShakeToDrinkMutation, Nothing>(
     initialState = ShakeToDrinkState(),
-    initialAction = Initial,
+    initialAction = ShakeToDrinkAction.Initial,
     processor = { state, _ ->
         merge(
-            filterIsInstance<Initial>()
+            filterIsInstance<ShakeToDrinkAction.Initial>()
                 .take(1)
                 .flatMapMerge { detectShakes(shakeDetector) }
                 .flatMapToResult { drinkRepository.getDrinks(DrinksRequest.Random(1)).map { it.first() } }
                 .filter { !(it is Success<Drink> && state().randomDrink is Uninitialized) }
-                .map { RandomDrinkMutation(it) },
-            filterIsInstance<Retry>()
+                .map { ShakeToDrinkMutation.RandomDrink(it) },
+            filterIsInstance<ShakeToDrinkAction.Retry>()
                 .flatMapToResult { drinkRepository.getDrinks(DrinksRequest.Random(1)).map { it.first() } }
-                .map { RandomDrinkMutation(it) },
-            filterIsInstance<DialogDismissed>()
-                .map { RandomDrinkMutation(Uninitialized()) },
+                .map { ShakeToDrinkMutation.RandomDrink(it) },
+            filterIsInstance<ShakeToDrinkAction.DialogDismissed>()
+                .map { ShakeToDrinkMutation.RandomDrink(Uninitialized()) },
         )
     },
     reducer = { mutation ->
         when (mutation) {
-            is RandomDrinkMutation -> copy(
+            is ShakeToDrinkMutation.RandomDrink -> copy(
                 randomDrink = mutation.data,
                 shouldShow = mutation.data !is Uninitialized
             )
