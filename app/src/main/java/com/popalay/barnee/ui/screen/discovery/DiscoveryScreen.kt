@@ -14,9 +14,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.compose.navigate
 import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.toPaddingValues
+import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
 import com.popalay.barnee.domain.discovery.DiscoveryState
@@ -25,7 +24,7 @@ import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.ui.util.getViewModel
 
 @Composable
 fun DiscoveryScreen() {
@@ -48,8 +47,10 @@ private fun DiscoveryScreen(state: DiscoveryState) {
             categories = state.categories,
             emptyMessage = "We currently have no drinks",
             listState = listState,
-            contentPadding = LocalWindowInsets.current.navigationBars.toPaddingValues(
-                additionalHorizontal = 8.dp
+            contentPadding = rememberInsetsPaddingValues(
+                insets = LocalWindowInsets.current.navigationBars,
+                additionalStart = 8.dp,
+                additionalEnd = 8.dp
             )
         )
     }

@@ -1,7 +1,5 @@
 package com.popalay.barnee.ui.theme
 
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.Colors
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
@@ -29,10 +27,8 @@ private val LightColorPalette = lightColors(
     onBackground = Black
 )
 
-val Colors.backgroundVariant get() = Grey
-
 @Composable
-fun BarneeTheme(darkTheme: Boolean = isSystemInDarkTheme(), content: @Composable () -> Unit) {
+fun BarneeTheme(content: @Composable () -> Unit) {
     MaterialTheme(
         colors = DarkColorPalette,
         typography = Typography,

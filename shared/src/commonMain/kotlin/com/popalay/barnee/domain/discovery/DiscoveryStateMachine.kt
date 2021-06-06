@@ -18,12 +18,12 @@ data class DiscoveryState(
     val categories: Result<List<Category>> = Uninitialized()
 ) : State
 
-sealed class DiscoveryAction : Action {
-    object Initial : DiscoveryAction()
+sealed interface DiscoveryAction : Action {
+    object Initial : DiscoveryAction
 }
 
-sealed class DiscoveryMutation : Mutation {
-    data class Categories(val data: Result<List<Category>>) : DiscoveryMutation()
+sealed interface DiscoveryMutation : Mutation {
+    data class Categories(val data: Result<List<Category>>) : DiscoveryMutation
 }
 
 class DiscoveryStateMachine(

@@ -26,14 +26,14 @@ data class ShakeToDrinkState(
     val shouldShow: Boolean = false
 ) : State
 
-sealed class ShakeToDrinkAction : Action {
-    object Initial : ShakeToDrinkAction()
-    object DialogDismissed : ShakeToDrinkAction()
-    object Retry : ShakeToDrinkAction()
+sealed interface ShakeToDrinkAction : Action {
+    object Initial : ShakeToDrinkAction
+    object DialogDismissed : ShakeToDrinkAction
+    object Retry : ShakeToDrinkAction
 }
 
-sealed class ShakeToDrinkMutation : Mutation {
-    data class RandomDrink(val data: Result<Drink>) : ShakeToDrinkMutation()
+sealed interface ShakeToDrinkMutation : Mutation {
+    data class RandomDrink(val data: Result<Drink>) : ShakeToDrinkMutation
 }
 
 class ShakeToDrinkStateMachine(
@@ -70,7 +70,7 @@ class ShakeToDrinkStateMachine(
 private fun detectShakes(shakeDetector: ShakeDetector) = callbackFlow {
     shakeDetector.start {
         try {
-            offer(true)
+            trySend(true)
         } catch (e: Exception) {
             // Handle exception from the channel: failure in flow or premature closing
         }

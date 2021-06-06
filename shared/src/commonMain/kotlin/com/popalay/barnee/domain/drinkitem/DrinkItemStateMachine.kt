@@ -14,12 +14,12 @@ data class DrinkItemState(
     val isFavorite: Boolean = false
 ) : State
 
-sealed class DrinkItemAction : Action {
-    data class ToggleFavorite(val drink: Drink) : DrinkItemAction()
+sealed interface DrinkItemAction : Action {
+    data class ToggleFavorite(val drink: Drink) : DrinkItemAction
 }
 
-sealed class DrinkItemMutation : Mutation {
-    data class ToggleFavorite(val data: Boolean) : DrinkItemMutation()
+sealed interface DrinkItemMutation : Mutation {
+    data class ToggleFavorite(val data: Boolean) : DrinkItemMutation
 }
 
 class DrinkItemStateMachine(

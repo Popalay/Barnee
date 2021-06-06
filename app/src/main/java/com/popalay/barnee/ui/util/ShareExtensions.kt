@@ -9,13 +9,12 @@ import com.google.firebase.dynamiclinks.ktx.dynamicLink
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.dynamiclinks.ktx.shortLinkAsync
 import com.google.firebase.ktx.Firebase
-import java.util.Locale
 
 internal fun Context.shareDrink(displayName: String, alias: String) {
     val link = "https://barnee.com/drink/${alias}".toUri()
     val domainUriPrefix = "https://barnee.page.link"
     val googlePlayLink = "https://play.google.com/store/apps/details?id=com.popalay.barnee".toUri()
-    val text = "Check out how to make a ${displayName.capitalize(Locale.getDefault())}"
+    val text = "Check out how to make a ${displayName.capitalizeFirstChar()}"
     val title = "Share drink"
 
     Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {

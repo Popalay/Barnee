@@ -5,15 +5,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -29,31 +28,28 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
     processor: Processor<S, M, SE>,
     reducer: Reducer<S, M>
 ) {
-    private val actionFlow = MutableSharedFlow<A>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val actionFlow = MutableSharedFlow<A>(replay = 1)
     private val _sideEffectFlow = MutableSharedFlow<SE>()
-    private val coroutineScope: CoroutineScope = MainScope()
+    private val stateMachineScope: CoroutineScope = MainScope()
     private val currentState: S get() = stateFlow.value
 
+    val sideEffectFlow: SharedFlow<SE> = _sideEffectFlow
     val stateFlow: StateFlow<S> = actionFlow
         .onStart { initialAction?.let { process(it) } }
-        .flatMapConcat { actionFlow.processor({ currentState }, { _sideEffectFlow.emit(it) }) }
-        .scan(initialState) { state, mutation -> reducer(state, mutation) }
+        .flatMapLatest { actionFlow.processor({ currentState }, { _sideEffectFlow.emit(it) }) }
+        .map { reducer(currentState, it) }
         .stateIn(
-            coroutineScope,
+            stateMachineScope,
             SharingStarted.Eagerly,
             initialState
         )
-    val sideEffectFlow: SharedFlow<SE> = _sideEffectFlow
 
     open fun clear() {
-        coroutineScope.cancel()
+        stateMachineScope.cancel()
     }
 
     fun process(action: A) {
-        coroutineScope.launch { actionFlow.emit(action) }
+        stateMachineScope.launch { actionFlow.emit(action) }
     }
 }
 
