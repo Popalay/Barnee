@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package com.popalay.barnee.di
 
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
@@ -17,7 +15,7 @@ import org.koin.core.component.get
 import org.koin.dsl.module
 import platform.Foundation.NSUserDefaults
 
-@OptIn(ExperimentalSettingsApi::class)
+@OptIn(ExperimentalSettingsApi::class, ExperimentalCoroutinesApi::class)
 actual val platformModule = module {
     single {
         val delegate = NSUserDefaults("Settings")

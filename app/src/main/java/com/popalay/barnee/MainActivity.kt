@@ -33,10 +33,7 @@ import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.FavoriteDrinksScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.QueryDrinksScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.SimilarDrinksScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.TagDrinksScreen
+import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -81,19 +78,19 @@ class MainActivity : ComponentActivity() {
                         DiscoveryScreen()
                     }
                     navigationNode(DrinkNavigationCommand) {
-                        DrinkScreen(DrinkNavigationCommand.parseArgs(it))
+                        DrinkScreen(DrinkNavigationCommand.parseInput(it))
                     }
                     navigationNode(TagDrinksNavigationCommand) {
-                        TagDrinksScreen(TagDrinksNavigationCommand.parseArgs(it))
+                        ParameterizedDrinkListScreen(TagDrinksNavigationCommand.parseInput(it))
                     }
                     navigationNode(SimilarDrinksNavigationCommand) {
-                        SimilarDrinksScreen(SimilarDrinksNavigationCommand.parseArgs(it))
+                        ParameterizedDrinkListScreen(SimilarDrinksNavigationCommand.parseInput(it))
                     }
                     navigationNode(QueryDrinksNavigationCommand) {
-                        QueryDrinksScreen(QueryDrinksNavigationCommand.parseArgs(it))
+                        ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
                     }
                     navigationNode(FavoriteDrinksNavigationCommand) {
-                        FavoriteDrinksScreen()
+                        ParameterizedDrinkListScreen(FavoriteDrinksNavigationCommand.parseInput(it))
                     }
                     navigationNode(SearchNavigationCommand) {
                         SearchScreen()

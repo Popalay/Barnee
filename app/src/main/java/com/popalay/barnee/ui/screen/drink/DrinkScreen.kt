@@ -40,6 +40,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -75,9 +76,10 @@ import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
+import com.popalay.barnee.domain.drink.DrinkInput
+import com.popalay.barnee.domain.drink.DrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.DrinkScreenArgs
 import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
@@ -91,24 +93,33 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForExtarnalImage
-import com.popalay.barnee.ui.util.shareDrink
 import com.popalay.barnee.ui.util.getViewModel
+import com.popalay.barnee.ui.util.shareDrink
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun DrinkScreen(args: DrinkScreenArgs) {
+fun DrinkScreen(input: DrinkInput) {
+    DrinkScreen(getViewModel { parametersOf(input) }, getViewModel())
+}
+
+@Composable
+fun DrinkScreen(viewModel: DrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
+    val state by viewModel.stateFlow.collectAsState()
+    DrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
+}
+
+@Composable
+fun DrinkScreen(
+    state: DrinkState,
+    onAction: (DrinkAction) -> Unit,
+    onItemAction: (DrinkItemAction) -> Unit
+) {
     val navController = LocalNavController.current
     val context = LocalContext.current
-    val viewModel: DrinkViewModel = getViewModel { parametersOf(args.alias) }
-    val drinkItemViewModel: DrinkItemViewModel = getViewModel()
-    val state by viewModel.stateFlow.collectAsState()
-    val drink = remember(state) { state.drinkWithRelated()?.drink }
+    val drink by derivedStateOf { state.drinkWithRelated()?.drink }
 
     val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
     val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
-
-    val displayName = args.name.ifBlank { drink?.displayName.orEmpty() }
-    val displayImage = args.image.ifBlank { drink?.displayImageUrl.orEmpty() }
 
     CollapsingScaffold(
         maxHeight = toolbarHeight,
@@ -121,13 +132,13 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                 isPlaying = state.isPlaying,
                 imageContent = {
                     ImageContent(
-                        image = displayImage,
+                        image = state.displayImage,
                         rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.isFavorite,
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drink?.let { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(it)) } },
-                        onPlayClick = { viewModel.processAction(DrinkAction.TogglePlaying) }
+                        onHeartClick = { drink?.let { onItemAction(DrinkItemAction.ToggleFavorite(it)) } },
+                        onPlayClick = { onAction(DrinkAction.TogglePlaying) }
                     )
                 },
                 videoContent = {
@@ -141,14 +152,14 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                 },
                 sharedContent = {
                     SharedContent(
-                        title = displayName,
+                        title = state.displayName,
                         nutrition = drink?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
                         isPlaying = state.isPlaying,
                         shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = offset,
                         scrollFraction = fraction,
-                        onShareClick = { context.shareDrink(displayName, args.alias) }
+                        onShareClick = { context.shareDrink(state.displayName, state.alias) }
                     )
                 },
                 scrollFraction = fraction,
@@ -157,7 +168,7 @@ fun DrinkScreen(args: DrinkScreenArgs) {
         }
     ) { contentPadding ->
         LazyColumn(contentPadding = contentPadding) {
-            item {
+            item(drink?.id) {
                 StateLayout(
                     value = state.drinkWithRelated,
                     loadingState = {
@@ -170,7 +181,7 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                     },
                     errorState = {
                         ErrorAndRetryStateView(
-                            onRetry = { viewModel.processAction(DrinkAction.Retry) },
+                            onRetry = { onAction(DrinkAction.Retry) },
                             modifier = Modifier.padding(top = 32.dp)
                         )
                     }
@@ -204,7 +215,14 @@ fun DrinkScreen(args: DrinkScreenArgs) {
                         }
                         RecommendedDrinks(
                             data = value.relatedDrinks,
-                            onShowMoreClick = { navController.navigate(AppNavigation.similarDrinks(args.alias, displayName)) },
+                            onShowMoreClick = {
+                                navController.navigate(
+                                    AppNavigation.similarDrinks(
+                                        state.alias,
+                                        state.displayName
+                                    )
+                                )
+                            },
                         )
                         Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
@@ -262,7 +280,6 @@ private fun SharedContent(
 ) {
     val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
     val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
-    val titleWidthFraction = remember(scrollFraction) { if (scrollFraction > 0.9F) 1F else 0.7F }
     val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
     val titleOffset = with(LocalDensity.current) {
         IntOffset(
@@ -298,8 +315,8 @@ private fun SharedContent(
             maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
-                .padding(start = 24.dp, end = 16.dp)
-                .fillMaxWidth(titleWidthFraction)
+                .padding(start = 24.dp)
+                .fillMaxWidth(0.7F)
                 .offset { titleOffset }
                 .alpha(titleAlpha)
         )
@@ -565,6 +582,6 @@ private fun RecommendedDrinks(
 @Composable
 private fun DrinkScreenPreview() {
     BarneeTheme {
-        DrinkScreen(DrinkScreenArgs("alias", "name", "sample.png"))
+        DrinkScreen(DrinkInput("alias", "name", "sample.png"))
     }
 }

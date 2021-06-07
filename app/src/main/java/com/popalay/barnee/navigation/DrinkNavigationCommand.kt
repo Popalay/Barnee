@@ -6,12 +6,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
-
-data class DrinkScreenArgs(
-    val alias: String,
-    val name: String,
-    val image: String
-) : ScreenArgs
+import com.popalay.barnee.domain.drink.DrinkInput
 
 object DrinkNavigationCommand : NavigationCommand {
     private const val KEY_ALIAS = "alias"
@@ -36,7 +31,7 @@ object DrinkNavigationCommand : NavigationCommand {
         image: String
     ): String = "drink/$alias?$KEY_IMAGE=$image&$KEY_NAME=$name"
 
-    fun parseArgs(backStackEntry: NavBackStackEntry) = DrinkScreenArgs(
+    fun parseInput(backStackEntry: NavBackStackEntry) = DrinkInput(
         alias = backStackEntry.arguments?.getString(KEY_ALIAS).orEmpty(),
         image = backStackEntry.arguments?.getString(KEY_IMAGE).orEmpty(),
         name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()

@@ -18,6 +18,8 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListAction
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
@@ -27,21 +29,28 @@ import com.popalay.barnee.ui.util.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ParameterizedDrinkListScreen(
-    request: DrinksRequest,
-    title: String,
-    titleHighlighted: String = ""
-) {
-    val viewModel: ParameterizedDrinkListViewModel = getViewModel { parametersOf(request) }
-    val state by viewModel.stateFlow.collectAsState()
+fun ParameterizedDrinkListScreen(input: ParameterizedDrinkListInput) {
+    ParameterizedDrinkListScreen(getViewModel { parametersOf(input) })
+}
 
+@Composable
+fun ParameterizedDrinkListScreen(viewModel: ParameterizedDrinkListViewModel) {
+    val state by viewModel.stateFlow.collectAsState()
+    ParameterizedDrinkListScreen(state, viewModel::processAction)
+}
+
+@Composable
+fun ParameterizedDrinkListScreen(
+    state: ParameterizedDrinkListState,
+    onAction: (ParameterizedDrinkListAction) -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         ActionsAppBar(
             title = buildAnnotatedString {
-                append(title)
+                append(state.title)
                 withStyle(SpanStyle(color = MaterialTheme.colors.primary)) {
-                    append(titleHighlighted)
+                    append(state.titleHighlighted)
                 }
             },
             modifier = Modifier.liftOnScroll(listState),
@@ -51,7 +60,7 @@ fun ParameterizedDrinkListScreen(
             drinks = state.drinks,
             listState = listState,
             emptyMessage = "We don't have any drinks\nfor this category",
-            onRetry = { viewModel.processAction(ParameterizedDrinkListAction.Retry) },
+            onRetry = { onAction(ParameterizedDrinkListAction.Retry) },
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,
                 additionalStart = 8.dp,
@@ -67,6 +76,6 @@ fun ParameterizedDrinkListScreen(
 @Composable
 fun ParameterizedDrinkListScreenPreview() {
     BarneeTheme {
-        ParameterizedDrinkListScreen(DrinksRequest.Favorites, "Title", "Highlighted")
+        ParameterizedDrinkListScreen(ParameterizedDrinkListState(DrinksRequest.Favorites, "Title", "Highlighted"), {})
     }
 }
