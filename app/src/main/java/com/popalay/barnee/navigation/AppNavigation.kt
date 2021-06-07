@@ -15,8 +15,6 @@ val LocalNavController = staticCompositionLocalOf<NavController> {
 
 const val DEEPLINK_PREFIX = "https://barnee.com/"
 
-interface ScreenArgs
-
 object AppNavigation {
     fun root() = discovery()
 

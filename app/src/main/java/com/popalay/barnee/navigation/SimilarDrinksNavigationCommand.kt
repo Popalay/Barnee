@@ -4,11 +4,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
-
-data class SimilarDrinksScreenArgs(
-    val alias: String,
-    val name: String
-) : ScreenArgs
+import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 
 object SimilarDrinksNavigationCommand : NavigationCommand {
     private const val KEY_LIKE = "like"
@@ -26,8 +23,13 @@ object SimilarDrinksNavigationCommand : NavigationCommand {
         name: String
     ): String = "drink?$KEY_LIKE=$alias&$KEY_NAME=$name"
 
-    fun parseArgs(backStackEntry: NavBackStackEntry) = SimilarDrinksScreenArgs(
-        alias = backStackEntry.arguments?.getString(KEY_LIKE).orEmpty(),
-        name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()
-    )
+    fun parseInput(backStackEntry: NavBackStackEntry): ParameterizedDrinkListInput {
+        val alias = backStackEntry.arguments?.getString(KEY_LIKE).orEmpty()
+        val name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()
+        return ParameterizedDrinkListInput(
+            request = DrinksRequest.RelatedTo(alias),
+            title = "Cocktails like ",
+            titleHighlighted = name
+        )
+    }
 }

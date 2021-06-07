@@ -36,6 +36,7 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
@@ -50,9 +51,21 @@ import com.popalay.barnee.ui.util.getViewModel
 
 @Composable
 fun ShakeToDrinkScreen() {
-    val viewModel: ShakeToDrinkViewModel = getViewModel()
-    val drinkItemViewModel: DrinkItemViewModel = getViewModel()
+ ShakeToDrinkScreen(getViewModel(), getViewModel())
+}
+
+@Composable
+fun ShakeToDrinkScreen(viewModel: ShakeToDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
     val state by viewModel.stateFlow.collectAsState()
+    ShakeToDrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
+}
+
+@Composable
+fun ShakeToDrinkScreen(
+    state: ShakeToDrinkState,
+    onAction: (ShakeToDrinkAction) -> Unit,
+    onItemAction: (DrinkItemAction) -> Unit
+) {
     val navController = LocalNavController.current
 
     if (state.shouldShow) {
@@ -61,7 +74,7 @@ fun ShakeToDrinkScreen() {
             hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
         }
 
-        Dialog(onDismissRequest = { viewModel.processAction(ShakeToDrinkAction.DialogDismissed) }) {
+        Dialog(onDismissRequest = { onAction(ShakeToDrinkAction.DialogDismissed) }) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -86,17 +99,17 @@ fun ShakeToDrinkScreen() {
                         loadingState = { LoadingStateView() },
                         errorState = {
                             ErrorAndRetryStateView(
-                                onRetry = { viewModel.processAction(ShakeToDrinkAction.Retry) }
+                                onRetry = { onAction(ShakeToDrinkAction.Retry) }
                             )
                         }
                     ) { value ->
                         RandomDrink(
                             data = value,
                             onClick = {
-                                viewModel.processAction(ShakeToDrinkAction.DialogDismissed)
+                                onAction(ShakeToDrinkAction.DialogDismissed)
                                 navController.navigate(AppNavigation.drink(value.alias, value.displayName, value.displayImageUrl))
                             },
-                            onHeartClick = { drinkItemViewModel.processAction(DrinkItemAction.ToggleFavorite(value)) }
+                            onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
                         )
                     }
                 }

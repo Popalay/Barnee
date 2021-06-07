@@ -55,6 +55,7 @@ import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
+import com.popalay.barnee.domain.search.SearchState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.EmptyStateView
@@ -66,11 +67,20 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.getViewModel
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchScreen() {
-    val viewModel: SearchViewModel = getViewModel()
+    SearchScreen(getViewModel())
+}
+
+@Composable
+fun SearchScreen(viewModel: SearchViewModel) {
     val state by viewModel.stateFlow.collectAsState()
+    SearchScreen(state, viewModel::processAction)
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchScreen(state: SearchState, onAction: (SearchAction) -> Unit) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val textInputService = LocalTextInputService.current
 
@@ -85,7 +95,7 @@ fun SearchScreen() {
 
     LaunchedEffect(!bottomSheetState.isVisible) {
         if (!bottomSheetState.isVisible) {
-            viewModel.processAction(SearchAction.FiltersDismissed)
+            onAction(SearchAction.FiltersDismissed)
         }
     }
 
@@ -105,7 +115,7 @@ fun SearchScreen() {
                 Filters(
                     aggregation = aggregation,
                     selected = state.selectedFilters,
-                    onFilterClicked = { viewModel.processAction(SearchAction.FilterClicked(it)) }
+                    onFilterClicked = { onAction(SearchAction.FilterClicked(it)) }
                 )
             }
         }
@@ -114,22 +124,22 @@ fun SearchScreen() {
             Column {
                 val listState = rememberLazyListState()
                 SearchAppBar(
-                    onFilterClick = { viewModel.processAction(SearchAction.ShowFiltersClicked) },
+                    onFilterClick = { onAction(SearchAction.ShowFiltersClicked) },
                     isFiltersApplied = state.selectedFilters.isNotEmpty(),
                     modifier = Modifier.liftOnScroll(listState)
                 )
                 DrinkGrid(
                     drinks = state.drinks,
                     emptyMessage = "We currently have no drinks\non your request",
-                    onRetry = { viewModel.processAction(SearchAction.Retry) },
+                    onRetry = { onAction(SearchAction.Retry) },
                     listState = listState,
                     modifier = Modifier.weight(1F),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
                 )
                 SearchTextField(
                     value = state.searchQuery,
-                    onValueChange = { viewModel.processAction(SearchAction.QueryChanged(it)) },
-                    onClearClicked = { viewModel.processAction(SearchAction.ClearSearchQuery) },
+                    onValueChange = { onAction(SearchAction.QueryChanged(it)) },
+                    onClearClicked = { onAction(SearchAction.ClearSearchQuery) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(1.dp)

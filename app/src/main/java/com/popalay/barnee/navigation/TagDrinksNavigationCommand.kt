@@ -4,8 +4,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
-
-data class TagDrinksScreenArgs(val tag: String) : ScreenArgs
+import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
+import com.popalay.barnee.ui.util.capitalizeFirstChar
 
 object TagDrinksNavigationCommand : NavigationCommand {
     private const val KEY_TAG = "tag"
@@ -18,7 +19,11 @@ object TagDrinksNavigationCommand : NavigationCommand {
 
     fun destination(tag: String): String = "drink?$KEY_TAG=$tag"
 
-    fun parseArgs(backStackEntry: NavBackStackEntry) = TagDrinksScreenArgs(
-        tag = backStackEntry.arguments?.getString(KEY_TAG).orEmpty(),
-    )
+    fun parseInput(backStackEntry: NavBackStackEntry): ParameterizedDrinkListInput {
+        val tag = backStackEntry.arguments?.getString(KEY_TAG).orEmpty()
+        return ParameterizedDrinkListInput(
+            request = DrinksRequest.ForTags(setOf(tag)),
+            title = tag.capitalizeFirstChar()
+        )
+    }
 }
