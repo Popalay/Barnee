@@ -1,5 +1,7 @@
 package com.popalay.barnee.domain
 
+import com.popalay.barnee.util.CFlow
+import com.popalay.barnee.util.wrap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -9,7 +11,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -21,6 +22,7 @@ interface State
 interface Action
 interface Mutation
 interface SideEffect
+object EmptySideEffect : SideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
@@ -35,7 +37,7 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
     private val currentState: S get() = stateFlow.value
 
     val sideEffectFlow: SharedFlow<SE> = _sideEffectFlow
-    val stateFlow: StateFlow<S> = actionFlow
+    val stateFlow: CFlow<S> = actionFlow
         .onStart { initialAction?.let { process(it) } }
         .flatMapLatest { actionFlow.processor({ currentState }, { _sideEffectFlow.emit(it) }) }
         .map { reducer(currentState, it) }
@@ -43,7 +45,7 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
             stateMachineScope,
             SharingStarted.Eagerly,
             initialState
-        )
+        ).wrap()
 
     open fun clear() {
         stateMachineScope.cancel()

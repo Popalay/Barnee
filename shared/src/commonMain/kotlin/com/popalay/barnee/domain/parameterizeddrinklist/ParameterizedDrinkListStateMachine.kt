@@ -4,6 +4,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
@@ -43,7 +44,7 @@ sealed interface ParameterizedDrinkListMutation : Mutation {
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation, Nothing>(
+) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation, EmptySideEffect>(
     initialState = ParameterizedDrinkListState(input),
     initialAction = ParameterizedDrinkListAction.Initial,
     processor = { state, _ ->

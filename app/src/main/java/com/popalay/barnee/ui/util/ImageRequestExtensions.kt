@@ -3,12 +3,10 @@ package com.popalay.barnee.ui.util
 import androidx.compose.ui.unit.IntSize
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
+import com.popalay.barnee.data.model.ImageUrl
 
-fun ImageRequest.Builder.applyForExtarnalImage(data: String, size: IntSize) =
-    data(data + "?imwidth=${size.width}")
-        .memoryCacheKey(data)
-        .placeholderMemoryCacheKey(MemoryCache.Key(data))
+fun ImageRequest.Builder.applyForImageUrl(data: ImageUrl, size: IntSize) =
+    data(data.scaledUrl(size.width to size.height))
+        .memoryCacheKey(data.url)
+        .placeholderMemoryCacheKey(MemoryCache.Key(data.url))
         .crossfade(true)
-
-fun ImageRequest.Builder.applyForInternalImage(data: String, size: IntSize) =
-    data("https://res.cloudinary.com/barnee/image/upload/c_scale,w_${size.width}/$data")

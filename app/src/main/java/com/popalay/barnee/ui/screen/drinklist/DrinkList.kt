@@ -48,7 +48,7 @@ import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForExtarnalImage
+import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -152,7 +152,7 @@ private fun DrinkListItem(
             Image(
                 painter = rememberCoilPainter(
                     request = data.displayImageUrl,
-                    requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
+                    requestBuilder = { size -> applyForImageUrl(data.displayImageUrl, size) },
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),

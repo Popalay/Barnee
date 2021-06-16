@@ -43,7 +43,7 @@ import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForInternalImage
+import com.popalay.barnee.ui.util.applyForImageUrl
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -112,7 +112,7 @@ private fun CategoryListItem(
             Image(
                 painter = rememberCoilPainter(
                     request = data.imageUrl,
-                    requestBuilder = { size -> applyForInternalImage(data.imageUrl, size) },
+                    requestBuilder = { size -> applyForImageUrl(data.imageUrl, size) },
                     fadeIn = true
                 ),
                 contentDescription = null,

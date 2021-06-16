@@ -1,8 +1,10 @@
 package com.popalay.barnee.domain.drink
 
 import com.popalay.barnee.data.model.FullDrinkResponse
+import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
@@ -18,18 +20,18 @@ import kotlinx.coroutines.flow.take
 data class DrinkInput(
     val alias: String,
     val name: String,
-    val image: String
+    val image: ImageUrl
 ) : Input
 
 data class DrinkState(
     val alias: String,
     val name: String,
-    val image: String,
+    val image: ImageUrl,
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
     val isPlaying: Boolean = false
 ) : State {
-    val displayName = name.ifBlank { drinkWithRelated()?.drink?.displayName.orEmpty() }
-    val displayImage = image.ifBlank { drinkWithRelated()?.drink?.displayImageUrl.orEmpty() }
+    val displayName = drinkWithRelated()?.drink?.displayName ?: name
+    val displayImage = drinkWithRelated()?.drink?.displayImageUrl ?: image
 
     constructor(input: DrinkInput) : this(input.alias, input.name, input.image)
 }
@@ -48,7 +50,7 @@ sealed interface DrinkMutation : Mutation {
 class DrinkStateMachine(
     input: DrinkInput,
     drinkRepository: DrinkRepository
-) : StateMachine<DrinkState, DrinkAction, DrinkMutation, Nothing>(
+) : StateMachine<DrinkState, DrinkAction, DrinkMutation, EmptySideEffect>(
     initialState = DrinkState(input),
     initialAction = DrinkAction.Initial,
     processor = { state, _ ->
