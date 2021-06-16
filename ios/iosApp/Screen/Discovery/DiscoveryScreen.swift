@@ -12,19 +12,18 @@ import shared
 
 struct DiscoveryScreen: View {
     @ObservedObject var viewModel: DiscoveryViewModel
-    
+
     var body: some View {
         NavigationView {
             VStack {
-                switch viewModel.state.drinks {
+                switch viewModel.state.categories {
                 case is Loading<NSArray>:
                     ProgressView("Loading…")
                 case is Success<NSArray>:
-                    List(viewModel.state.drinks.invoke() as! [Drink], id: \.name) { drink in
-                        DrinkView(drink: drink)
-                    }
-                    .navigationBarTitle(Text("Barnee"))
-                default :
+                    List(viewModel.state.categories.invoke() as! [shared.Category], id: \.text) { category in
+                        CategoryView(category: category)
+                    }.navigationBarTitle(Text("Barnee"))
+                default:
                     Text("Empty state")
                 }
             }
@@ -32,15 +31,14 @@ struct DiscoveryScreen: View {
     }
 }
 
-struct DrinkView: View {
-    var drink: Drink
-    
+struct CategoryView: View {
+    var category: shared.Category
+
     var body: some View {
         HStack {
-            ImageView(withURL:drink.displayImageUrl, width: 64, height: 64)
+            ImageView(withURL: category.imageUrl.url, width: 64, height: 64)
             VStack(alignment: .leading) {
-                Text(drink.name).font(.headline)
-                Text(String(drink.rating)).font(.subheadline)
+                Text(category.text).font(.headline)
             }
         }
     }

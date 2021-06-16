@@ -3,6 +3,7 @@ package com.popalay.barnee.domain.discovery
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
@@ -28,7 +29,7 @@ sealed interface DiscoveryMutation : Mutation {
 
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
-) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, Nothing>(
+) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, EmptySideEffect>(
     initialState = DiscoveryState(),
     initialAction = DiscoveryAction.Initial,
     processor = { _, _ ->

@@ -7,19 +7,22 @@ import Foundation
 import shared
 import SwiftUI
 
-class StateMachineWrapperViewModel<S: shared.State, A: Action, T: StateMachine<S, A>>: ObservableObject {
+class StateMachineWrapperViewModel<S: shared.State, A: Action, M: Mutation, SE: SideEffect, T: StateMachine<S, A, M, SE>>: ObservableObject {
     private let stateMachine: T
     @Published var state: S
 
     init(stateMachine: T, initialState: S) {
         self.stateMachine = stateMachine
-        self.state = initialState
-        stateMachine.onChange { newState in
-            self.state = newState
-        }
+        state = initialState
+        asPublisher(stateMachine.stateFlow)
+                .compactMap {
+                    $0
+                }
+                .receive(on: DispatchQueue.main)
+                .assign(to: &$state)
     }
 
     func processAction(action: A) {
-        stateMachine.consume(action: action)
+        stateMachine.process(action: action)
     }
 }

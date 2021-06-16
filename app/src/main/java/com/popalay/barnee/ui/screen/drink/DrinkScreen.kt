@@ -72,8 +72,10 @@ import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
+import com.popalay.barnee.data.model.toImageUrl
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
@@ -92,7 +94,7 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
-import com.popalay.barnee.ui.util.applyForExtarnalImage
+import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.getViewModel
 import com.popalay.barnee.ui.util.shareDrink
 import org.koin.core.parameter.parametersOf
@@ -334,7 +336,7 @@ private fun SharedContent(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoxScope.ImageContent(
-    image: String,
+    image: ImageUrl,
     rating: String,
     showPlayButton: Boolean,
     isHeartButtonSelected: Boolean?,
@@ -345,7 +347,7 @@ private fun BoxScope.ImageContent(
     Image(
         painter = rememberCoilPainter(
             request = image,
-            requestBuilder = { size -> applyForExtarnalImage(image, size) },
+            requestBuilder = { size -> applyForImageUrl(image, size) },
             fadeIn = true
         ),
         contentDescription = null,
@@ -582,6 +584,6 @@ private fun RecommendedDrinks(
 @Composable
 private fun DrinkScreenPreview() {
     BarneeTheme {
-        DrinkScreen(DrinkInput("alias", "name", "sample.png"))
+        DrinkScreen(DrinkInput("alias", "name", "sample.png".toImageUrl()))
     }
 }

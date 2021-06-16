@@ -5,6 +5,7 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
@@ -49,7 +50,7 @@ sealed interface SearchMutation : Mutation {
 
 class SearchStateMachine(
     drinkRepository: DrinkRepository
-) : StateMachine<SearchState, SearchAction, SearchMutation, Nothing>(
+) : StateMachine<SearchState, SearchAction, SearchMutation, EmptySideEffect>(
     initialState = SearchState(),
     initialAction = SearchAction.Initial,
     processor = { state, _ ->

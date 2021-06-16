@@ -3,6 +3,7 @@ package com.popalay.barnee.domain.drinkitem
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -24,7 +25,7 @@ sealed interface DrinkItemMutation : Mutation {
 
 class DrinkItemStateMachine(
     drinkRepository: DrinkRepository
-) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation, Nothing>(
+) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation, EmptySideEffect>(
     initialState = DrinkItemState(),
     processor = { _, _ ->
         merge(

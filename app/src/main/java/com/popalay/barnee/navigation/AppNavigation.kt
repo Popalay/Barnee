@@ -8,6 +8,7 @@ import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
+import com.popalay.barnee.data.model.ImageUrl
 
 val LocalNavController = staticCompositionLocalOf<NavController> {
     error("No local navigator found!")
@@ -23,7 +24,7 @@ object AppNavigation {
     fun drink(
         alias: String,
         name: String,
-        image: String
+        image: ImageUrl
     ) = DrinkNavigationCommand.destination(alias, name, image)
 
     fun favorites() = FavoriteDrinksNavigationCommand.destination

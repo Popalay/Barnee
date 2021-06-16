@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		27575D6087307478019790EA /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F757490670072E99EBE84654 /* Pods_iosApp.framework */; };
 		751EF55E2608B6FB00404D49 /* shared.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 751EF55D2608B6FB00404D49 /* shared.framework */; };
 		751EF55F2608B6FB00404D49 /* shared.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 751EF55D2608B6FB00404D49 /* shared.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		751EF5642608BDF400404D49 /* ImageFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 751EF5632608BDF400404D49 /* ImageFile.swift */; };
@@ -20,8 +21,8 @@
 		7555FF8B242A565B00829871 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 7555FF89242A565B00829871 /* LaunchScreen.storyboard */; };
 		7555FF96242A565B00829871 /* iosAppTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF95242A565B00829871 /* iosAppTests.swift */; };
 		7555FFA1242A565B00829871 /* iosAppUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FFA0242A565B00829871 /* iosAppUITests.swift */; };
-		8266FAA628FB75EE99913D75 /* libPods-iosApp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6BB0763D604A1039B41A3E /* libPods-iosApp.a */; };
 		DCC5396EFA4C795C7A25D78B /* StateMachineWrapperViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCC53B7D6990036D41000005 /* StateMachineWrapperViewModel.swift */; };
+		E87BD98102F582F03914C567 /* CombineUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = E87BDE6ED3A2ABEEBC958783 /* CombineUtils.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -56,7 +57,6 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4A6BB0763D604A1039B41A3E /* libPods-iosApp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-iosApp.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		706AF17D445B059F56AD1643 /* Pods-iosApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.release.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.release.xcconfig"; sourceTree = "<group>"; };
 		751EF55D2608B6FB00404D49 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = ../shared/build/cocoapods/framework/shared.framework; sourceTree = "<group>"; };
 		751EF5632608BDF400404D49 /* ImageFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageFile.swift; sourceTree = "<group>"; };
@@ -79,6 +79,8 @@
 		7555FFB1242A642300829871 /* shared.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = shared.framework; path = "../shared/build/xcode-frameworks/shared.framework"; sourceTree = "<group>"; };
 		9F5A1D9A0D288E3C549F608E /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		DCC53B7D6990036D41000005 /* StateMachineWrapperViewModel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StateMachineWrapperViewModel.swift; sourceTree = "<group>"; };
+		E87BDE6ED3A2ABEEBC958783 /* CombineUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CombineUtils.swift; sourceTree = "<group>"; };
+		F757490670072E99EBE84654 /* Pods_iosApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_iosApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,8 +88,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8266FAA628FB75EE99913D75 /* libPods-iosApp.a in Frameworks */,
 				751EF55E2608B6FB00404D49 /* shared.framework in Frameworks */,
+				27575D6087307478019790EA /* Pods_iosApp.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +162,7 @@
 				7555FF86242A565B00829871 /* Preview Content */,
 				751EF5632608BDF400404D49 /* ImageFile.swift */,
 				751EF56A2608F12A00404D49 /* SceneDelegat.swift */,
+				E87BD8141C9E94625D96CA76 /* Utils */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -195,7 +198,7 @@
 			children = (
 				7555FFB1242A642300829871 /* shared.framework */,
 				751EF55D2608B6FB00404D49 /* shared.framework */,
-				4A6BB0763D604A1039B41A3E /* libPods-iosApp.a */,
+				F757490670072E99EBE84654 /* Pods_iosApp.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -207,6 +210,14 @@
 				706AF17D445B059F56AD1643 /* Pods-iosApp.release.xcconfig */,
 			);
 			path = Pods;
+			sourceTree = "<group>";
+		};
+		E87BD8141C9E94625D96CA76 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				E87BDE6ED3A2ABEEBC958783 /* CombineUtils.swift */,
+			);
+			path = Utils;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -374,6 +385,7 @@
 				751EF5642608BDF400404D49 /* ImageFile.swift in Sources */,
 				751EF56B2608F12A00404D49 /* SceneDelegat.swift in Sources */,
 				DCC5396EFA4C795C7A25D78B /* StateMachineWrapperViewModel.swift in Sources */,
+				E87BD98102F582F03914C567 /* CombineUtils.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -543,6 +555,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = 7VYR4TP8W5;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -553,7 +566,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.iosApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popalay.barnee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -568,6 +581,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"iosApp/Preview Content\"";
+				DEVELOPMENT_TEAM = 7VYR4TP8W5;
 				ENABLE_PREVIEWS = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -578,7 +592,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = orgIdentifier.iosApp;
+				PRODUCT_BUNDLE_IDENTIFIER = com.popalay.barnee;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

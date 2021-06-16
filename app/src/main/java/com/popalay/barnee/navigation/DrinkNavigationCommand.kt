@@ -6,6 +6,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
+import com.popalay.barnee.data.model.ImageUrl
+import com.popalay.barnee.data.model.toImageUrl
 import com.popalay.barnee.domain.drink.DrinkInput
 
 object DrinkNavigationCommand : NavigationCommand {
@@ -28,12 +30,12 @@ object DrinkNavigationCommand : NavigationCommand {
     fun destination(
         alias: String,
         name: String,
-        image: String
-    ): String = "drink/$alias?$KEY_IMAGE=$image&$KEY_NAME=$name"
+        image: ImageUrl
+    ): String = "drink/$alias?$KEY_IMAGE=${image.url}&$KEY_NAME=$name"
 
     fun parseInput(backStackEntry: NavBackStackEntry) = DrinkInput(
         alias = backStackEntry.arguments?.getString(KEY_ALIAS).orEmpty(),
-        image = backStackEntry.arguments?.getString(KEY_IMAGE).orEmpty(),
+        image = backStackEntry.arguments?.getString(KEY_IMAGE).orEmpty().toImageUrl(),
         name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()
     )
 }

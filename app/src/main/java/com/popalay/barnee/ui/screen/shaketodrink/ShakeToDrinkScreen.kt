@@ -46,7 +46,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForExtarnalImage
+import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.getViewModel
 
 @Composable
@@ -129,7 +129,7 @@ private fun RandomDrink(
         Image(
             painter = rememberCoilPainter(
                 request = data.displayImageUrl,
-                requestBuilder = { size -> applyForExtarnalImage(data.displayImageUrl, size) },
+                requestBuilder = { size -> applyForImageUrl(data.displayImageUrl, size) },
             ),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
