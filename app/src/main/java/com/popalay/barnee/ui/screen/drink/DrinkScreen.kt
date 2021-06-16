@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
@@ -177,8 +178,9 @@ fun DrinkScreen(
                         LinearProgressIndicator(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(12.dp)
-                                .offset(y = (-8).dp)
+                                .height(32.dp)
+                                .offset(y = (-26).dp)
+                                .clip(RoundedCornerShape(bottomEnd = 8.dp,  bottomStart = 8.dp))
                         )
                     },
                     errorState = {
