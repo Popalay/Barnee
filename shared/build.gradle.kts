@@ -47,6 +47,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.settings)
                 implementation(libs.settingscoroutines)
+                api(libs.paging.multiplatform)
             }
         }
 

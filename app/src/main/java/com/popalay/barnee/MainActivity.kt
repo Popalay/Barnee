@@ -33,6 +33,7 @@ import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
+import com.popalay.barnee.ui.screen.favorites.FavoritesScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -90,7 +91,7 @@ class MainActivity : ComponentActivity() {
                         ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
                     }
                     navigationNode(FavoriteDrinksNavigationCommand) {
-                        ParameterizedDrinkListScreen(FavoriteDrinksNavigationCommand.parseInput(it))
+                        FavoritesScreen()
                     }
                     navigationNode(SearchNavigationCommand) {
                         SearchScreen()

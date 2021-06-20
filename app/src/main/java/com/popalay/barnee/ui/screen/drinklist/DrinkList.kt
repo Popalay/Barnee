@@ -29,9 +29,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.navigation.AppNavigation
 import com.popalay.barnee.navigation.LocalNavController
@@ -43,6 +44,7 @@ import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
+import com.popalay.barnee.ui.common.PageLoadingIndicator
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
@@ -54,7 +56,7 @@ import com.popalay.barnee.ui.util.getViewModel
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrinkGrid(
-    drinks: Result<List<Drink>>,
+    drinks: LazyPagingItems<Drink>,
     emptyMessage: String,
     onRetry: () -> Unit,
     modifier: Modifier = Modifier,
@@ -86,19 +88,24 @@ fun DrinkGrid(
             modifier = modifier
         ) {
             itemsInGridIndexed(
-                items = value,
+                lazyPagingItems = value,
                 columns = DEFAULT_COLUMNS,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
             ) { index, item ->
-                DrinkListItem(
-                    item,
-                    onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
-                )
+                item?.let {
+                    DrinkListItem(
+                        item,
+                        onClick = { navController.navigate(AppNavigation.drink(item)) },
+                        onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
+                        onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                        modifier = Modifier.padding(top = if (index % 2 == 1 && value.itemCount > 1) DefaultItemShift else 0.dp)
+                    )
+                }
+            }
+            if (value.loadState.append == LoadState.Loading) {
+                item { PageLoadingIndicator() }
             }
         }
     }
@@ -121,7 +128,7 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { navController.navigate(AppNavigation.drink(item.alias, item.displayName, item.displayImageUrl)) },
+                    onClick = { navController.navigate(AppNavigation.drink(item)) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)

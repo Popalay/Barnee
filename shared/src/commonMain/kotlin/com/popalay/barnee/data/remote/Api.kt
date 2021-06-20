@@ -26,25 +26,28 @@ class Api(json: Json) {
         }
     }
 
-    suspend fun drinks(query: String, count: Int = 100): List<Drink> = try {
-        client.get<DrinksResponse>("${baseUrl}drinks/$query?exactmatch=true&take=$count").result
+    suspend fun drinks(query: String, skip: Int, take: Int): List<Drink> = try {
+        client.get<DrinksResponse>("${baseUrl}drinks/$query?exactmatch=true&skip=$skip&take=$take").result
     } catch (e: NoTransformationFoundException) {
         emptyList()
     }
 
-    suspend fun drinksByAliases(aliases: Set<String>): List<Drink> = drinks("alias/${aliases.joinToString(",")}")
+    suspend fun drinksByAliases(aliases: Set<String>, skip: Int, take: Int): List<Drink> =
+        drinks("alias/${aliases.joinToString(",")}", skip, take)
 
-    suspend fun drinksByTags(tags: Set<String>): List<Drink> = drinks("tag/${tags.joinToString(",")}")
+    suspend fun drinksByTags(tags: Set<String>, skip: Int, take: Int): List<Drink> =
+        drinks("tag/${tags.joinToString(",")}", skip, take)
+
+    suspend fun random(skip: Int, take: Int): List<Drink> =
+        drinks("random/is/specificImage/InEnvironment", skip, take)
+
+    suspend fun searchDrinks(query: String, skip: Int, take: Int): List<Drink> = try {
+        client.get<DrinksResponse>("${baseUrl}drinks/$query/is/specificImage/InEnvironment?skip=$skip&take=${take}").result
+    } catch (e: NoTransformationFoundException) {
+        emptyList()
+    }
 
     suspend fun similarDrinks(alias: String): List<Drink> = getFullDrink(alias).relatedDrinks
-
-    suspend fun random(count: Int): List<Drink> = drinks("random/is/specificImage/InEnvironment", count)
-
-    suspend fun searchDrinks(query: String, count: Int): List<Drink> = try {
-        client.get<DrinksResponse>("${baseUrl}drinks/$query/is/specificImage/InEnvironment?take=${count}").result
-    } catch (e: NoTransformationFoundException) {
-        emptyList()
-    }
 
     suspend fun getAggregation(): Aggregation =
         client.get<AggregationResponse>("${baseUrl}drinks/aggregations").metaData.aggregations
