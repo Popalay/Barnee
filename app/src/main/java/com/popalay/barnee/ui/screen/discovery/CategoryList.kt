@@ -24,7 +24,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign.Start
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
@@ -129,7 +129,7 @@ private fun CategoryListItem(
                 Text(
                     text = data.text,
                     style = MaterialTheme.typography.h2,
-                    textAlign = Start,
+                    textAlign = TextAlign.Start,
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1F)

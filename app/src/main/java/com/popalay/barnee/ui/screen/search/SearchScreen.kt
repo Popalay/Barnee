@@ -44,9 +44,8 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.style.TextAlign.Center
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.flowlayout.FlowRow
@@ -291,12 +290,12 @@ private fun AggregationGroup(
                 text = displayName,
                 color = if (isSelected) MaterialTheme.colors.onPrimary else MaterialTheme.colors.primary,
                 style = MaterialTheme.typography.body2,
-                textAlign = Center,
+                textAlign = TextAlign.Center,
                 modifier = Modifier
                     .defaultMinSize(minWidth = 92.dp)
                     .clip(CircleShape)
                     .background(if (isSelected) MaterialTheme.colors.primary else Color.Transparent, CircleShape)
-                    .border(Dp.Hairline, MaterialTheme.colors.primary, CircleShape)
+                    .border(1.dp, MaterialTheme.colors.primary, CircleShape)
                     .clickable { onClick(alias to group) }
                     .padding(vertical = 8.dp, horizontal = 16.dp)
             )
