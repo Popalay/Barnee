@@ -48,6 +48,7 @@ import androidx.compose.ui.text.style.TextAlign.Center
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsWithImePadding
@@ -123,15 +124,20 @@ fun SearchScreen(state: SearchState, onAction: (SearchAction) -> Unit) {
         Scaffold {
             Column {
                 val listState = rememberLazyListState()
+                val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
+
                 SearchAppBar(
                     onFilterClick = { onAction(SearchAction.ShowFiltersClicked) },
                     isFiltersApplied = state.selectedFilters.isNotEmpty(),
                     modifier = Modifier.liftOnScroll(listState)
                 )
                 DrinkGrid(
-                    drinks = state.drinks,
+                    drinks = lazyPagingItems,
                     emptyMessage = "We currently have no drinks\non your request",
-                    onRetry = { onAction(SearchAction.Retry) },
+                    onRetry = {
+                        lazyPagingItems.retry()
+                        onAction(SearchAction.Retry)
+                    },
                     listState = listState,
                     modifier = Modifier.weight(1F),
                     contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)

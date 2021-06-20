@@ -31,7 +31,7 @@ object DrinkNavigationCommand : NavigationCommand {
         alias: String,
         name: String,
         image: ImageUrl
-    ): String = "drink/$alias?$KEY_IMAGE=${image.url}&$KEY_NAME=$name"
+    ): String = "drink/$alias?$KEY_IMAGE=$image&$KEY_NAME=$name"
 
     fun parseInput(backStackEntry: NavBackStackEntry) = DrinkInput(
         alias = backStackEntry.arguments?.getString(KEY_ALIAS).orEmpty(),

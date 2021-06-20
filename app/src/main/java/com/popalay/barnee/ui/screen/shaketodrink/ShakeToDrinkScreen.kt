@@ -107,7 +107,7 @@ fun ShakeToDrinkScreen(
                             data = value,
                             onClick = {
                                 onAction(ShakeToDrinkAction.DialogDismissed)
-                                navController.navigate(AppNavigation.drink(value.alias, value.displayName, value.displayImageUrl))
+                                navController.navigate(AppNavigation.drink(value))
                             },
                             onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
                         )

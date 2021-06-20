@@ -16,6 +16,7 @@ dependencies {
     implementation(libs.youtubeExtractor) {
         exclude("com.android.support", "support-annotations")
     }
+    implementation(libs.paging.compose)
     implementation(libs.firebase.dynamicLinks)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.compose)

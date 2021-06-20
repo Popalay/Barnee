@@ -2,11 +2,14 @@ package com.popalay.barnee.di
 
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.repository.DrinkPager
 import com.popalay.barnee.data.repository.DrinkRepository
+import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
+import com.popalay.barnee.domain.favorites.FavoritesStateMachine
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -27,7 +30,7 @@ val commonModule = module {
             ignoreUnknownKeys = true
         }
     }
-    single { DrinkRepository(get(), get()) }
+    single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
 
     factory { DiscoveryStateMachine(get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get()) }
@@ -35,6 +38,7 @@ val commonModule = module {
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
     factory { DrinkItemStateMachine(get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
+    factory { FavoritesStateMachine(get()) }
 }
 
 expect val platformModule: Module

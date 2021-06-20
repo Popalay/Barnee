@@ -1,6 +1,6 @@
 [versions]
 kotlin = "1.5.10"
-android-gradlePlugin = "7.1.0-alpha01"
+android-gradlePlugin = "7.1.0-alpha02"
 google-services-gradlePlugin = "4.3.8"
 dependencyUpdatesPlugin = "0.39.0"
 compose = "1.0.0-beta08"
@@ -10,7 +10,7 @@ androidx-lifecycle = "2.4.0-alpha01"
 accompanist = "0.11.1"
 datastore = "1.0.0-beta01"
 ktor = "1.6.0"
-exoplayer = "2.14.0"
+exoplayer = "2.14.1"
 youtubeExtractor = "master-SNAPSHOT"
 junit = "4.13.2"
 androidx-test = "1.1.2"
@@ -20,6 +20,8 @@ coroutines = "1.5.0-native-mt"
 koin = "3.0.2"
 settings = "0.7.7"
 firebase-dynamicLinks = "20.1.0"
+paging-compose = "1.0.0-alpha10"
+paging-multiplatform = "0.4.2"
 
 [libraries]
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -58,6 +60,8 @@ settings = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref
 settingscoroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "settings" }
 settingsdatastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "settings" }
 firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.ref = "firebase-dynamicLinks" }
+paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
+paging-multiplatform = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "paging-multiplatform" }
 
 [bundles]
 compose = ["compose-ui", "compose-tooling", "compose-material", "compose-runtime"]

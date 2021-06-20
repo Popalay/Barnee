@@ -57,10 +57,10 @@ class DrinkStateMachine(
         merge(
             filterIsInstance<DrinkAction.Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.getFullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
                 .map { DrinkMutation.DrinkWithRelated(it) },
             filterIsInstance<DrinkAction.Retry>()
-                .flatMapToResult { drinkRepository.getFullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
                 .map { DrinkMutation.DrinkWithRelated(it) },
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }

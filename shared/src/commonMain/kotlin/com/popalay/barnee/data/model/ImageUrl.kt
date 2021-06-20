@@ -14,6 +14,8 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
     override fun scaledUrl(size: Pair<Int, Int>): String =
         "${URL_PREFIX}c_scale,w_${size.first}/$rawUrl"
 
+    override fun toString(): String = rawUrl
+
     companion object {
         private const val URL_PREFIX = "https://res.cloudinary.com/barnee/image/upload/"
     }
@@ -23,11 +25,14 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
 value class ExternalImageUrl(override val url: String) : ImageUrl {
     override fun scaledUrl(size: Pair<Int, Int>): String =
         url + "?imwidth=${size.first}"
+
+    override fun toString(): String = url
 }
 
 object EmptyImageUrl : ImageUrl {
     override val url: String = ""
     override fun scaledUrl(size: Pair<Int, Int>): String = ""
+    override fun toString(): String = ""
 }
 
 fun String.toImageUrl() = when {

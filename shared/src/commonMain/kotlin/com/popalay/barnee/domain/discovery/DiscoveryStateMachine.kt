@@ -36,7 +36,7 @@ class DiscoveryStateMachine(
         merge(
             filterIsInstance<DiscoveryAction.Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.getCategories() }
+                .flatMapToResult { drinkRepository.categories() }
                 .map { DiscoveryMutation.Categories(it) }
         )
     },
