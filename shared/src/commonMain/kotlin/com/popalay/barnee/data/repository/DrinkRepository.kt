@@ -20,6 +20,7 @@ import com.popalay.barnee.data.repository.DrinksRequest.Search
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
@@ -53,12 +54,14 @@ class DrinkRepositoryImpl(
             is Search -> requestPage { searchDrinks(request.query, request.filters, it) }
             is Favorites -> favoriteDrinks()
         }
+            .distinctUntilChanged()
 
     override fun randomDrink(): Flow<Drink> = flow { emit(api.random(skip = 0, take = 1).first()) }
         .flatMapLatest { drink ->
             localStore.getFavoriteDrinks()
                 .mapLatest { favorites -> drink.copy(isFavorite = drink.alias in favorites) }
         }
+        .distinctUntilChanged()
 
     override fun fullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
         .flatMapLatest { response ->
@@ -70,6 +73,7 @@ class DrinkRepositoryImpl(
                     )
                 }
         }
+        .distinctUntilChanged()
 
     override suspend fun toggleFavoriteFor(alias: String): Boolean = withContext(Dispatchers.Main) {
         val favorites = localStore.getFavoriteDrinks().first()
