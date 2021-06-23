@@ -2,7 +2,6 @@ package com.popalay.barnee.di
 
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.remote.Api
-import com.popalay.barnee.data.repository.DrinkPager
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
@@ -14,6 +13,16 @@ import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListIn
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
+import com.popalay.barnee.util.isDebug
+import io.ktor.client.HttpClient
+import io.ktor.client.features.json.JsonFeature
+import io.ktor.client.features.json.serializer.KotlinxSerializer
+import io.ktor.client.features.logging.DEFAULT
+import io.ktor.client.features.logging.EMPTY
+import io.ktor.client.features.logging.LogLevel
+import io.ktor.client.features.logging.Logger
+import io.ktor.client.features.logging.Logging
+import io.ktor.http.ContentType
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -28,6 +37,18 @@ val commonModule = module {
             prettyPrint = true
             isLenient = true
             ignoreUnknownKeys = true
+        }
+    }
+    single {
+        HttpClient {
+            install(JsonFeature) {
+                serializer = KotlinxSerializer(get())
+                accept(ContentType.Application.Json)
+            }
+            install(Logging) {
+                logger = if (isDebug) Logger.DEFAULT else Logger.EMPTY
+                level = LogLevel.ALL
+            }
         }
     }
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }

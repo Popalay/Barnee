@@ -9,6 +9,7 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
@@ -38,6 +39,7 @@ import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkLis
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.util.isDebug
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,7 +59,13 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun ComposeApp() {
         ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
+            val context = LocalContext.current
             val navController = rememberNavController()
+            val imageLoader = remember {
+                ImageLoader.Builder(context)
+                    .logger(if (isDebug) DebugLogger() else null)
+                    .build()
+            }
 
             LaunchedEffect(Unit) {
                 Firebase.dynamicLinks.getDynamicLink(intent)
@@ -71,7 +79,7 @@ class MainActivity : ComponentActivity() {
 
             CompositionLocalProvider(
                 LocalNavController provides navController,
-                LocalImageLoader provides ImageLoader.Builder(LocalContext.current).logger(DebugLogger()).build()
+                LocalImageLoader provides imageLoader
             ) {
                 ShakeToDrinkScreen()
                 NavHost(navController, startDestination = AppNavigation.root()) {

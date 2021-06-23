@@ -75,5 +75,6 @@ android {
     defaultConfig {
         minSdk = 28
         targetSdk = 30
+        consumerProguardFiles("proguard-rules.pro")
     }
 }
