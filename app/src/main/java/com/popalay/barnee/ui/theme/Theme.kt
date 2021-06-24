@@ -2,7 +2,6 @@ package com.popalay.barnee.ui.theme
 
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 
 private val DarkColorPalette = darkColors(
@@ -14,17 +13,6 @@ private val DarkColorPalette = darkColors(
     onPrimary = DarkGrey,
     onSurface = White,
     onBackground = White
-)
-
-private val LightColorPalette = lightColors(
-    primary = DarkYellow,
-    primaryVariant = Grey,
-    secondary = DarkYellow,
-    surface = White,
-    background = White,
-    onPrimary = Black,
-    onSurface = Black,
-    onBackground = Black
 )
 
 @Composable

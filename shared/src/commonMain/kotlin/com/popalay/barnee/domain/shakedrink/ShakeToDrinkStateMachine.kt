@@ -71,7 +71,7 @@ private fun detectShakes(shakeDetector: ShakeDetector) = callbackFlow {
     shakeDetector.start {
         try {
             trySend(true)
-        } catch (e: Exception) {
+        } catch (ignore: Exception) {
             // Handle exception from the channel: failure in flow or premature closing
         }
     }

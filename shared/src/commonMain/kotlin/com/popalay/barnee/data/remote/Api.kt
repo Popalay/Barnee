@@ -12,7 +12,7 @@ import io.ktor.client.request.get
 class Api(private val client: HttpClient) {
     suspend fun drinks(query: String, skip: Int, take: Int): List<Drink> = try {
         client.get<DrinksResponse>("${baseUrl}drinks/$query?exactmatch=true&skip=$skip&take=$take").result
-    } catch (e: NoTransformationFoundException) {
+    } catch (ignore: NoTransformationFoundException) {
         emptyList()
     }
 
@@ -27,7 +27,7 @@ class Api(private val client: HttpClient) {
 
     suspend fun searchDrinks(query: String, skip: Int, take: Int): List<Drink> = try {
         client.get<DrinksResponse>("${baseUrl}drinks/$query/is/specificImage/InEnvironment?skip=$skip&take=${take}").result
-    } catch (e: NoTransformationFoundException) {
+    } catch (ignore: NoTransformationFoundException) {
         emptyList()
     }
 

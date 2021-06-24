@@ -52,7 +52,7 @@ fun <T : Any> LazyListScope.itemsInGridIndexed(
 ) {
     val rows = when {
         items.size % columns == 0 -> items.size / columns
-        else -> (items.size / columns) + 1
+        else -> items.size / columns + 1
     }
 
     for (row in 0 until rows) {
@@ -71,7 +71,7 @@ fun <T : Any> LazyListScope.itemsInGridIndexed(
             ) {
                 for (column in 0 until columns) {
                     Box(modifier = Modifier.weight(1f)) {
-                        val index = (row * columns) + column
+                        val index = row * columns + column
                         if (index < items.size) {
                             itemContent(index, items[index])
                         }
@@ -101,7 +101,7 @@ fun <T : Any> LazyListScope.itemsInGridIndexed(
 ) {
     val rows = when {
         lazyPagingItems.itemCount % columns == 0 -> lazyPagingItems.itemCount / columns
-        else -> (lazyPagingItems.itemCount / columns) + 1
+        else -> lazyPagingItems.itemCount / columns + 1
     }
 
     for (row in 0 until rows) {
@@ -119,7 +119,7 @@ fun <T : Any> LazyListScope.itemsInGridIndexed(
             ) {
                 for (column in 0 until columns) {
                     Box(modifier = Modifier.weight(1f)) {
-                        val index = (row * columns) + column
+                        val index = row * columns + column
                         if (index < lazyPagingItems.itemCount) {
                             val item by lazyPagingItems.getAsState(index)
                             itemContent(index, item)

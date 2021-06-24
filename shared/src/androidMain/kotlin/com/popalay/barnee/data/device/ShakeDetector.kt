@@ -162,6 +162,7 @@ actual class ShakeDetector(private val sensorManager: SensorManager) : SensorEve
     }
 
     /** An accelerometer sample.  */
+    @Suppress("DataClassShouldBeImmutable")
     internal data class Sample(
         var timestamp: Long = 0,
         var accelerating: Boolean = false,
