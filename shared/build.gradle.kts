@@ -51,20 +51,16 @@ kotlin {
             }
         }
 
-        val androidMain by getting {
-            dependencies {
-                implementation(libs.datastore.core)
-                implementation(libs.datastore.runtime)
-                implementation(libs.datastore.preferences)
-                implementation(libs.ktor.android)
-                implementation(libs.settingsdatastore)
-            }
+        sourceSets["androidMain"].dependencies {
+            implementation(libs.datastore.core)
+            implementation(libs.datastore.runtime)
+            implementation(libs.datastore.preferences)
+            implementation(libs.ktor.android)
+            implementation(libs.settingsdatastore)
         }
 
-        val iosMain by getting {
-            dependencies {
-                implementation(libs.ktor.ios)
-            }
+        sourceSets["iosMain"].dependencies {
+            implementation(libs.ktor.ios)
         }
     }
 }

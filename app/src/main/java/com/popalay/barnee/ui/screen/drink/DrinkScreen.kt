@@ -584,7 +584,7 @@ private fun RecommendedDrinks(
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun DrinkScreenPreview() {
+fun DrinkScreenPreview() {
     BarneeTheme {
         DrinkScreen(DrinkInput("alias", "name", "sample.png".toImageUrl()))
     }
