@@ -33,7 +33,7 @@ android {
         minSdk = 28
         targetSdk = 30
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
-        versionName = "1.0.6"
+        versionName = "1.0.7"
 
         signingConfigs {
             getByName("debug") {
