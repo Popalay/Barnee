@@ -43,10 +43,12 @@ import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
+import com.popalay.barnee.ui.common.ShareButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import com.popalay.barnee.ui.util.shareCollection
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -72,6 +74,7 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
             modifier = Modifier.liftOnScroll(listState),
             leadingButtons = { BackButton() },
             trailingButtons = {
+                ShareButton(onClick = { shareCollection(state.name) })
                 IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
                     Icon(
                         imageVector = Icons.Default.Delete,

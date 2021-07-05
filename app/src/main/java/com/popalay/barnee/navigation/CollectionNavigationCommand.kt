@@ -23,9 +23,11 @@
 package com.popalay.barnee.navigation
 
 import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDeepLink
 import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
+import androidx.navigation.navDeepLink
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.navigation.CollectionDestination
 import com.popalay.barnee.domain.navigation.CollectionDestination.Companion.KEY_NAME
@@ -35,6 +37,10 @@ object CollectionNavigationCommand : NavigationCommand<CollectionInput>,
     RouteProvider by CollectionDestination.Companion {
     override val arguments: List<NamedNavArgument> = listOf(
         navArgument(KEY_NAME) { type = NavType.StringType },
+    )
+
+    override val deeplinks: List<NavDeepLink> = listOf(
+        navDeepLink { uriPattern = "${DEEPLINK_PREFIX}$route" }
     )
 
     override fun parseInput(backStackEntry: NavBackStackEntry): CollectionInput {
