@@ -27,6 +27,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
@@ -55,7 +56,7 @@ data class CollectionState(
 sealed interface CollectionAction : Action {
     object Initial : CollectionAction
     object RemoveClicked : CollectionAction
-
+    object ShareClicked : CollectionAction
 }
 
 sealed interface CollectionMutation : Mutation {
@@ -67,6 +68,7 @@ class CollectionStateMachine(
     input: CollectionInput,
     collectionRepository: CollectionRepository,
     drinkRepository: DrinkRepository,
+    shareRepository: ShareRepository,
     router: Router
 ) : StateMachine<CollectionState, CollectionAction, CollectionMutation, EmptySideEffect>(
     initialState = CollectionState(input),
@@ -80,6 +82,9 @@ class CollectionStateMachine(
             filterIsInstance<CollectionAction.RemoveClicked>()
                 .map { collectionRepository.remove(state().name) }
                 .onEach { router.navigate(BackDestination) }
+                .map { CollectionMutation.Nothing },
+            filterIsInstance<CollectionAction.ShareClicked>()
+                .map { shareRepository.shareCollection(state().name) }
                 .map { CollectionMutation.Nothing }
         )
     },

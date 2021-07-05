@@ -32,7 +32,7 @@ import com.popalay.barnee.domain.navigation.QueryDrinksDestination.Companion.KEY
 import com.popalay.barnee.domain.navigation.QueryDrinksDestination.Companion.KEY_QUERY
 import com.popalay.barnee.domain.navigation.RouteProvider
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
-import com.popalay.barnee.ui.util.capitalizeFirstChar
+import com.popalay.barnee.util.capitalizeFirstChar
 
 object QueryDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInput>,
     RouteProvider by QueryDrinksDestination.Companion {

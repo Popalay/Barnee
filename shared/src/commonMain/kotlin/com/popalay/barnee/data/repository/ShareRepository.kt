@@ -20,30 +20,42 @@
  * SOFTWARE.
  */
 
-@file:OptIn(ExperimentalSettingsImplementation::class)
+package com.popalay.barnee.data.repository
 
-package com.popalay.barnee.di
-
-import android.content.Context
-import android.hardware.SensorManager
-import androidx.datastore.preferences.preferencesDataStore
-import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.data.device.Sharer
-import com.popalay.barnee.data.device.SharerImpl
 import com.popalay.barnee.data.remote.DeeplinkFactory
-import com.popalay.barnee.data.remote.DeeplinkFactoryImpl
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.ExperimentalSettingsImplementation
-import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.datastore.DataStoreSettings
-import org.koin.dsl.module
+import com.popalay.barnee.util.capitalizeFirstChar
 
-private val Context.dataStore by preferencesDataStore("Settings")
+interface ShareRepository {
+    suspend fun shareDrink(alias: String, displayName: String)
+    suspend fun shareCollection(displayName: String)
+}
 
-@OptIn(ExperimentalSettingsApi::class)
-actual val platformModule = module {
-    single<FlowSettings> { DataStoreSettings(get<Context>().dataStore) }
-    single { ShakeDetector(get<Context>().getSystemService(SensorManager::class.java)) }
-    single<DeeplinkFactory> { DeeplinkFactoryImpl() }
-    single<Sharer> { SharerImpl(get()) }
+internal class ShareRepositoryImpl(
+    private val sharer: Sharer,
+    private val deeplinkFactory: DeeplinkFactory
+) : ShareRepository {
+    override suspend fun shareDrink(alias: String, displayName: String) {
+        val text = "Check out how to make a ${displayName.capitalizeFirstChar()}"
+        val title = "Share drink"
+        val shortUrl = deeplinkFactory.build("/drink/${alias}")
+
+        sharer.openShareDialog(
+            title = title,
+            text = text,
+            content = "$text $shortUrl"
+        )
+    }
+
+    override suspend fun shareCollection(displayName: String) {
+        val text = "Check out my collection - ${displayName.capitalizeFirstChar()}"
+        val title = "Share collection"
+        val shortUrl = deeplinkFactory.build("/collection/${displayName}")
+
+        sharer.openShareDialog(
+            title = title,
+            text = displayName,
+            content = "$text $shortUrl"
+        )
+    }
 }

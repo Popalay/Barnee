@@ -31,7 +31,7 @@ import com.popalay.barnee.domain.navigation.RouteProvider
 import com.popalay.barnee.domain.navigation.TagDrinksDestination
 import com.popalay.barnee.domain.navigation.TagDrinksDestination.Companion.KEY_TAG
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
-import com.popalay.barnee.ui.util.capitalizeFirstChar
+import com.popalay.barnee.util.capitalizeFirstChar
 
 object TagDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInput>,
     RouteProvider by TagDrinksDestination {

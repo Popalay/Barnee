@@ -49,8 +49,8 @@ import com.popalay.barnee.domain.addtocollection.AddToCollectionSideEffect
 import com.popalay.barnee.domain.addtocollection.AddToCollectionState
 import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
-import com.popalay.barnee.ui.util.capitalizeFirstChar
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayName
 import kotlinx.coroutines.flow.Flow
 import org.koin.androidx.compose.getViewModel
