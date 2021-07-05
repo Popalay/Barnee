@@ -40,7 +40,6 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -95,6 +94,7 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.shareDrink
 import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.displayStory
@@ -112,7 +112,7 @@ fun DrinkScreen(input: DrinkInput) {
 
 @Composable
 fun DrinkScreen(viewModel: DrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     DrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
 }
 
@@ -185,7 +185,7 @@ fun DrinkScreen(
                                 .fillMaxWidth()
                                 .height(32.dp)
                                 .offset(y = (-26).dp)
-                                .clip(RoundedCornerShape(bottomEnd = 8.dp,  bottomStart = 8.dp))
+                                .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
                         )
                     },
                     errorState = {

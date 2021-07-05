@@ -18,7 +18,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,6 +46,7 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
@@ -55,12 +55,12 @@ import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ShakeToDrinkScreen() {
- ShakeToDrinkScreen(getViewModel(), getViewModel())
+    ShakeToDrinkScreen(getViewModel(), getViewModel())
 }
 
 @Composable
 fun ShakeToDrinkScreen(viewModel: ShakeToDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     ShakeToDrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
 }
 

@@ -15,10 +15,8 @@ import androidx.compose.material.SnackbarResult
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -28,11 +26,11 @@ import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState
 import com.popalay.barnee.domain.addtocollection.AddToCollectionSideEffect
 import com.popalay.barnee.domain.addtocollection.AddToCollectionState
 import com.popalay.barnee.ui.common.PrimarySnackbar
+import com.popalay.barnee.ui.util.LifecycleAwareSideEffect
 import com.popalay.barnee.ui.util.capitalizeFirstChar
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayName
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -42,7 +40,7 @@ fun AddToCollectionScreen() {
 
 @Composable
 fun AddToCollectionScreen(viewModel: AddToCollectionViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     AddToCollectionScreen(state, viewModel.sideEffectFlow, viewModel::processAction)
 }
 
@@ -55,24 +53,19 @@ fun AddToCollectionScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
-    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(sideEffectFlow, state) {
-        scope.launch {
-            sideEffectFlow.collectLatest { sideEffect ->
-                when (sideEffect) {
-                    is AddToCollectionSideEffect.DrinkAddedToFavorites -> {
-                        val message = "${sideEffect.drink.displayName.capitalizeFirstChar()} was added to favorites"
-                        snackbarHostState.showSnackbar(message, actionLabel = "Change").let { result ->
-                            if (result == SnackbarResult.ActionPerformed) {
-                                onAction(AddToCollectionAction.ChangeCollectionClicked(sideEffect.drink))
-                            }
-                        }
+    LifecycleAwareSideEffect(sideEffectFlow, state) { sideEffect ->
+        when (sideEffect) {
+            is AddToCollectionSideEffect.DrinkAddedToFavorites -> {
+                val message = "${sideEffect.drink.displayName.capitalizeFirstChar()} was added to favorites"
+                snackbarHostState.showSnackbar(message, actionLabel = "Change").let { result ->
+                    if (result == SnackbarResult.ActionPerformed) {
+                        onAction(AddToCollectionAction.ChangeCollectionClicked(sideEffect.drink))
                     }
-                    is AddToCollectionSideEffect.ShowAddToCollectionDialog -> bottomSheetState.show()
-                    is AddToCollectionSideEffect.HideAddToCollectionDialog -> bottomSheetState.hide()
                 }
             }
+            is AddToCollectionSideEffect.ShowAddToCollectionDialog -> bottomSheetState.show()
+            is AddToCollectionSideEffect.HideAddToCollectionDialog -> bottomSheetState.hide()
         }
     }
 

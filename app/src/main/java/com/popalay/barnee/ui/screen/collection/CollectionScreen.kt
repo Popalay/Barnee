@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,6 +19,7 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -30,7 +30,7 @@ fun CollectionScreen(input: CollectionInput) {
 
 @Composable
 fun CollectionScreen(viewModel: CollectionViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     CollectionScreen(state)
 }
 
