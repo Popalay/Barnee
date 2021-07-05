@@ -1,18 +1,27 @@
 package com.popalay.barnee.di
 
 import com.popalay.barnee.data.local.LocalStore
+import com.popalay.barnee.data.local.LocalStoreImpl
 import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.repository.CollectionRepository
+import com.popalay.barnee.data.repository.CollectionRepositoryImpl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
+import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
+import com.popalay.barnee.domain.collection.CollectionInput
+import com.popalay.barnee.domain.collection.CollectionStateMachine
+import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
-import com.popalay.barnee.domain.favorites.FavoritesStateMachine
+import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
+import com.popalay.barnee.util.EmptyLogger
+import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
 import io.ktor.client.HttpClient
 import io.ktor.client.features.json.JsonFeature
@@ -30,8 +39,9 @@ import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
 val commonModule = module {
+    single { if (isDebug) RealLogger() else EmptyLogger }
     single { Api(get()) }
-    single { LocalStore(get()) }
+    single<LocalStore> { LocalStoreImpl(get()) }
     single {
         Json {
             prettyPrint = true
@@ -52,14 +62,18 @@ val commonModule = module {
         }
     }
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
+    single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
 
+    single { StateMachineLogger(get()) }
     factory { DiscoveryStateMachine(get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
     factory { DrinkItemStateMachine(get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
-    factory { FavoritesStateMachine(get()) }
+    factory { (input: CollectionInput) -> CollectionStateMachine(input, get()) }
+    factory { CollectionListStateMachine(get()) }
+    factory { AddToCollectionStateMachine(get()) }
 }
 
 expect val platformModule: Module

@@ -23,18 +23,21 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.navigation.CollectionNavigationCommand
+import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.FavoriteDrinksNavigationCommand
 import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
 import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigationNode
+import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
+import com.popalay.barnee.ui.screen.collection.CollectionScreen
+import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.favorites.FavoritesScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -81,30 +84,39 @@ class MainActivity : ComponentActivity() {
                 LocalNavController provides navController,
                 LocalImageLoader provides imageLoader
             ) {
+                NavigationGraph()
+                AddToCollectionScreen()
                 ShakeToDrinkScreen()
-                NavHost(navController, startDestination = AppNavigation.root()) {
-                    navigationNode(DiscoveryNavigationCommand) {
-                        DiscoveryScreen()
-                    }
-                    navigationNode(DrinkNavigationCommand) {
-                        DrinkScreen(DrinkNavigationCommand.parseInput(it))
-                    }
-                    navigationNode(TagDrinksNavigationCommand) {
-                        ParameterizedDrinkListScreen(TagDrinksNavigationCommand.parseInput(it))
-                    }
-                    navigationNode(SimilarDrinksNavigationCommand) {
-                        ParameterizedDrinkListScreen(SimilarDrinksNavigationCommand.parseInput(it))
-                    }
-                    navigationNode(QueryDrinksNavigationCommand) {
-                        ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
-                    }
-                    navigationNode(FavoriteDrinksNavigationCommand) {
-                        FavoritesScreen()
-                    }
-                    navigationNode(SearchNavigationCommand) {
-                        SearchScreen()
-                    }
-                }
+            }
+        }
+    }
+
+    @Composable
+    fun NavigationGraph() {
+        NavHost(LocalNavController.current, startDestination = AppNavigation.root()) {
+            navigationNode(DiscoveryNavigationCommand) {
+                DiscoveryScreen()
+            }
+            navigationNode(DrinkNavigationCommand) {
+                DrinkScreen(DrinkNavigationCommand.parseInput(it))
+            }
+            navigationNode(TagDrinksNavigationCommand) {
+                ParameterizedDrinkListScreen(TagDrinksNavigationCommand.parseInput(it))
+            }
+            navigationNode(SimilarDrinksNavigationCommand) {
+                ParameterizedDrinkListScreen(SimilarDrinksNavigationCommand.parseInput(it))
+            }
+            navigationNode(QueryDrinksNavigationCommand) {
+                ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
+            }
+            navigationNode(CollectionsNavigationCommand) {
+                CollectionListScreen()
+            }
+            navigationNode(CollectionNavigationCommand) {
+                CollectionScreen(CollectionNavigationCommand.parseInput(it))
+            }
+            navigationNode(SearchNavigationCommand) {
+                SearchScreen()
             }
         }
     }

@@ -47,7 +47,11 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.getViewModel
+import com.popalay.barnee.util.displayImageUrl
+import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.displayRating
+import com.popalay.barnee.util.inCollection
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ShakeToDrinkScreen() {
@@ -161,7 +165,7 @@ private fun RandomDrink(
                 )
                 AnimatedHeartButton(
                     onToggle = onHeartClick,
-                    isSelected = data.isFavorite,
+                    isSelected = data.inCollection,
                     iconSize = 32.dp,
                 )
             }

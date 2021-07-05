@@ -3,14 +3,17 @@ package com.popalay.barnee.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.navigation.NavBackStackEntry
-import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
+import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.util.displayImageUrl
+import com.popalay.barnee.util.displayName
 
-val LocalNavController = staticCompositionLocalOf<NavController> {
+val LocalNavController = staticCompositionLocalOf<NavHostController> {
     error("No local navigator found!")
 }
 
@@ -23,7 +26,7 @@ object AppNavigation {
 
     fun drink(drink: Drink) = DrinkNavigationCommand.destination(drink.alias, drink.displayName, drink.displayImageUrl)
 
-    fun favorites() = FavoriteDrinksNavigationCommand.destination
+    fun collections() = CollectionsNavigationCommand.destination
 
     fun search() = SearchNavigationCommand.destination
 
@@ -38,6 +41,8 @@ object AppNavigation {
     ) = SimilarDrinksNavigationCommand.destination(alias, name)
 
     fun tagDrinks(tag: String) = TagDrinksNavigationCommand.destination(tag)
+
+    fun collection(collection: Collection) = CollectionNavigationCommand.destination(collection.name)
 }
 
 fun NavGraphBuilder.navigationNode(

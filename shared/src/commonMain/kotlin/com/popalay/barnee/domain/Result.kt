@@ -33,7 +33,7 @@ data class Fail<out T>(val error: Throwable, private val value: T? = null) :
 
 val <T : Any?> Result<T>.isEmpty
     get() = when {
-        this() is List<*> -> (this() as List<*>).isEmpty()
+        this() is Collection<*> -> (this() as Collection<*>).isEmpty()
         else -> this() == null
     }
 

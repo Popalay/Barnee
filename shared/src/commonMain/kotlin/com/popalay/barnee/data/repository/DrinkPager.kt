@@ -19,12 +19,12 @@ private val DefaultPagingConfig = PagingConfig(
     initialLoadSize = DEFAULT_PAGE_SIZE * 2
 )
 
-data class PageRequest(
+internal data class PageRequest(
     val skip: Int,
     val take: Int
 )
 
-class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
+internal class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
     val pages
         get(): Flow<PagingData<Drink>> {
             val scope = MainScope() + Job()
@@ -44,7 +44,7 @@ class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
                 items = items,
                 currentKey = skip,
                 prevKey = { (skip - take).coerceAtLeast(0) },
-                nextKey = { skip + take }
+                nextKey = { if (items.size == take) skip + take else null }
             )
         }
     )

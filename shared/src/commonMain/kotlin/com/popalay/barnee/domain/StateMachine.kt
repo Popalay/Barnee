@@ -1,21 +1,24 @@
 package com.popalay.barnee.domain
 
+import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.util.CFlow
 import com.popalay.barnee.util.wrap
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 interface Input
 interface State
@@ -30,17 +33,24 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
     initialAction: A? = null,
     processor: Processor<S, M, SE>,
     reducer: Reducer<S, M>
-) {
-    private val actionFlow = MutableSharedFlow<A>(replay = 1)
+) : KoinComponent {
+    private val actionFlow = MutableSharedFlow<A>()
     private val _sideEffectFlow = MutableSharedFlow<SE>()
-    private val stateMachineScope: CoroutineScope = MainScope()
-    private val currentState: S get() = stateFlow.value
+    private val stateMachineScope = MainScope()
+    private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
+    private val logger by inject<StateMachineLogger>()
 
-    val sideEffectFlow: SharedFlow<SE> = _sideEffectFlow
+    val sideEffectFlow: CFlow<SE> = _sideEffectFlow.asSharedFlow().wrap()
     val stateFlow: CFlow<S> = actionFlow
-        .onStart { initialAction?.let { process(it) } }
-        .flatMapLatest { actionFlow.processor({ currentState }, { _sideEffectFlow.emit(it) }) }
+        .onStart { initialAction?.let { emit(it) } }
+        .onEach { logger.log(this, it) }
+        .processor({ currentState }, {
+            _sideEffectFlow.emit(it)
+            logger.log(this, it)
+        })
+        .onEach { logger.log(this, it) }
         .map { reducer(currentState, it) }
+        .onEach { logger.log(this, it) }
         .stateIn(
             stateMachineScope,
             SharingStarted.Eagerly,
@@ -48,7 +58,7 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
         ).wrap()
 
     open fun clear() {
-        stateMachineScope.cancel()
+        stateMachineScope.coroutineContext.cancelChildren()
     }
 
     fun process(action: A) {
