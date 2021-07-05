@@ -88,7 +88,9 @@ fun ActionsAppBar(
             .padding(8.dp)
             .padding(start = if (leadingButtons != null) 0.dp else 16.dp)
     ) {
-        leadingButtons?.invoke(this)
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.onBackground) {
+            leadingButtons?.invoke(this)
+        }
         Box(
             modifier = Modifier
                 .fillMaxWidth()

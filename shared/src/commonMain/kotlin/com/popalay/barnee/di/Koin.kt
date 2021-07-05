@@ -99,7 +99,7 @@ val commonModule = module {
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
     factory { DrinkItemStateMachine(get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
-    factory { (input: CollectionInput) -> CollectionStateMachine(input, get()) }
+    factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
     factory { AddToCollectionStateMachine(get()) }
 }

@@ -37,6 +37,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
@@ -106,7 +107,7 @@ internal class CollectionRepositoryImpl(
         }
 
     override fun collection(name: String): Flow<Collection> = collections()
-        .map { collection -> collection.first { it.name == name } }
+        .mapNotNull { collection -> collection.firstOrNull { it.name == name } }
 
     override fun collectionsUpdate(): Flow<Drink> = collectionsUpdateFlow.asSharedFlow()
 
