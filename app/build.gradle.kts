@@ -29,11 +29,12 @@ plugins {
 }
 
 dependencies {
-    add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.compose.compiler)
+    add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.androidx.compose.compiler)
     implementation(project(":shared"))
-    implementation(libs.activity.compose)
-    implementation(libs.navigation.compose)
-    implementation(libs.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.core.splashscreen)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor) {
         exclude("com.android.support", "support-annotations")
@@ -41,7 +42,7 @@ dependencies {
     implementation(libs.paging.compose)
     implementation(libs.firebase.dynamicLinks)
     implementation(libs.bundles.koin)
-    implementation(libs.bundles.compose)
+    implementation(libs.bundles.androidx.compose)
     implementation(libs.bundles.accompanist)
 }
 
@@ -49,11 +50,11 @@ val isCI = System.getenv("CI") == "true"
 println("Is CI environment: $isCI")
 
 android {
-    compileSdk = 30
+    compileSdkPreview = "S"
     defaultConfig {
         applicationId = "com.popalay.barnee"
-        minSdk = 28
-        targetSdk = 30
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
         versionName = "1.1.0"
 
@@ -101,6 +102,6 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.get()
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.get()
     }
 }

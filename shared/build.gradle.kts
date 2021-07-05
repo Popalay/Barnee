@@ -67,18 +67,18 @@ kotlin {
                 implementation(libs.logback.classic)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.koin.core)
-                implementation(libs.settings)
-                implementation(libs.settingscoroutines)
-                api(libs.paging.multiplatform)
+                implementation(libs.multiplatformsettings.noarg)
+                implementation(libs.multiplatformsettings.coroutines)
+                api(libs.multiplatformpaging)
             }
         }
 
         sourceSets["androidMain"].dependencies {
-            implementation(libs.datastore.core)
-            implementation(libs.datastore.runtime)
-            implementation(libs.datastore.preferences)
+            implementation(libs.androidx.datastore.core)
+            implementation(libs.androidx.datastore.runtime)
+            implementation(libs.androidx.datastore.preferences)
             implementation(libs.ktor.android)
-            implementation(libs.settingsdatastore)
+            implementation(libs.multiplatformsettings.datastore)
             implementation(libs.firebase.dynamicLinks)
         }
 
@@ -89,11 +89,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 30
+    compileSdkPreview = "S"
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdk = 28
-        targetSdk = 30
+        minSdk = libs.versions.android.minSdk.get().toInt()
+        targetSdk = libs.versions.android.targetSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
     }
 }
