@@ -24,6 +24,7 @@ package com.popalay.barnee.domain.collection
 
 import com.kuuurt.paging.multiplatform.PagingData
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
@@ -32,11 +33,14 @@ import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.navigation.BackDestination
+import com.popalay.barnee.domain.navigation.Router
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class CollectionInput(val name: String) : Input
@@ -50,15 +54,20 @@ data class CollectionState(
 
 sealed interface CollectionAction : Action {
     object Initial : CollectionAction
+    object RemoveClicked : CollectionAction
+
 }
 
 sealed interface CollectionMutation : Mutation {
+    object Nothing : CollectionMutation
     data class Drinks(val data: Flow<PagingData<Drink>>) : CollectionMutation
 }
 
 class CollectionStateMachine(
     input: CollectionInput,
-    drinkRepository: DrinkRepository
+    collectionRepository: CollectionRepository,
+    drinkRepository: DrinkRepository,
+    router: Router
 ) : StateMachine<CollectionState, CollectionAction, CollectionMutation, EmptySideEffect>(
     initialState = CollectionState(input),
     initialAction = CollectionAction.Initial,
@@ -67,12 +76,17 @@ class CollectionStateMachine(
             filterIsInstance<CollectionAction.Initial>()
                 .take(1)
                 .map { drinkRepository.drinks(DrinksRequest.Collection(state().name)) }
-                .map { CollectionMutation.Drinks(it) }
+                .map { CollectionMutation.Drinks(it) },
+            filterIsInstance<CollectionAction.RemoveClicked>()
+                .map { collectionRepository.remove(state().name) }
+                .onEach { router.navigate(BackDestination) }
+                .map { CollectionMutation.Nothing }
         )
     },
     reducer = { mutation ->
         when (mutation) {
             is CollectionMutation.Drinks -> copy(drinks = mutation.data)
+            is CollectionMutation.Nothing -> this
         }
     }
 )

@@ -26,6 +26,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -34,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.popalay.barnee.domain.collection.CollectionAction
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionState
 import com.popalay.barnee.ui.common.ActionsAppBar
@@ -53,11 +58,11 @@ fun CollectionScreen(input: CollectionInput) {
 @Composable
 fun CollectionScreen(viewModel: CollectionViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    CollectionScreen(state)
+    CollectionScreen(state, viewModel::processAction)
 }
 
 @Composable
-fun CollectionScreen(state: CollectionState) {
+fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
@@ -65,7 +70,15 @@ fun CollectionScreen(state: CollectionState) {
         ActionsAppBar(
             title = state.name,
             modifier = Modifier.liftOnScroll(listState),
-            leadingButtons = { BackButton() }
+            leadingButtons = { BackButton() },
+            trailingButtons = {
+                IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove collection",
+                    )
+                }
+            }
         )
         DrinkGrid(
             drinks = lazyPagingItems,
@@ -86,6 +99,6 @@ fun CollectionScreen(state: CollectionState) {
 @Composable
 fun FavoritesScreenPreview() {
     BarneeTheme {
-        CollectionScreen(CollectionState("Favorites"))
+        CollectionScreen(CollectionState("Favorites")) {}
     }
 }
