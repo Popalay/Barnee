@@ -27,21 +27,19 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.navigation.TagDrinksDestination
+import com.popalay.barnee.domain.navigation.TagDrinksDestination.Companion.KEY_TAG
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.ui.util.capitalizeFirstChar
 
-object TagDrinksNavigationCommand : NavigationCommand {
-    private const val KEY_TAG = "tag"
-
+object TagDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInput>,
+    RouteProvider by TagDrinksDestination {
     override val arguments: List<NamedNavArgument> = listOf(
         navArgument(KEY_TAG) { type = NavType.StringType },
     )
 
-    override val route: String = "drink?$KEY_TAG={$KEY_TAG}"
-
-    fun destination(tag: String): String = "drink?$KEY_TAG=$tag"
-
-    fun parseInput(backStackEntry: NavBackStackEntry): ParameterizedDrinkListInput {
+    override fun parseInput(backStackEntry: NavBackStackEntry): ParameterizedDrinkListInput {
         val tag = backStackEntry.arguments?.getString(KEY_TAG).orEmpty()
         return ParameterizedDrinkListInput(
             request = DrinksRequest.ForTags(setOf(tag)),

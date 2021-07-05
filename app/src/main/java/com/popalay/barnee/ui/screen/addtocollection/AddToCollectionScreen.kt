@@ -48,7 +48,7 @@ import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState
 import com.popalay.barnee.domain.addtocollection.AddToCollectionSideEffect
 import com.popalay.barnee.domain.addtocollection.AddToCollectionState
 import com.popalay.barnee.ui.common.PrimarySnackbar
-import com.popalay.barnee.ui.util.LifecycleAwareSideEffect
+import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.capitalizeFirstChar
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayName
@@ -76,7 +76,7 @@ fun AddToCollectionScreen(
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
 
-    LifecycleAwareSideEffect(sideEffectFlow, state) { sideEffect ->
+    LifecycleAwareLaunchedEffect(sideEffectFlow, state) { sideEffect ->
         when (sideEffect) {
             is AddToCollectionSideEffect.DrinkAddedToFavorites -> {
                 val message = "${sideEffect.drink.displayName.capitalizeFirstChar()} was added to favorites"

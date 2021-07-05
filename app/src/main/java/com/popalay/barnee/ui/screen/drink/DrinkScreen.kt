@@ -93,6 +93,7 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.R
+import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
@@ -102,8 +103,6 @@ import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
@@ -120,6 +119,7 @@ import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.shareDrink
 import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.displayStory
+import com.popalay.barnee.util.displayText
 import com.popalay.barnee.util.inCollection
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
@@ -144,7 +144,6 @@ fun DrinkScreen(
     onAction: (DrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    val navController = LocalNavController.current
     val context = LocalContext.current
     val drink by derivedStateOf { state.drinkWithRelated()?.drink }
 
@@ -239,21 +238,14 @@ fun DrinkScreen(
                         if (value.drink.keywords.isNotEmpty()) {
                             Keywords(
                                 keywords = value.drink.keywords,
-                                onClick = { navController.navigate(AppNavigation.tagDrinks(it)) },
+                                onClick = { onAction(DrinkAction.CategoryClicked(it)) },
                                 modifier = Modifier.padding(horizontal = 24.dp)
                             )
                             Divider(modifier = Modifier.padding(vertical = 24.dp))
                         }
                         RecommendedDrinks(
                             data = value.relatedDrinks,
-                            onShowMoreClick = {
-                                navController.navigate(
-                                    AppNavigation.similarDrinks(
-                                        state.alias,
-                                        state.displayName
-                                    )
-                                )
-                            },
+                            onShowMoreClick = { onAction(DrinkAction.MoreRecommendedDrinksClicked) },
                         )
                         Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
@@ -539,8 +531,8 @@ private fun Steps(
 
 @Composable
 private fun Keywords(
-    keywords: List<String>,
-    onClick: (String) -> Unit,
+    keywords: List<Category>,
+    onClick: (Category) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -553,7 +545,7 @@ private fun Keywords(
         FlowRow {
             keywords.forEach { item ->
                 Text(
-                    text = item,
+                    text = item.displayText,
                     style = MaterialTheme.typography.body2,
                     color = MaterialTheme.colors.primaryVariant,
                     modifier = Modifier

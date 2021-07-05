@@ -55,9 +55,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -90,7 +89,6 @@ fun DrinkGrid(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewModel: DrinkItemViewModel = getViewModel()
-    val navController = LocalNavController.current
 
     StateLayout(
         value = drinks,
@@ -123,7 +121,7 @@ fun DrinkGrid(
                 item?.let {
                     DrinkListItem(
                         item,
-                        onClick = { navController.navigate(AppNavigation.drink(item)) },
+                        onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
                         onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
                         onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
                         modifier = Modifier.topShift(index = index, size = value.itemCount)
@@ -144,7 +142,6 @@ fun DrinkHorizontalList(
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
     val viewModel: DrinkItemViewModel = getViewModel()
-    val navController = LocalNavController.current
 
     BoxWithConstraints {
         LazyRow(
@@ -154,7 +151,7 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { navController.navigate(AppNavigation.drink(item)) },
+                    onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
                     onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
                     onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)

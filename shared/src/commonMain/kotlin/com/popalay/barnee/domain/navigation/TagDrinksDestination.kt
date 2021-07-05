@@ -20,10 +20,20 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import com.popalay.barnee.data.model.Category
+import kotlin.jvm.JvmInline
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+@JvmInline
+value class TagDrinksDestination(
+    override val destination: String
+) : Destination {
+    constructor(tag: Category) : this("drink?$KEY_TAG=${tag.text}")
+
+    companion object : RouteProvider {
+
+        const val KEY_TAG = "tag"
+        override val route: String = "drink?$KEY_TAG={$KEY_TAG}"
+    }
+}

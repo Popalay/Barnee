@@ -87,7 +87,7 @@ import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.LifecycleAwareSideEffect
+import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayNames
 import kotlinx.coroutines.flow.Flow
@@ -114,7 +114,7 @@ fun SearchScreen(
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val textInputService = LocalTextInputService.current
 
-    LifecycleAwareSideEffect(sideEffectFlow, state) { sideEffect ->
+    LifecycleAwareLaunchedEffect(sideEffectFlow, state) { sideEffect ->
         when (sideEffect) {
             SearchSideEffect.ShowFilters -> {
                 textInputService?.hideSoftwareKeyboard()

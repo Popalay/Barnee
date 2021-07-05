@@ -20,10 +20,23 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import kotlin.jvm.JvmInline
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+@JvmInline
+value class QueryDrinksDestination(
+    override val destination: String
+) : Destination {
+    constructor(
+        query: String,
+        name: String
+    ) : this("drink?$KEY_QUERY=$query&$KEY_NAME=$name")
+
+    companion object : RouteProvider {
+        const val KEY_QUERY = "query"
+        const val KEY_NAME = "name"
+
+        override val route: String = "drink?$KEY_QUERY={$KEY_QUERY}&$KEY_NAME={$KEY_NAME}"
+    }
+}

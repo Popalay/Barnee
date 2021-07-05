@@ -31,7 +31,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
-import com.popalay.barnee.domain.SideEffect
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -52,21 +51,21 @@ fun <T : R, R> StateFlow<T>.collectAsStateWithLifecycle(
 }
 
 @Composable
-fun <T : SideEffect> LifecycleAwareSideEffect(
-    sideEffectFlow: Flow<T>,
+fun <T : Any> LifecycleAwareLaunchedEffect(
+    flow: Flow<T>,
     key2: Any? = null,
     minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
     action: suspend (T) -> Unit
 ) {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val sideEffectFlowLifecycleAware = remember(sideEffectFlow, lifecycleOwner) {
-        sideEffectFlow.flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState)
+    val flowLifecycleAware = remember(flow, lifecycleOwner) {
+        flow.flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState)
     }
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(sideEffectFlowLifecycleAware, key2) {
+    LaunchedEffect(flowLifecycleAware, key2) {
         scope.launch {
-            sideEffectFlowLifecycleAware.collectLatest { action(it) }
+            flowLifecycleAware.collectLatest { action(it) }
         }
     }
 }

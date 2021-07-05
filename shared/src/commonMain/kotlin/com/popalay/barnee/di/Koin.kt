@@ -37,7 +37,10 @@ import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
+import com.popalay.barnee.domain.log.NavigationLogger
 import com.popalay.barnee.domain.log.StateMachineLogger
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.RouterImpl
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -62,6 +65,9 @@ import org.koin.dsl.module
 
 val commonModule = module {
     single { if (isDebug) RealLogger() else EmptyLogger }
+    single { StateMachineLogger(get()) }
+    single { NavigationLogger(get()) }
+
     single { Api(get()) }
     single<LocalStore> { LocalStoreImpl(get()) }
     single {
@@ -85,16 +91,16 @@ val commonModule = module {
     }
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
+    single<Router> { RouterImpl(get()) }
 
-    single { StateMachineLogger(get()) }
-    factory { DiscoveryStateMachine(get()) }
-    factory { (input: DrinkInput) -> DrinkStateMachine(input, get()) }
+    factory { DiscoveryStateMachine(get(), get()) }
+    factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
-    factory { DrinkItemStateMachine(get()) }
+    factory { DrinkItemStateMachine(get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get()) }
-    factory { CollectionListStateMachine(get()) }
+    factory { CollectionListStateMachine(get(), get()) }
     factory { AddToCollectionStateMachine(get()) }
 }
 

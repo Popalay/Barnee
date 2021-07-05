@@ -20,10 +20,23 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import kotlin.jvm.JvmInline
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+@JvmInline
+value class SimilarDrinksDestination(
+    override val destination: String
+) : Destination {
+    constructor(
+        alias: String,
+        name: String
+    ) : this("drink?$KEY_LIKE=$alias&$KEY_NAME=$name")
+
+    companion object : RouteProvider {
+        const val KEY_LIKE = "like"
+        const val KEY_NAME = "name"
+
+        override val route: String = "drink?$KEY_LIKE={$KEY_LIKE}&$KEY_NAME={$KEY_NAME}"
+    }
+}

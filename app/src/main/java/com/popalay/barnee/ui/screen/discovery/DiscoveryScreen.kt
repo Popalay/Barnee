@@ -39,9 +39,8 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
+import com.popalay.barnee.domain.discovery.DiscoveryAction
 import com.popalay.barnee.domain.discovery.DiscoveryState
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -56,17 +55,22 @@ fun DiscoveryScreen() {
 @Composable
 private fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DiscoveryScreen(state)
+    DiscoveryScreen(state, viewModel::processAction)
 }
 
 @Composable
-private fun DiscoveryScreen(state: DiscoveryState) {
+private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
-        DiscoveryAppBar(modifier = Modifier.liftOnScroll(listState))
+        DiscoveryAppBar(
+            onHeartClick = { onAction(DiscoveryAction.HeartClicked) },
+            onSearchClick = { onAction(DiscoveryAction.SearchClicked) },
+            modifier = Modifier.liftOnScroll(listState)
+        )
         CategoryGrid(
             categories = state.categories,
             emptyMessage = "We currently have no drinks",
+            onItemClick = { onAction(DiscoveryAction.CategoryClicked(it)) },
             listState = listState,
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,
@@ -78,19 +82,22 @@ private fun DiscoveryScreen(state: DiscoveryState) {
 }
 
 @Composable
-private fun DiscoveryAppBar(modifier: Modifier = Modifier) {
-    val navController = LocalNavController.current
+private fun DiscoveryAppBar(
+    onHeartClick: () -> Unit,
+    onSearchClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     ActionsAppBar(
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
-            IconButton(onClick = { navController.navigate(AppNavigation.collections()) }) {
+            IconButton(onClick = onHeartClick) {
                 Icon(
                     painter = painterResource(R.drawable.ic_favorites),
                     contentDescription = "Favorites",
                 )
             }
-            IconButton(onClick = { navController.navigate(AppNavigation.search()) }) {
+            IconButton(onClick = onSearchClick) {
                 Icon(
                     painter = painterResource(R.drawable.ic_search),
                     contentDescription = "Search",

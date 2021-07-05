@@ -20,10 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.log
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import com.popalay.barnee.domain.navigation.Destination
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.util.Logger
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+class NavigationLogger(private val logger: Logger) {
+    fun <T : Router> log(tag: T, destination: Destination) {
+        logger.info(tag::class.simpleName.orEmpty(), "destination => $destination")
+    }
+}

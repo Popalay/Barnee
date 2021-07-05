@@ -20,10 +20,27 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import com.popalay.barnee.domain.log.NavigationLogger
+import com.popalay.barnee.util.CFlow
+import com.popalay.barnee.util.wrap
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+interface Router {
+    val destinationFlow: CFlow<Destination>
+    suspend fun navigate(destination: Destination)
+}
+
+internal class RouterImpl(
+    private val navigationLogger: NavigationLogger
+) : Router {
+    private val _routeFlow = MutableSharedFlow<Destination>()
+    override val destinationFlow: CFlow<Destination> = _routeFlow.asSharedFlow().wrap()
+
+    override suspend fun navigate(destination: Destination) {
+        navigationLogger.log(this, destination)
+        _routeFlow.emit(destination)
+    }
+}

@@ -29,14 +29,18 @@ import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.navigation.DrinkDestination
+import com.popalay.barnee.domain.navigation.Router
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 
 object DrinkItemState : State
 
 sealed interface DrinkItemAction : Action {
     data class ToggleFavorite(val drink: Drink) : DrinkItemAction
+    data class DrinkClicked(val drink: Drink) : DrinkItemAction
 }
 
 sealed interface DrinkItemMutation : Mutation {
@@ -44,7 +48,8 @@ sealed interface DrinkItemMutation : Mutation {
 }
 
 class DrinkItemStateMachine(
-    collectionRepository: CollectionRepository
+    collectionRepository: CollectionRepository,
+    router: Router
 ) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation, EmptySideEffect>(
     initialState = DrinkItemState,
     processor = { _, _ ->
@@ -57,6 +62,9 @@ class DrinkItemStateMachine(
                         collectionRepository.removeFromCollectionAndNotify(it.drink)
                     }
                 }
+                .map { DrinkItemMutation.Nothing },
+            filterIsInstance<DrinkItemAction.DrinkClicked>()
+                .onEach { router.navigate(DrinkDestination(it.drink)) }
                 .map { DrinkItemMutation.Nothing }
         )
     },

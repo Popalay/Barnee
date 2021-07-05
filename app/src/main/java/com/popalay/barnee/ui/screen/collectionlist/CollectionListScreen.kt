@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.popalay.barnee.domain.collectionlist.CollectionListAction
 import com.popalay.barnee.domain.collectionlist.CollectionListState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
@@ -49,11 +50,11 @@ fun CollectionListScreen() {
 @Composable
 fun CollectionListScreen(viewModel: CollectionListViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    CollectionListScreen(state)
+    CollectionListScreen(state, viewModel::processAction)
 }
 
 @Composable
-fun CollectionListScreen(state: CollectionListState) {
+fun CollectionListScreen(state: CollectionListState, onAction: (CollectionListAction) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
 
@@ -67,6 +68,7 @@ fun CollectionListScreen(state: CollectionListState) {
             listState = listState,
             emptyMessage = "You don't have any collections yet\nstart adding them by clicking the ♥ button",
             onRetry = { },
+            onItemClick = { onAction(CollectionListAction.CollectionClicked(it)) },
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,
                 additionalStart = 8.dp,
@@ -81,6 +83,6 @@ fun CollectionListScreen(state: CollectionListState) {
 @Composable
 fun CollectionListScreenPreview() {
     BarneeTheme {
-        CollectionListScreen(CollectionListState())
+        CollectionListScreen(CollectionListState()) {}
     }
 }

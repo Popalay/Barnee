@@ -52,8 +52,6 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
@@ -72,12 +70,11 @@ import com.popalay.barnee.ui.util.applyForImageUrl
 fun CategoryGrid(
     categories: Result<List<Category>>,
     emptyMessage: String,
+    onItemClick: (Category) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val navController = LocalNavController.current
-
     StateLayout(
         value = categories,
         emptyState = {
@@ -108,7 +105,7 @@ fun CategoryGrid(
             ) { index, item ->
                 CategoryListItem(
                     item,
-                    onClick = { navController.navigate(AppNavigation.queryDrinks(item.alias, item.text)) },
+                    onClick = { onItemClick(item) },
                     modifier = Modifier.padding(top = if (index % 2 == 1 && value.size > 1) DefaultItemShift else 0.dp)
                 )
             }

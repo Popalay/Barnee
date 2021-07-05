@@ -32,9 +32,14 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
+import com.popalay.barnee.domain.navigation.CollectionsDestination
+import com.popalay.barnee.domain.navigation.QueryDrinksDestination
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.SearchDestination
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class DiscoveryState(
@@ -43,14 +48,19 @@ data class DiscoveryState(
 
 sealed interface DiscoveryAction : Action {
     object Initial : DiscoveryAction
+    object HeartClicked : DiscoveryAction
+    object SearchClicked : DiscoveryAction
+    data class CategoryClicked(val category: Category) : DiscoveryAction
 }
 
 sealed interface DiscoveryMutation : Mutation {
+    object Nothing : DiscoveryMutation
     data class Categories(val data: Result<List<Category>>) : DiscoveryMutation
 }
 
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
+    router: Router
 ) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, EmptySideEffect>(
     initialState = DiscoveryState(),
     initialAction = DiscoveryAction.Initial,
@@ -59,12 +69,22 @@ class DiscoveryStateMachine(
             filterIsInstance<DiscoveryAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.categories() }
-                .map { DiscoveryMutation.Categories(it) }
+                .map { DiscoveryMutation.Categories(it) },
+            filterIsInstance<DiscoveryAction.HeartClicked>()
+                .onEach { router.navigate(CollectionsDestination) }
+                .map { DiscoveryMutation.Nothing },
+            filterIsInstance<DiscoveryAction.CategoryClicked>()
+                .onEach { router.navigate(QueryDrinksDestination(it.category.alias, it.category.text)) }
+                .map { DiscoveryMutation.Nothing },
+            filterIsInstance<DiscoveryAction.SearchClicked>()
+                .onEach { router.navigate(SearchDestination) }
+                .map { DiscoveryMutation.Nothing }
         )
     },
     reducer = { mutation ->
         when (mutation) {
             is DiscoveryMutation.Categories -> copy(categories = mutation.data)
+            is DiscoveryMutation.Nothing -> this
         }
     }
 )

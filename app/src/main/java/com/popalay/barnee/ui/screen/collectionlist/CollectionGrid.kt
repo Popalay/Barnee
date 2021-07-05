@@ -50,8 +50,6 @@ import com.google.accompanist.coil.rememberCoilPainter
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
@@ -71,12 +69,11 @@ fun CollectionGrid(
     collections: Result<Set<Collection>>,
     emptyMessage: String,
     onRetry: () -> Unit,
+    onItemClick: (Collection) -> Unit,
     modifier: Modifier = Modifier,
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val navController = LocalNavController.current
-
     StateLayout(
         value = collections,
         emptyState = {
@@ -107,7 +104,7 @@ fun CollectionGrid(
             ) { index, item ->
                 CollectionItem(
                     item,
-                    onClick = { navController.navigate(AppNavigation.collection(item)) },
+                    onClick = { onItemClick(item) },
                     modifier = Modifier.topShift(index = index, size = value.size)
                 )
             }
