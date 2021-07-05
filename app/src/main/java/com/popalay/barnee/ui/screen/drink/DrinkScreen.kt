@@ -22,6 +22,7 @@
 
 package com.popalay.barnee.ui.screen.drink
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -53,7 +54,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
@@ -78,7 +78,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -107,6 +106,7 @@ import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
+import com.popalay.barnee.ui.common.ShareButton
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
@@ -144,9 +144,7 @@ fun DrinkScreen(
     onAction: (DrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    val context = LocalContext.current
     val drink by derivedStateOf { state.drinkWithRelated()?.drink }
-
     val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
     val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
 
@@ -188,7 +186,7 @@ fun DrinkScreen(
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = offset,
                         scrollFraction = fraction,
-                        onShareClick = { context.shareDrink(state.displayName, state.alias) }
+                        onShareClick = { shareDrink(state.displayName, state.alias) }
                     )
                 },
                 scrollFraction = fraction,
@@ -299,7 +297,7 @@ private fun SharedContent(
     offset: IntOffset,
     scrollFraction: Float,
     secondaryElementsAlpha: Float,
-    onShareClick: () -> Unit
+    onShareClick: suspend Context.() -> Unit
 ) {
     val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
     val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
@@ -325,12 +323,7 @@ private fun SharedContent(
         ) {
             BackButton()
             Spacer(modifier = Modifier.fillMaxWidth().weight(1F))
-            IconButton(onClick = onShareClick) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_share),
-                    contentDescription = "Share",
-                )
-            }
+            ShareButton(onClick = onShareClick)
         }
         Text(
             text = title,

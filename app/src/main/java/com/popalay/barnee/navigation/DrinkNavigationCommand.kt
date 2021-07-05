@@ -45,7 +45,7 @@ object DrinkNavigationCommand : NavigationCommand<DrinkInput>,
     )
 
     override val deeplinks: List<NavDeepLink> = listOf(
-        navDeepLink { uriPattern = "${DEEPLINK_PREFIX}drink/{$KEY_ALIAS}" }
+        navDeepLink { uriPattern = "${DEEPLINK_PREFIX}$route" }
     )
 
     override fun parseInput(backStackEntry: NavBackStackEntry) = DrinkInput(
