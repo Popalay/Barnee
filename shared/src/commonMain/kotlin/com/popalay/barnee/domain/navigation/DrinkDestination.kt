@@ -20,10 +20,31 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.ImageUrl
+import com.popalay.barnee.util.displayImageUrl
+import com.popalay.barnee.util.displayName
+import kotlin.jvm.JvmInline
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+@JvmInline
+value class DrinkDestination(
+    override val destination: String
+) : Destination {
+    constructor(
+        alias: String,
+        name: String,
+        image: ImageUrl
+    ) : this("drink/$alias?$KEY_IMAGE=$image&$KEY_NAME=$name")
+
+    constructor(drink: Drink) : this(drink.alias, drink.displayName, drink.displayImageUrl)
+
+    companion object : RouteProvider {
+        const val KEY_ALIAS = "alias"
+        const val KEY_NAME = "name"
+        const val KEY_IMAGE = "image"
+
+        override val route: String = "drink/{$KEY_ALIAS}?$KEY_IMAGE={$KEY_IMAGE}&$KEY_NAME={$KEY_NAME}"
+    }
+}

@@ -35,6 +35,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
@@ -44,16 +45,17 @@ import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
-import com.popalay.barnee.navigation.AppNavigation
+import com.popalay.barnee.domain.navigation.BackDestination
+import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
 import com.popalay.barnee.navigation.TagDrinksNavigationCommand
+import com.popalay.barnee.navigation.navigate
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
 import com.popalay.barnee.ui.screen.collection.CollectionScreen
@@ -64,7 +66,9 @@ import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkLis
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.util.isDebug
+import org.koin.androidx.compose.get
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -102,11 +106,8 @@ class MainActivity : ComponentActivity() {
                     }
             }
 
-            CompositionLocalProvider(
-                LocalNavController provides navController,
-                LocalImageLoader provides imageLoader
-            ) {
-                NavigationGraph()
+            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                NavigationGraph(navController)
                 AddToCollectionScreen()
                 ShakeToDrinkScreen()
             }
@@ -114,8 +115,15 @@ class MainActivity : ComponentActivity() {
     }
 
     @Composable
-    fun NavigationGraph() {
-        NavHost(LocalNavController.current, startDestination = AppNavigation.root()) {
+    fun NavigationGraph(navController: NavHostController) {
+        val router: Router = get()
+
+        LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
+            if (destination == BackDestination) navController.popBackStack()
+            else navController.navigate(destination)
+        }
+
+        NavHost(navController, startDestination = DiscoveryNavigationCommand.route) {
             navigationNode(DiscoveryNavigationCommand) {
                 DiscoveryScreen()
             }

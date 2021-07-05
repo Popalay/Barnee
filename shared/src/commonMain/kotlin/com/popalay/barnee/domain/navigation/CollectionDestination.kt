@@ -20,10 +20,20 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
+import com.popalay.barnee.data.model.Collection
+import kotlin.jvm.JvmInline
 
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+@JvmInline
+value class CollectionDestination(
+    override val destination: String
+) : Destination {
+    constructor(collection: Collection) : this("collection/${collection.name}")
+
+    companion object : RouteProvider {
+        const val KEY_NAME = "name"
+
+        override val route: String = "collection/{$KEY_NAME}"
+    }
+}

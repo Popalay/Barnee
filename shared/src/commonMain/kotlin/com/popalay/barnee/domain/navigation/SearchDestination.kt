@@ -20,10 +20,9 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
-
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+object SearchDestination : Destination, RouteProvider {
+    override val destination = "search"
+    override val route: String = "search"
+}

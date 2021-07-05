@@ -23,6 +23,7 @@
 package com.popalay.barnee.util
 
 import com.popalay.barnee.data.model.AggregationGroup
+import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.EmptyImageUrl
@@ -44,8 +45,7 @@ val Drink.displayRating
 val Drink.keywords
     get() = (categories + collections + occasions)
         .filter { it.alias.isNotBlank() }
-        .map { it.text.lowercase() }
-        .filter { it != "unknown" }
+        .filter { it.text != "unknown" }
 
 val Drink.displayStory
     get() = story.trim().removeSuffix(".")
@@ -66,3 +66,5 @@ fun String.toImageUrl() = when {
 fun Collection.isEmpty() = aliases.isEmpty()
 
 fun Collection.isNotEmpty() = !isEmpty()
+
+val Category.displayText get() = text.lowercase()

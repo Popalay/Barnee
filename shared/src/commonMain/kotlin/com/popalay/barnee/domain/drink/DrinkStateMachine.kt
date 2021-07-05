@@ -22,6 +22,7 @@
 
 package com.popalay.barnee.domain.drink
 
+import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
@@ -34,11 +35,15 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.SimilarDrinksDestination
+import com.popalay.barnee.domain.navigation.TagDrinksDestination
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class DrinkInput(
@@ -64,16 +69,20 @@ sealed interface DrinkAction : Action {
     object Initial : DrinkAction
     object TogglePlaying : DrinkAction
     object Retry : DrinkAction
+    object MoreRecommendedDrinksClicked : DrinkAction
+    data class CategoryClicked(val category: Category) : DrinkAction
 }
 
 sealed interface DrinkMutation : Mutation {
+    object Nothing : DrinkMutation
     data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation
     data class TogglePlaying(val data: Boolean) : DrinkMutation
 }
 
 class DrinkStateMachine(
     input: DrinkInput,
-    drinkRepository: DrinkRepository
+    drinkRepository: DrinkRepository,
+    router: Router
 ) : StateMachine<DrinkState, DrinkAction, DrinkMutation, EmptySideEffect>(
     initialState = DrinkState(input),
     initialAction = DrinkAction.Initial,
@@ -89,12 +98,19 @@ class DrinkStateMachine(
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
                 .map { DrinkMutation.TogglePlaying(it) },
+            filterIsInstance<DrinkAction.MoreRecommendedDrinksClicked>()
+                .onEach { router.navigate(SimilarDrinksDestination(state().alias, state().displayName)) }
+                .map { DrinkMutation.Nothing },
+            filterIsInstance<DrinkAction.CategoryClicked>()
+                .onEach { router.navigate(TagDrinksDestination(it.category)) }
+                .map { DrinkMutation.Nothing }
         )
     },
     reducer = { mutation ->
         when (mutation) {
             is DrinkMutation.DrinkWithRelated -> copy(drinkWithRelated = mutation.data)
             is DrinkMutation.TogglePlaying -> copy(isPlaying = mutation.data)
+            is DrinkMutation.Nothing -> this
         }
     }
 )

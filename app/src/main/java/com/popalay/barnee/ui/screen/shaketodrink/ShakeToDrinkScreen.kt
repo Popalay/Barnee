@@ -58,8 +58,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
-import com.popalay.barnee.navigation.AppNavigation
-import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
@@ -92,8 +90,6 @@ fun ShakeToDrinkScreen(
     onAction: (ShakeToDrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    val navController = LocalNavController.current
-
     if (state.shouldShow) {
         val hapticFeedback = LocalHapticFeedback.current
         LaunchedEffect(Unit) {
@@ -133,7 +129,7 @@ fun ShakeToDrinkScreen(
                             data = value,
                             onClick = {
                                 onAction(ShakeToDrinkAction.DialogDismissed)
-                                navController.navigate(AppNavigation.drink(value))
+                                onItemAction(DrinkItemAction.DrinkClicked(value))
                             },
                             onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
                         )

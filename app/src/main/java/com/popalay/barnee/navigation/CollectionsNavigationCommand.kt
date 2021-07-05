@@ -22,7 +22,8 @@
 
 package com.popalay.barnee.navigation
 
-object CollectionsNavigationCommand : NavigationCommand {
-    override val route: String = "collection"
-    const val destination = "collection"
-}
+import com.popalay.barnee.domain.navigation.CollectionsDestination
+import com.popalay.barnee.domain.navigation.RouteProvider
+
+object CollectionsNavigationCommand : NavigationCommand<Nothing>,
+    RouteProvider by CollectionsDestination

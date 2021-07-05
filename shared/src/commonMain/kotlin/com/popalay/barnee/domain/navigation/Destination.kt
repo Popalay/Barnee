@@ -20,10 +20,8 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.navigation.SearchDestination
-
-object SearchNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by SearchDestination
+sealed interface Destination {
+    val destination: String
+}

@@ -32,9 +32,12 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
+import com.popalay.barnee.domain.navigation.CollectionDestination
+import com.popalay.barnee.domain.navigation.Router
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class CollectionListState(
@@ -43,14 +46,17 @@ data class CollectionListState(
 
 sealed interface CollectionListAction : Action {
     object Initial : CollectionListAction
+    data class CollectionClicked(val collection: Collection) : CollectionListAction
 }
 
 sealed interface CollectionListMutation : Mutation {
+    object Nothing : CollectionListMutation
     data class Collections(val data: Result<Set<Collection>>) : CollectionListMutation
 }
 
 class CollectionListStateMachine(
     collectionRepository: CollectionRepository,
+    router: Router
 ) : StateMachine<CollectionListState, CollectionListAction, CollectionListMutation, EmptySideEffect>(
     initialState = CollectionListState(),
     initialAction = CollectionListAction.Initial,
@@ -59,12 +65,16 @@ class CollectionListStateMachine(
             filterIsInstance<CollectionListAction.Initial>()
                 .take(1)
                 .flatMapToResult { collectionRepository.collections() }
-                .map { CollectionListMutation.Collections(it) }
+                .map { CollectionListMutation.Collections(it) },
+            filterIsInstance<CollectionListAction.CollectionClicked>()
+                .onEach { router.navigate(CollectionDestination(it.collection)) }
+                .map { CollectionListMutation.Nothing }
         )
     },
     reducer = { mutation ->
         when (mutation) {
             is CollectionListMutation.Collections -> copy(collections = mutation.data)
+            is CollectionListMutation.Nothing -> this
         }
     }
 )
