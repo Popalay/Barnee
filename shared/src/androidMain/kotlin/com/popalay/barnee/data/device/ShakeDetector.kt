@@ -51,7 +51,7 @@ actual class ShakeDetector(private val sensorManager: SensorManager) : SensorEve
             sensorManager.registerListener(
                 this,
                 accelerometer,
-                SensorManager.SENSOR_DELAY_FASTEST
+                SensorManager.SENSOR_DELAY_GAME
             )
         }
         return accelerometer != null

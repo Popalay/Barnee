@@ -31,11 +31,9 @@
         <item name="android:windowLightNavigationBar">@bool/use_light_nav_bar</item>
     </style>
 
-    <style name="Theme.Barnee.Splash" parent="Theme.Barnee.Base">
-        <item name="android:statusBarColor">@color/status_bar_color</item>
-        <item name="android:navigationBarColor">@color/navigation_bar_color</item>
-        <item name="android:windowLightStatusBar">@bool/use_light_status_bar</item>
-        <item name="android:windowBackground">@drawable/bg_splash</item>
-        <item name="android:windowLightNavigationBar">false</item>
+    <style name="Theme.Barnee.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenBackground">#FF1C2126</item>
+        <item name="postSplashScreenTheme">@style/Theme.Barnee</item>
     </style>
 </resources>

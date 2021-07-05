@@ -173,7 +173,7 @@ private fun RandomDrink(
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = data.displayRating,
+                    text = data.displayRating.let { "$it/10" },
                     style = MaterialTheme.typography.h2,
                 )
                 Spacer(
