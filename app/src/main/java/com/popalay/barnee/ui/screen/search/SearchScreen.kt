@@ -36,9 +36,7 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -67,10 +65,10 @@ import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.LifecycleAwareSideEffect
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayNames
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -80,7 +78,7 @@ fun SearchScreen() {
 
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     SearchScreen(state, viewModel.sideEffectFlow, viewModel::processAction)
 }
 
@@ -93,17 +91,12 @@ fun SearchScreen(
 ) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val textInputService = LocalTextInputService.current
-    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(sideEffectFlow, state) {
-        scope.launch {
-            sideEffectFlow.collectLatest { sideEffect ->
-                when (sideEffect) {
-                    SearchSideEffect.ShowFilters -> {
-                        textInputService?.hideSoftwareKeyboard()
-                        bottomSheetState.show()
-                    }
-                }
+    LifecycleAwareSideEffect(sideEffectFlow, state) { sideEffect ->
+        when (sideEffect) {
+            SearchSideEffect.ShowFilters -> {
+                textInputService?.hideSoftwareKeyboard()
+                bottomSheetState.show()
             }
         }
     }

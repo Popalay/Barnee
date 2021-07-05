@@ -7,7 +7,6 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -24,6 +23,7 @@ import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -33,7 +33,7 @@ fun DiscoveryScreen() {
 
 @Composable
 private fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     DiscoveryScreen(state)
 }
 

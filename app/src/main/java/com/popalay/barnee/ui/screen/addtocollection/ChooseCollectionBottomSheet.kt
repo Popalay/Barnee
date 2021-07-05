@@ -18,7 +18,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
@@ -29,6 +28,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
 import com.popalay.barnee.ui.theme.MediumSquircleShape
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -37,7 +37,7 @@ fun ChooseCollectionBottomSheet(
     onCreateNewClicked: () -> Unit
 ) {
     val viewModel: CollectionListViewModel = getViewModel()
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
 
     StateLayout(state.collections) { value ->
         BottomSheetContent(

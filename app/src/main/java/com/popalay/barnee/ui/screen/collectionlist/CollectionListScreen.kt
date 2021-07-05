@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,6 +16,7 @@ import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -26,7 +26,7 @@ fun CollectionListScreen() {
 
 @Composable
 fun CollectionListScreen(viewModel: CollectionListViewModel) {
-    val state by viewModel.stateFlow.collectAsState()
+    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
     CollectionListScreen(state)
 }
 
@@ -44,7 +44,7 @@ fun CollectionListScreen(state: CollectionListState) {
             collections = state.collections,
             listState = listState,
             emptyMessage = "You don't have any collections yet\nstart adding them by clicking the ♥ button",
-            onRetry = {  },
+            onRetry = { },
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,
                 additionalStart = 8.dp,
