@@ -3,6 +3,7 @@ package com.popalay.barnee.ui.common
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,3 +50,8 @@ fun Modifier.drawBadge(
         center = Offset(size.width, size.height)
     )
 }
+
+fun Modifier.topShift(
+    index: Int,
+    size: Int
+) = this.padding(top = if (index % 2 == 1 && size > 1) DefaultItemShift else 0.dp)

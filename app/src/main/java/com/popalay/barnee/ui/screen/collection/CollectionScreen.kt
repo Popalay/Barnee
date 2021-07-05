@@ -1,4 +1,4 @@
-package com.popalay.barnee.ui.screen.favorites
+package com.popalay.barnee.ui.screen.collection
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -13,33 +13,35 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.popalay.barnee.domain.favorites.FavoritesState
+import com.popalay.barnee.domain.collection.CollectionInput
+import com.popalay.barnee.domain.collection.CollectionState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.getViewModel
+import org.koin.androidx.compose.getViewModel
+import org.koin.core.parameter.parametersOf
 
 @Composable
-fun FavoritesScreen() {
-    FavoritesScreen(getViewModel())
+fun CollectionScreen(input: CollectionInput) {
+    CollectionScreen(getViewModel { parametersOf(input) })
 }
 
 @Composable
-fun FavoritesScreen(viewModel: FavoritesViewModel) {
+fun CollectionScreen(viewModel: CollectionViewModel) {
     val state by viewModel.stateFlow.collectAsState()
-    FavoritesScreen(state)
+    CollectionScreen(state)
 }
 
 @Composable
-fun FavoritesScreen(state: FavoritesState) {
+fun CollectionScreen(state: CollectionState) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
 
         ActionsAppBar(
-            title = "Favorites",
+            title = state.name,
             modifier = Modifier.liftOnScroll(listState),
             leadingButtons = { BackButton() }
         )
@@ -62,6 +64,6 @@ fun FavoritesScreen(state: FavoritesState) {
 @Composable
 fun FavoritesScreenPreview() {
     BarneeTheme {
-        FavoritesScreen(FavoritesState())
+        CollectionScreen(CollectionState("Favorites"))
     }
 }

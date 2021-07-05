@@ -76,7 +76,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
-import com.popalay.barnee.data.model.toImageUrl
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
@@ -96,8 +95,14 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.getViewModel
 import com.popalay.barnee.ui.util.shareDrink
+import com.popalay.barnee.util.displayRating
+import com.popalay.barnee.util.displayStory
+import com.popalay.barnee.util.inCollection
+import com.popalay.barnee.util.keywords
+import com.popalay.barnee.util.toImageUrl
+import com.popalay.barnee.util.videoUrl
+import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
@@ -138,7 +143,7 @@ fun DrinkScreen(
                         image = state.displayImage,
                         rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
-                        isHeartButtonSelected = drink?.isFavorite,
+                        isHeartButtonSelected = drink?.inCollection,
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         onHeartClick = { drink?.let { onItemAction(DrinkItemAction.ToggleFavorite(it)) } },
                         onPlayClick = { onAction(DrinkAction.TogglePlaying) }

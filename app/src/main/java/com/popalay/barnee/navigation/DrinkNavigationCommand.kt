@@ -7,8 +7,8 @@ import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
 import com.popalay.barnee.data.model.ImageUrl
-import com.popalay.barnee.data.model.toImageUrl
 import com.popalay.barnee.domain.drink.DrinkInput
+import com.popalay.barnee.util.toImageUrl
 
 object DrinkNavigationCommand : NavigationCommand {
     private const val KEY_ALIAS = "alias"

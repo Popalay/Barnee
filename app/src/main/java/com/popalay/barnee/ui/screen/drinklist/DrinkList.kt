@@ -39,7 +39,6 @@ import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
-import com.popalay.barnee.ui.common.DefaultItemShift
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
@@ -49,9 +48,14 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
+import com.popalay.barnee.ui.common.topShift
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.getViewModel
+import com.popalay.barnee.util.displayImageUrl
+import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.displayRating
+import com.popalay.barnee.util.inCollection
+import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -100,7 +104,7 @@ fun DrinkGrid(
                         onClick = { navController.navigate(AppNavigation.drink(item)) },
                         onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
                         onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
-                        modifier = Modifier.padding(top = if (index % 2 == 1 && value.itemCount > 1) DefaultItemShift else 0.dp)
+                        modifier = Modifier.topShift(index = index, size = value.itemCount)
                     )
                 }
             }
@@ -191,7 +195,7 @@ private fun DrinkListItem(
             }
             AnimatedHeartButton(
                 onToggle = onHeartClick,
-                isSelected = data.isFavorite,
+                isSelected = data.inCollection,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)

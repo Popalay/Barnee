@@ -38,6 +38,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -55,6 +56,7 @@ import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.domain.search.SearchAction
+import com.popalay.barnee.domain.search.SearchSideEffect
 import com.popalay.barnee.domain.search.SearchState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
@@ -65,7 +67,11 @@ import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.getViewModel
+import com.popalay.barnee.util.displayNames
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun SearchScreen() {
@@ -75,25 +81,34 @@ fun SearchScreen() {
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
     val state by viewModel.stateFlow.collectAsState()
-    SearchScreen(state, viewModel::processAction)
+    SearchScreen(state, viewModel.sideEffectFlow, viewModel::processAction)
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchScreen(state: SearchState, onAction: (SearchAction) -> Unit) {
+fun SearchScreen(
+    state: SearchState,
+    sideEffectFlow: Flow<SearchSideEffect>,
+    onAction: (SearchAction) -> Unit
+) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val textInputService = LocalTextInputService.current
+    val scope = rememberCoroutineScope()
 
-    LaunchedEffect(state.isFiltersShown) {
-        if (!bottomSheetState.isVisible && state.isFiltersShown) {
-            textInputService?.hideSoftwareKeyboard()
-            bottomSheetState.show()
-        } else if (bottomSheetState.isVisible && !state.isFiltersShown) {
-            bottomSheetState.hide()
+    LaunchedEffect(sideEffectFlow, state) {
+        scope.launch {
+            sideEffectFlow.collectLatest { sideEffect ->
+                when (sideEffect) {
+                    SearchSideEffect.ShowFilters -> {
+                        textInputService?.hideSoftwareKeyboard()
+                        bottomSheetState.show()
+                    }
+                }
+            }
         }
     }
 
-    LaunchedEffect(!bottomSheetState.isVisible) {
+    LaunchedEffect(bottomSheetState.isVisible) {
         if (!bottomSheetState.isVisible) {
             onAction(SearchAction.FiltersDismissed)
         }

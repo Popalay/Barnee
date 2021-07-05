@@ -24,12 +24,11 @@ import com.popalay.barnee.navigation.LocalNavController
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.getViewModel
+import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun DiscoveryScreen() {
-    val viewModel: DiscoveryViewModel = getViewModel()
-    DiscoveryScreen(viewModel)
+    DiscoveryScreen(getViewModel())
 }
 
 @Composable
@@ -63,7 +62,7 @@ private fun DiscoveryAppBar(modifier: Modifier = Modifier) {
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
-            IconButton(onClick = { navController.navigate(AppNavigation.favorites()) }) {
+            IconButton(onClick = { navController.navigate(AppNavigation.collections()) }) {
                 Icon(
                     painter = painterResource(R.drawable.ic_favorites),
                     contentDescription = "Favorites",

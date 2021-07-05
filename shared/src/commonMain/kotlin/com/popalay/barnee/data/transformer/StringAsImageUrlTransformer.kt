@@ -2,7 +2,7 @@ package com.popalay.barnee.data.transformer
 
 import com.popalay.barnee.data.model.EmptyImageUrl
 import com.popalay.barnee.data.model.ImageUrl
-import com.popalay.barnee.data.model.toImageUrl
+import com.popalay.barnee.util.toImageUrl
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -16,7 +16,7 @@ object StringAsImageUrlTransformer : KSerializer<ImageUrl> {
         PrimitiveSerialDescriptor("StringAsImageUrlTransformer", PrimitiveKind.STRING)
 
     override fun serialize(encoder: Encoder, value: ImageUrl) {
-        throw UnsupportedOperationException()
+        encoder.encodeString(value.toString())
     }
 
     @OptIn(ExperimentalSerializationApi::class)
