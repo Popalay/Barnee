@@ -26,6 +26,7 @@ import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
+import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
@@ -70,6 +71,7 @@ sealed interface DrinkAction : Action {
     object TogglePlaying : DrinkAction
     object Retry : DrinkAction
     object MoreRecommendedDrinksClicked : DrinkAction
+    object ShareClicked : DrinkAction
     data class CategoryClicked(val category: Category) : DrinkAction
 }
 
@@ -82,6 +84,7 @@ sealed interface DrinkMutation : Mutation {
 class DrinkStateMachine(
     input: DrinkInput,
     drinkRepository: DrinkRepository,
+    shareRepository: ShareRepository,
     router: Router
 ) : StateMachine<DrinkState, DrinkAction, DrinkMutation, EmptySideEffect>(
     initialState = DrinkState(input),
@@ -103,6 +106,9 @@ class DrinkStateMachine(
                 .map { DrinkMutation.Nothing },
             filterIsInstance<DrinkAction.CategoryClicked>()
                 .onEach { router.navigate(TagDrinksDestination(it.category)) }
+                .map { DrinkMutation.Nothing },
+            filterIsInstance<DrinkAction.ShareClicked>()
+                .onEach { shareRepository.shareDrink(state().alias, state().displayName) }
                 .map { DrinkMutation.Nothing }
         )
     },

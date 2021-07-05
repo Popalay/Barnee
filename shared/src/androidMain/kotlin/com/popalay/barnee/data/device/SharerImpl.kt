@@ -20,30 +20,23 @@
  * SOFTWARE.
  */
 
-@file:OptIn(ExperimentalSettingsImplementation::class)
-
-package com.popalay.barnee.di
+package com.popalay.barnee.data.device
 
 import android.content.Context
-import android.hardware.SensorManager
-import androidx.datastore.preferences.preferencesDataStore
-import com.popalay.barnee.data.device.ShakeDetector
-import com.popalay.barnee.data.device.Sharer
-import com.popalay.barnee.data.device.SharerImpl
-import com.popalay.barnee.data.remote.DeeplinkFactory
-import com.popalay.barnee.data.remote.DeeplinkFactoryImpl
-import com.russhwolf.settings.ExperimentalSettingsApi
-import com.russhwolf.settings.ExperimentalSettingsImplementation
-import com.russhwolf.settings.coroutines.FlowSettings
-import com.russhwolf.settings.datastore.DataStoreSettings
-import org.koin.dsl.module
+import android.content.Intent
 
-private val Context.dataStore by preferencesDataStore("Settings")
-
-@OptIn(ExperimentalSettingsApi::class)
-actual val platformModule = module {
-    single<FlowSettings> { DataStoreSettings(get<Context>().dataStore) }
-    single { ShakeDetector(get<Context>().getSystemService(SensorManager::class.java)) }
-    single<DeeplinkFactory> { DeeplinkFactoryImpl() }
-    single<Sharer> { SharerImpl(get()) }
+internal actual class SharerImpl(
+    private val context: Context
+) : Sharer {
+    override fun openShareDialog(title: String, content: String, text: String) {
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"
+            putExtra(Intent.EXTRA_TITLE, text)
+            putExtra(Intent.EXTRA_TEXT, content)
+        }
+        val chooserIntent = Intent.createChooser(intent, title).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+        context.startActivity(chooserIntent)
+    }
 }

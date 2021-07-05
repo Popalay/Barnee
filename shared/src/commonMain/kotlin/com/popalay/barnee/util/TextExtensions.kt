@@ -20,34 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.common
+package com.popalay.barnee.util
 
-import android.content.Context
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import kotlinx.coroutines.launch
-
-@Composable
-fun ShareButton(
-    onClick: suspend Context.() -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val context = LocalContext.current
-    val scope = rememberCoroutineScope()
-
-    IconButton(
-        onClick = { scope.launch { onClick(context) } },
-        modifier = modifier
-    ) {
-        Icon(
-            imageVector = Icons.Default.Share,
-            contentDescription = "Share",
-        )
-    }
-}
+fun String.capitalizeFirstChar() =
+    replaceFirstChar { if (it.isLowerCase()) it.titlecase() else it.toString() }

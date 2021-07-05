@@ -30,6 +30,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -43,12 +44,10 @@ import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
-import com.popalay.barnee.ui.common.ShareButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
-import com.popalay.barnee.ui.util.shareCollection
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -74,7 +73,12 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
             modifier = Modifier.liftOnScroll(listState),
             leadingButtons = { BackButton() },
             trailingButtons = {
-                ShareButton(onClick = { shareCollection(state.name) })
+                IconButton(onClick = { onAction(CollectionAction.ShareClicked) }) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share drink",
+                    )
+                }
                 IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
                     Icon(
                         imageVector = Icons.Default.Delete,

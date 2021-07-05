@@ -20,9 +20,12 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.util
+package com.popalay.barnee.data.remote
 
-import java.util.Locale
+import kotlin.coroutines.suspendCoroutine
 
-fun String.capitalizeFirstChar(locale: Locale = Locale.getDefault()) =
-    replaceFirstChar { if (it.isLowerCase()) it.titlecase(locale) else it.toString() }
+internal actual class DeeplinkFactoryImpl : DeeplinkFactory {
+    override suspend fun build(suffix: String): String = suspendCoroutine { continuation ->
+        TODO("Not yet implemented")
+    }
+}
