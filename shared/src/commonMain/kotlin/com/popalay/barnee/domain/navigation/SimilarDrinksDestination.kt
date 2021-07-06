@@ -25,7 +25,7 @@ package com.popalay.barnee.domain.navigation
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class SimilarDrinksDestination(
+value class SimilarDrinksDestination private constructor(
     override val destination: String
 ) : Destination {
     constructor(

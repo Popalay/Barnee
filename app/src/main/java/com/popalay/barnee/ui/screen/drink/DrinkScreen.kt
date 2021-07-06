@@ -70,6 +70,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -108,6 +109,8 @@ import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
+import com.popalay.barnee.domain.navigation.CollectionDestination
+import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
@@ -130,6 +133,8 @@ import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoUrl
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -370,6 +375,9 @@ private fun SharedContent(
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CollectionBanner(collection: Collection?) {
+    val router: Router = get()
+    val scope = rememberCoroutineScope()
+
     AnimatedVisibility(
         visible = collection?.isDefault == false,
         enter = fadeIn(),
@@ -378,6 +386,9 @@ fun CollectionBanner(collection: Collection?) {
         Surface(
             shape = CircleShape,
             color = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.medium),
+            modifier = Modifier
+                .clip(CircleShape)
+                .clickable { scope.launch { router.navigate(CollectionDestination(requireNotNull(collection))) } }
         ) {
             Text(
                 text = collection?.name.orEmpty(),

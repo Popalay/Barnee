@@ -26,7 +26,7 @@ import com.popalay.barnee.data.model.Collection
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class CollectionDestination(
+value class CollectionDestination private constructor(
     override val destination: String
 ) : Destination {
     constructor(collection: Collection) : this("collection/${collection.name}")

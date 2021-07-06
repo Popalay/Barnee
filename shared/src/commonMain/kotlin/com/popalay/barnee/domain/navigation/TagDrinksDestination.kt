@@ -26,13 +26,12 @@ import com.popalay.barnee.data.model.Category
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class TagDrinksDestination(
+value class TagDrinksDestination private constructor(
     override val destination: String
 ) : Destination {
     constructor(tag: Category) : this("drink?$KEY_TAG=${tag.text}")
 
     companion object : RouteProvider {
-
         const val KEY_TAG = "tag"
         override val route: String = "drink?$KEY_TAG={$KEY_TAG}"
     }

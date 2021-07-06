@@ -29,7 +29,7 @@ import com.popalay.barnee.util.displayName
 import kotlin.jvm.JvmInline
 
 @JvmInline
-value class DrinkDestination(
+value class DrinkDestination private constructor(
     override val destination: String
 ) : Destination {
     constructor(
