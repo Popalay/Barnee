@@ -26,6 +26,7 @@ import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.isNotEmpty
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -70,8 +71,9 @@ internal class CollectionRepositoryImpl(
 
     override suspend fun addToCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
         val collections = removeFromCollections(drink)
-        val targetCollection = (collections.firstOrNull { it.name == collectionName.ifBlank { Collection.DEFAULT_NAME } }
-            ?: Collection(collectionName.ifBlank { Collection.DEFAULT_NAME }, emptySet(), emptySet())).let {
+        val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
+        val targetCollection = (collections.firstOrNull { it.name == validCollectionName }
+            ?: Collection(validCollectionName, emptySet(), emptySet())).let {
             it.copy(aliases = it.aliases + drink.alias, cover = setOf(drink.displayImageUrl) + it.cover)
         }
 

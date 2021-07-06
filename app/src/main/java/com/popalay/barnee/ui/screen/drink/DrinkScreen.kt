@@ -27,6 +27,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -57,6 +59,7 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -81,6 +84,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -94,6 +98,7 @@ import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
+import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
@@ -116,10 +121,12 @@ import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
-import com.popalay.barnee.util.displayRating
+import com.popalay.barnee.util.calories
+import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
 import com.popalay.barnee.util.displayText
 import com.popalay.barnee.util.inCollection
+import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoUrl
@@ -159,7 +166,7 @@ fun DrinkScreen(
                 imageContent = {
                     ImageContent(
                         image = state.displayImage,
-                        rating = drink?.displayRating?.let { "$it/10" }.orEmpty(),
+                        rating = drink?.displayRatingWithMax.orEmpty(),
                         showPlayButton = !drink?.videoUrl.isNullOrBlank(),
                         isHeartButtonSelected = drink?.inCollection,
                         secondaryElementsAlpha = secondaryElementsAlpha,
@@ -179,7 +186,8 @@ fun DrinkScreen(
                 sharedContent = {
                     SharedContent(
                         title = state.displayName,
-                        nutrition = drink?.nutrition?.totalCalories?.toString()?.let { "$it kcal" }.orEmpty(),
+                        nutrition = drink?.calories.orEmpty(),
+                        collection = drink?.collection,
                         isPlaying = state.isPlaying,
                         shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
@@ -291,6 +299,7 @@ private fun DrinkAppBar(
 private fun SharedContent(
     title: String,
     nutrition: String,
+    collection: Collection?,
     isPlaying: Boolean,
     shouldCutTitle: Boolean,
     offset: IntOffset,
@@ -341,13 +350,44 @@ private fun SharedContent(
                 .alpha(titleAlpha)
         )
         Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = nutrition,
-            style = MaterialTheme.typography.h3,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .padding(start = 24.dp)
+                .fillMaxWidth(0.7F)
                 .alpha(secondaryElementsAlpha)
-        )
+        ) {
+            Text(
+                text = nutrition,
+                style = MaterialTheme.typography.h3,
+            )
+            Spacer(modifier = Modifier.width(24.dp))
+            CollectionBanner(collection)
+        }
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun CollectionBanner(collection: Collection?) {
+    AnimatedVisibility(
+        visible = collection?.isDefault == false,
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Surface(
+            shape = CircleShape,
+            color = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.medium),
+        ) {
+            Text(
+                text = collection?.name.orEmpty(),
+                style = MaterialTheme.typography.caption,
+                fontWeight = FontWeight.Bold,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
+            )
+        }
     }
 }
 

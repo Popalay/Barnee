@@ -33,7 +33,9 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -62,14 +64,16 @@ import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
+import com.popalay.barnee.ui.screen.drink.CollectionBanner
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
-import com.popalay.barnee.util.displayRating
+import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.inCollection
 import org.koin.androidx.compose.getViewModel
 
@@ -168,12 +172,27 @@ private fun RandomDrink(
                 style = MaterialTheme.typography.h1,
                 modifier = Modifier
                     .fillMaxWidth(0.7F)
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.fillMaxWidth(0.7F)
+            ) {
+                Text(
+                    text = data.calories,
+                    style = MaterialTheme.typography.h3,
+                )
+                Spacer(modifier = Modifier.width(24.dp))
+                CollectionBanner(data.collection)
+            }
+            Spacer(
+                modifier = Modifier
                     .fillMaxHeight()
                     .weight(1F)
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    text = data.displayRating.let { "$it/10" },
+                    text = data.displayRatingWithMax,
                     style = MaterialTheme.typography.h2,
                 )
                 Spacer(
