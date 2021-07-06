@@ -26,7 +26,11 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Collection(
-    val name: String,
+    val name: String = DEFAULT_NAME,
     val aliases: Set<String>,
     val cover: Set<ImageUrl>
-)
+) {
+    companion object {
+        const val DEFAULT_NAME = "Favorites"
+    }
+}

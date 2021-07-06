@@ -70,8 +70,8 @@ internal class CollectionRepositoryImpl(
 
     override suspend fun addToCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
         val collections = removeFromCollections(drink)
-        val targetCollection = (collections.firstOrNull { it.name == collectionName.ifBlank { DEFAULT_COLLECTION_NAME } }
-            ?: Collection(collectionName.ifBlank { DEFAULT_COLLECTION_NAME }, emptySet(), emptySet())).let {
+        val targetCollection = (collections.firstOrNull { it.name == collectionName.ifBlank { Collection.DEFAULT_NAME } }
+            ?: Collection(collectionName.ifBlank { Collection.DEFAULT_NAME }, emptySet(), emptySet())).let {
             it.copy(aliases = it.aliases + drink.alias, cover = setOf(drink.displayImageUrl) + it.cover)
         }
 
@@ -134,9 +134,9 @@ internal class CollectionRepositoryImpl(
             ?.takeIf { it.any(String::isNotEmpty) }
             ?.let { runCatching { api.drinksByAliases(it, skip = 0, take = 100) }.getOrNull() }
             ?.let { drinks ->
-                val collection = collections().first().firstOrNull { it.name == DEFAULT_COLLECTION_NAME }
+                val collection = collections().first().firstOrNull { it.name == Collection.DEFAULT_NAME }
                     ?: Collection(
-                        name = DEFAULT_COLLECTION_NAME,
+                        name = Collection.DEFAULT_NAME,
                         aliases = drinks.map { it.alias }.toSet(),
                         cover = drinks.map { it.displayImageUrl }.toSet()
                     )
@@ -149,6 +149,5 @@ internal class CollectionRepositoryImpl(
     companion object {
         private const val KEY_FAVORITE_DRINKS = "KEY_FAVORITE_DRINKS"
         private const val KEY_COLLECTION = "KEY_COLLECTION"
-        private const val DEFAULT_COLLECTION_NAME = "Favorites"
     }
 }
