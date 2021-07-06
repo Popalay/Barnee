@@ -42,6 +42,9 @@ val Drink.videoUrl
 val Drink.displayRating
     get() = (rating / 10F).toIntIfInt().toString()
 
+val Drink.displayRatingWithMax
+    get() = displayRating.let { "$it/10" }
+
 val Drink.keywords
     get() = (categories + collections + occasions)
         .filter { it.alias.isNotBlank() }
@@ -52,6 +55,9 @@ val Drink.displayStory
 
 val Drink.inCollection
     get() = collection != null
+
+val Drink.calories
+    get() = nutrition.totalCalories.toString().let { "$it kcal" }
 
 fun Set<Collection>.with(drink: Drink) = firstOrNull { drink.alias in it.aliases }
 
@@ -68,3 +74,5 @@ fun Collection.isEmpty() = aliases.isEmpty()
 fun Collection.isNotEmpty() = !isEmpty()
 
 val Category.displayText get() = text.lowercase()
+
+val Collection.isDefault get() = name == Collection.DEFAULT_NAME
