@@ -23,6 +23,7 @@
 package com.popalay.barnee.domain.collection
 
 import com.kuuurt.paging.multiplatform.PagingData
+import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.DrinkRepository
@@ -48,9 +49,10 @@ data class CollectionInput(val name: String) : Input
 
 data class CollectionState(
     val name: String,
+    val isRemoveButtonVisible: Boolean,
     val drinks: Flow<PagingData<Drink>> = emptyFlow()
 ) : State {
-    constructor(input: CollectionInput) : this(input.name)
+    constructor(input: CollectionInput) : this(input.name, input.name != Collection.DEFAULT_NAME)
 }
 
 sealed interface CollectionAction : Action {

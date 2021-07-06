@@ -23,6 +23,8 @@
 package com.popalay.barnee.ui.screen.collection
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -62,6 +64,7 @@ fun CollectionScreen(viewModel: CollectionViewModel) {
     CollectionScreen(state, viewModel::processAction)
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
@@ -79,11 +82,13 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
                         contentDescription = "Share drink",
                     )
                 }
-                IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
-                    Icon(
-                        imageVector = Icons.Default.Delete,
-                        contentDescription = "Remove collection",
-                    )
+                AnimatedVisibility(state.isRemoveButtonVisible) {
+                    IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = "Remove collection",
+                        )
+                    }
                 }
             }
         )
@@ -106,6 +111,6 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
 @Composable
 fun FavoritesScreenPreview() {
     BarneeTheme {
-        CollectionScreen(CollectionState("Favorites")) {}
+        CollectionScreen(CollectionState("Favorites", true)) {}
     }
 }
