@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalContentColor
+import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -61,12 +62,7 @@ fun ActionsAppBar(
     trailingButtons: (@Composable RowScope.() -> Unit)? = null,
 ) {
     ActionsAppBar(
-        {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.h2,
-            )
-        },
+        { Text(text = title) },
         modifier,
         leadingButtons,
         trailingButtons
@@ -96,7 +92,9 @@ fun ActionsAppBar(
                 .fillMaxWidth()
                 .weight(1F)
         ) {
-            title()
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.h2) {
+                title()
+            }
         }
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.primary) {
             trailingButtons?.invoke(this)

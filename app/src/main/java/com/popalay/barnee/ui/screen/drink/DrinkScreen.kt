@@ -48,6 +48,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
@@ -88,35 +90,35 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
-import com.google.accompanist.insets.statusBarsPadding
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
-import com.popalay.barnee.domain.Success
+import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.navigation.CollectionDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
+import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
@@ -137,6 +139,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.roundToInt
 
 @Composable
 fun DrinkScreen(input: DrinkInput) {
@@ -156,16 +159,20 @@ fun DrinkScreen(
     onItemAction: (DrinkItemAction) -> Unit
 ) {
     val drink by derivedStateOf { state.drinkWithRelated()?.drink }
-    val toolbarHeight = with(LocalConfiguration.current) { remember { Dp(screenWidthDp / 0.8F) } }
-    val collapsedToolbarHeight = with(LocalDensity.current) { 88.dp + LocalWindowInsets.current.statusBars.bottom.toDp() }
+    val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
+    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / 0.8F).toPx() }
+    val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
+    val listState = rememberLazyListState()
+    val collapsingScaffoldState = rememberCollapsingScaffoldState(
+        minHeight = collapsedToolbarHeightPx,
+        maxHeight = toolbarHeightPx,
+        confirmOffsetChange = { _, _ -> drink != null && listState.firstVisibleItemScrollOffset == 0 }
+    )
 
     CollapsingScaffold(
-        maxHeight = toolbarHeight,
-        minHeight = collapsedToolbarHeight,
-        isEnabled = state.drinkWithRelated is Success,
-        appBarContent = { fraction, offset ->
-            val secondaryElementsAlpha = if (state.isPlaying) 0F else 1 - fraction * 1.5F
-
+        state = collapsingScaffoldState,
+        topBar = {
+            val secondaryElementsAlpha by derivedStateOf { if (state.isPlaying) 0F else 1 - collapsingScaffoldState.fraction * 1.5F }
             DrinkAppBar(
                 isPlaying = state.isPlaying,
                 imageContent = {
@@ -196,69 +203,93 @@ fun DrinkScreen(
                         isPlaying = state.isPlaying,
                         shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
-                        offset = offset,
-                        scrollFraction = fraction,
+                        offset = IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()),
+                        scrollFraction = collapsingScaffoldState.fraction,
                         onShareClick = { onAction(DrinkAction.ShareClicked) }
                     )
                 },
-                scrollFraction = fraction,
-                modifier = Modifier.offset { offset }
+                scrollFraction = collapsingScaffoldState.fraction,
+                modifier = Modifier.offset { IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()) }
             )
         }
     ) { contentPadding ->
-        LazyColumn(contentPadding = contentPadding) {
-            item(drink?.id) {
-                StateLayout(
-                    value = state.drinkWithRelated,
-                    loadingState = {
-                        LinearProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(32.dp)
-                                .offset(y = (-26).dp)
-                                .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
-                        )
-                    },
-                    errorState = {
-                        ErrorAndRetryStateView(
-                            onRetry = { onAction(DrinkAction.Retry) },
-                            modifier = Modifier.padding(top = 32.dp)
-                        )
-                    }
-                ) { value ->
-                    Column {
-                        Spacer(modifier = Modifier.height(32.dp))
-                        if (value.drink.displayStory.isNotBlank()) {
-                            Story(
-                                story = value.drink.displayStory,
-                                modifier = Modifier.padding(start = 32.dp, end = 24.dp)
-                            )
-                            Divider(modifier = Modifier.padding(vertical = 24.dp))
-                        }
-                        Ingredients(
-                            ingredient = value.drink.ingredients,
-                            modifier = Modifier.padding(horizontal = 32.dp)
+        DrinkScreenBody(
+            drinkWithRelated = state.drinkWithRelated,
+            listState = listState,
+            contentPadding = contentPadding,
+            onRetryClicked = { onAction(DrinkAction.Retry) },
+            onCategoryClicked = { onAction(DrinkAction.CategoryClicked(it)) },
+            onMoreRecommendedDrinksClicked = { onAction(DrinkAction.MoreRecommendedDrinksClicked) }
+        )
+    }
+}
+
+@Composable
+fun DrinkScreenBody(
+    drinkWithRelated: Result<FullDrinkResponse>,
+    listState: LazyListState,
+    onRetryClicked: () -> Unit,
+    onCategoryClicked: (Category) -> Unit,
+    onMoreRecommendedDrinksClicked: () -> Unit,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues()
+) {
+    LazyColumn(
+        state = listState,
+        contentPadding = contentPadding,
+        modifier = modifier
+    ) {
+        item {
+            StateLayout(
+                value = drinkWithRelated,
+                loadingState = {
+                    LinearProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(32.dp)
+                            .offset(y = (-26).dp)
+                            .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
+                    )
+                },
+                errorState = {
+                    ErrorAndRetryStateView(
+                        onRetry = onRetryClicked,
+                        modifier = Modifier.padding(top = 32.dp)
+                    )
+                }
+            ) { value ->
+                Column {
+                    Spacer(modifier = Modifier.height(32.dp))
+                    if (value.drink.displayStory.isNotBlank()) {
+                        Story(
+                            story = value.drink.displayStory,
+                            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
-                        Steps(
-                            instruction = value.drink.instruction,
-                            modifier = Modifier.padding(horizontal = 32.dp)
+                    }
+                    Ingredients(
+                        ingredient = value.drink.ingredients,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                    Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    Steps(
+                        instruction = value.drink.instruction,
+                        modifier = Modifier.padding(horizontal = 32.dp)
+                    )
+                    Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    if (value.drink.keywords.isNotEmpty()) {
+                        Keywords(
+                            keywords = value.drink.keywords,
+                            onClick = { onCategoryClicked(it) },
+                            modifier = Modifier.padding(horizontal = 24.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
-                        if (value.drink.keywords.isNotEmpty()) {
-                            Keywords(
-                                keywords = value.drink.keywords,
-                                onClick = { onAction(DrinkAction.CategoryClicked(it)) },
-                                modifier = Modifier.padding(horizontal = 24.dp)
-                            )
-                            Divider(modifier = Modifier.padding(vertical = 24.dp))
-                        }
-                        RecommendedDrinks(
-                            data = value.relatedDrinks,
-                            onShowMoreClick = { onAction(DrinkAction.MoreRecommendedDrinksClicked) },
-                        )
-                        Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                     }
+                    RecommendedDrinks(
+                        data = value.relatedDrinks,
+                        onShowMoreClick = onMoreRecommendedDrinksClicked,
+                    )
+                    Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                 }
             }
         }
@@ -312,15 +343,8 @@ private fun SharedContent(
     secondaryElementsAlpha: Float,
     onShareClick: () -> Unit
 ) {
-    val titleTextSize = remember(scrollFraction) { (56 * (1 - scrollFraction)).coerceAtLeast(24F) }
-    val titleMaxLines = remember(scrollFraction) { if (scrollFraction > 0.9F) 1 else if (shouldCutTitle) 3 else 6 }
-    val titleAlpha = if (isPlaying) scrollFraction * 1.5F else 1F
-    val titleOffset = with(LocalDensity.current) {
-        IntOffset(
-            x = (28.dp.toPx() * scrollFraction).toInt(),
-            y = ((-40).dp.toPx() * scrollFraction).toInt()
-        ) - offset
-    }
+    val titleMaxLines = remember(shouldCutTitle) { if (shouldCutTitle) 3 else 6 }
+    val titleAlpha = if (isPlaying) 0F else 1 - (scrollFraction * 1.5F).coerceAtMost(1F)
 
     Box(
         modifier = Modifier
@@ -328,30 +352,35 @@ private fun SharedContent(
             .alpha(scrollFraction)
             .background(MaterialTheme.colors.background)
     )
-    Column(modifier = Modifier.statusBarsPadding()) {
-        Row(
-            modifier = Modifier
-                .padding(top = 8.dp, start = 8.dp, end = 16.dp)
-                .offset { -offset }
-        ) {
-            BackButton()
-            Spacer(modifier = Modifier.fillMaxWidth().weight(1F))
-            IconButton(onClick = onShareClick) {
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = "Share drink",
+    Column {
+        ActionsAppBar(
+            title = {
+                Text(
+                    text = title,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.alpha(1 - titleAlpha)
                 )
-            }
-        }
+            },
+            leadingButtons = { BackButton() },
+            trailingButtons = {
+                IconButton(onClick = onShareClick) {
+                    Icon(
+                        imageVector = Icons.Default.Share,
+                        contentDescription = "Share drink",
+                    )
+                }
+            },
+            modifier = Modifier.offset { -offset }
+        )
         Text(
             text = title,
-            style = MaterialTheme.typography.h1.copy(fontSize = titleTextSize.sp),
+            style = MaterialTheme.typography.h1,
             maxLines = titleMaxLines,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier
                 .padding(start = 24.dp)
                 .fillMaxWidth(0.7F)
-                .offset { titleOffset }
                 .alpha(titleAlpha)
         )
         Spacer(modifier = Modifier.height(8.dp))
@@ -374,14 +403,18 @@ private fun SharedContent(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun CollectionBanner(collection: Collection?) {
+fun CollectionBanner(
+    collection: Collection?,
+    modifier: Modifier = Modifier
+) {
     val router: Router = get()
     val scope = rememberCoroutineScope()
 
     AnimatedVisibility(
         visible = collection?.isDefault == false,
         enter = fadeIn(),
-        exit = fadeOut()
+        exit = fadeOut(),
+        modifier = modifier
     ) {
         Surface(
             shape = CircleShape,
