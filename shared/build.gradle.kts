@@ -20,29 +20,20 @@
  * SOFTWARE.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
-
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version "1.5.10"
     id("com.android.library")
-    id("org.jetbrains.kotlin.native.cocoapods")
 }
 
-// CocoaPods requires the podspec to have a version.
-version = "1.0"
-
 kotlin {
-    val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true) ::iosArm64 else ::iosX64
-
-    iOSTarget("ios") {}
     android()
-
-    cocoapods {
-        // Configure fields required by CocoaPods.
-        summary = "Some description for a Kotlin/Native module"
-        homepage = "Link to a Kotlin/Native module homepage"
+    ios {
+        binaries {
+            framework {
+                baseName = "shared"
+            }
+        }
     }
 
     sourceSets {

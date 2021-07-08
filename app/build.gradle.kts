@@ -20,30 +20,43 @@
  * SOFTWARE.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
-
 plugins {
+    kotlin("multiplatform")
     id("com.android.application")
-    kotlin("android")
     id("com.google.gms.google-services")
 }
 
-dependencies {
-    add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.androidx.compose.compiler)
-    implementation(project(":shared"))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.exoplayer)
-    implementation(libs.youtubeExtractor) {
-        exclude("com.android.support", "support-annotations")
+kotlin {
+    android()
+    sourceSets {
+        all {
+            languageSettings.apply {
+                useExperimentalAnnotation("kotlin.RequiresOptIn")
+                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+            }
+        }
+
+        val androidMain by getting {
+            dependencies {
+//                add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.androidx.compose.compiler)
+                implementation(project(":shared"))
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.navigation.compose)
+                implementation(libs.androidx.lifecycle.runtime.ktx)
+                implementation(libs.androidx.core.splashscreen)
+                implementation(libs.exoplayer)
+//                implementation(libs.youtubeExtractor) {
+//                    exclude("com.android.support", "support-annotations")
+//                }
+                implementation(libs.paging.compose)
+                implementation(libs.firebase.dynamicLinks)
+                implementation(libs.bundles.koin)
+                implementation(libs.bundles.androidx.compose)
+                implementation(libs.bundles.accompanist)
+            }
+        }
     }
-    implementation(libs.paging.compose)
-    implementation(libs.firebase.dynamicLinks)
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.androidx.compose)
-    implementation(libs.bundles.accompanist)
 }
 
 val isCI = System.getenv("CI") == "true"
@@ -94,11 +107,6 @@ android {
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
-    }
-
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
     }
 
     composeOptions {

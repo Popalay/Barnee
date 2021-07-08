@@ -20,19 +20,22 @@
  * SOFTWARE.
  */
 
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven(url = "https://jitpack.io")
-        maven(url = "https://oss.sonatype.org/content/repositories/snapshots/")
-        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
+plugins {
+    id("org.jetbrains.gradle.apple.applePlugin") version "211.5739-0.12"
+}
+
+apple {
+    iosApp {
+        productName = "Barnee"
+
+        sceneDelegateClass = "SceneDelegate"
+        launchStoryboard = "LaunchScreen"
+
+        //productInfo["NSAppTransportSecurity"] = mapOf("NSAllowsArbitraryLoads" to true)
+        //buildSettings["OTHER_LDFLAGS"] = ""
+
+        dependencies {
+            implementation(project(":shared"))
+        }
     }
 }
-rootProject.name = "Barnee"
-
-include(":iosApp")
-include(":app")
-include(":shared")
-
-enableFeaturePreview("VERSION_CATALOGS")
