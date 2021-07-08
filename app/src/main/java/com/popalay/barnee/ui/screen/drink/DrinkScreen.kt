@@ -23,6 +23,8 @@
 package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
+import android.view.WindowManager
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -68,6 +70,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -107,6 +110,7 @@ import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
+import com.popalay.barnee.domain.drink.DrinkSideEffect
 import com.popalay.barnee.domain.drink.DrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.navigation.CollectionDestination
@@ -124,8 +128,10 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
+import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import com.popalay.barnee.ui.util.findActivity
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
@@ -135,6 +141,7 @@ import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoUrl
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
@@ -149,12 +156,13 @@ fun DrinkScreen(input: DrinkInput) {
 @Composable
 fun DrinkScreen(viewModel: DrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
+    DrinkScreen(state, viewModel.sideEffectFlow, viewModel::processAction, drinkItemViewModel::processAction)
 }
 
 @Composable
 fun DrinkScreen(
     state: DrinkState,
+    sideEffectFlow: Flow<DrinkSideEffect>,
     onAction: (DrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
@@ -162,12 +170,36 @@ fun DrinkScreen(
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
     val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / 0.8F).toPx() }
     val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
+    val activity = findActivity()
+    val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
     val listState = rememberLazyListState()
     val collapsingScaffoldState = rememberCollapsingScaffoldState(
         minHeight = collapsedToolbarHeightPx,
         maxHeight = toolbarHeightPx,
         confirmOffsetChange = { _, _ -> drink != null && listState.firstVisibleItemScrollOffset == 0 }
     )
+
+    LifecycleAwareLaunchedEffect(sideEffectFlow, Unit) { sideEffect ->
+        when (sideEffect) {
+            is DrinkSideEffect.KeepScreenOn -> {
+                activity?.let {
+                    if (sideEffect.keep) {
+                        it.window?.addFlags(keepScreenOnFlag)
+                        Toast.makeText(it, "The screen will remain on on this screen", Toast.LENGTH_LONG).show()
+                    } else {
+                        it.window?.clearFlags(keepScreenOnFlag)
+                        Toast.makeText(it, "The screen will turn off as usual", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            activity?.window?.clearFlags(keepScreenOnFlag)
+        }
+    }
 
     CollapsingScaffold(
         state = collapsingScaffoldState,
@@ -200,11 +232,13 @@ fun DrinkScreen(
                         title = state.displayName,
                         nutrition = drink?.calories.orEmpty(),
                         collection = drink?.collection,
+                        isScreenKeptOn = state.isScreenKeptOn,
                         isPlaying = state.isPlaying,
                         shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
                         secondaryElementsAlpha = secondaryElementsAlpha,
                         offset = IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()),
                         scrollFraction = collapsingScaffoldState.fraction,
+                        onKeepScrenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
                         onShareClick = { onAction(DrinkAction.ShareClicked) }
                     )
                 },
@@ -263,25 +297,25 @@ fun DrinkScreenBody(
                     if (value.drink.displayStory.isNotBlank()) {
                         Story(
                             story = value.drink.displayStory,
-                            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
+                            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
                     }
                     Ingredients(
                         ingredient = value.drink.ingredients,
-                        modifier = Modifier.padding(horizontal = 32.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
                     Steps(
                         instruction = value.drink.instruction,
-                        modifier = Modifier.padding(horizontal = 32.dp)
+                        modifier = Modifier.padding(horizontal = 24.dp)
                     )
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
                     if (value.drink.keywords.isNotEmpty()) {
                         Keywords(
                             keywords = value.drink.keywords,
                             onClick = { onCategoryClicked(it) },
-                            modifier = Modifier.padding(horizontal = 24.dp)
+                            modifier = Modifier.padding(horizontal = 16.dp)
                         )
                         Divider(modifier = Modifier.padding(vertical = 24.dp))
                     }
@@ -336,11 +370,13 @@ private fun SharedContent(
     title: String,
     nutrition: String,
     collection: Collection?,
+    isScreenKeptOn: Boolean,
     isPlaying: Boolean,
     shouldCutTitle: Boolean,
     offset: IntOffset,
     scrollFraction: Float,
     secondaryElementsAlpha: Float,
+    onKeepScrenOnClicked: () -> Unit,
     onShareClick: () -> Unit
 ) {
     val titleMaxLines = remember(shouldCutTitle) { if (shouldCutTitle) 3 else 6 }
@@ -364,6 +400,12 @@ private fun SharedContent(
             },
             leadingButtons = { BackButton() },
             trailingButtons = {
+                IconButton(onClick = onKeepScrenOnClicked) {
+                    Icon(
+                        painter = if (isScreenKeptOn) painterResource(R.drawable.ic_light_off) else painterResource(R.drawable.ic_light_on),
+                        contentDescription = "Keep screen on",
+                    )
+                }
                 IconButton(onClick = onShareClick) {
                     Icon(
                         imageVector = Icons.Default.Share,
@@ -462,7 +504,7 @@ private fun BoxScope.ImageContent(
         modifier = Modifier
             .fillMaxWidth()
             .align(Alignment.BottomStart)
-            .padding(start = 32.dp, end = 24.dp, bottom = 8.dp)
+            .padding(start = 24.dp, end = 8.dp, bottom = 8.dp)
             .alpha(secondaryElementsAlpha)
     ) {
         Text(
@@ -649,7 +691,7 @@ private fun RecommendedDrinks(
     Column(modifier = modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(start = 32.dp, end = 24.dp)
+            modifier = Modifier.padding(start = 24.dp, end = 16.dp)
         ) {
             Text(
                 text = "Recommended",
@@ -676,7 +718,7 @@ private fun RecommendedDrinks(
         }
         DrinkHorizontalList(
             data = data,
-            contentPadding = PaddingValues(horizontal = 32.dp, vertical = 16.dp)
+            contentPadding = PaddingValues(horizontal = 24.dp, vertical = 16.dp)
         )
     }
 }

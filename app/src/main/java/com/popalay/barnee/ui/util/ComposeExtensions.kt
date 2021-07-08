@@ -22,12 +22,15 @@
 
 package com.popalay.barnee.ui.util
 
+import android.app.Activity
+import android.content.ContextWrapper
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
@@ -68,4 +71,13 @@ fun <T : Any> LifecycleAwareLaunchedEffect(
             flowLifecycleAware.collectLatest { action(it) }
         }
     }
+}
+
+@Composable
+fun findActivity(): Activity? {
+    var context = LocalContext.current
+    while (context !is Activity) {
+        context = (context as? ContextWrapper)?.baseContext ?: return null
+    }
+    return context
 }

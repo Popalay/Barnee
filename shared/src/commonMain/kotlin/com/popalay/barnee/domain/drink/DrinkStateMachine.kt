@@ -28,10 +28,10 @@ import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
+import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
@@ -58,6 +58,7 @@ data class DrinkState(
     val name: String,
     val image: ImageUrl,
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
+    val isScreenKeptOn: Boolean = false,
     val isPlaying: Boolean = false
 ) : State {
     val displayName = drinkWithRelated()?.drink?.displayName ?: name
@@ -72,6 +73,7 @@ sealed interface DrinkAction : Action {
     object Retry : DrinkAction
     object MoreRecommendedDrinksClicked : DrinkAction
     object ShareClicked : DrinkAction
+    object KeepScreenOnClicked : DrinkAction
     data class CategoryClicked(val category: Category) : DrinkAction
 }
 
@@ -79,6 +81,11 @@ sealed interface DrinkMutation : Mutation {
     object Nothing : DrinkMutation
     data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation
     data class TogglePlaying(val data: Boolean) : DrinkMutation
+    data class KeepScreenOn(val data: Boolean) : DrinkMutation
+}
+
+sealed interface DrinkSideEffect : SideEffect {
+    data class KeepScreenOn(val keep: Boolean) : DrinkSideEffect
 }
 
 class DrinkStateMachine(
@@ -86,10 +93,10 @@ class DrinkStateMachine(
     drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
     router: Router
-) : StateMachine<DrinkState, DrinkAction, DrinkMutation, EmptySideEffect>(
+) : StateMachine<DrinkState, DrinkAction, DrinkMutation, DrinkSideEffect>(
     initialState = DrinkState(input),
     initialAction = DrinkAction.Initial,
-    processor = { state, _ ->
+    processor = { state, sideEffectConsumer ->
         merge(
             filterIsInstance<DrinkAction.Initial>()
                 .take(1)
@@ -109,13 +116,18 @@ class DrinkStateMachine(
                 .map { DrinkMutation.Nothing },
             filterIsInstance<DrinkAction.ShareClicked>()
                 .onEach { shareRepository.shareDrink(state().alias, state().displayName) }
-                .map { DrinkMutation.Nothing }
+                .map { DrinkMutation.Nothing },
+            filterIsInstance<DrinkAction.KeepScreenOnClicked>()
+                .map { !state().isScreenKeptOn }
+                .onEach { sideEffectConsumer(DrinkSideEffect.KeepScreenOn(it)) }
+                .map { DrinkMutation.KeepScreenOn(it) }
         )
     },
     reducer = { mutation ->
         when (mutation) {
             is DrinkMutation.DrinkWithRelated -> copy(drinkWithRelated = mutation.data)
             is DrinkMutation.TogglePlaying -> copy(isPlaying = mutation.data)
+            is DrinkMutation.KeepScreenOn -> copy(isScreenKeptOn = mutation.data)
             is DrinkMutation.Nothing -> this
         }
     }
