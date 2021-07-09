@@ -114,7 +114,7 @@ fun SearchScreen(
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val textInputService = LocalTextInputService.current
 
-    LifecycleAwareLaunchedEffect(sideEffectFlow, state) { sideEffect ->
+    LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
         when (sideEffect) {
             SearchSideEffect.ShowFilters -> {
                 textInputService?.hideSoftwareKeyboard()

@@ -29,14 +29,15 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancelChildren
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -57,17 +58,17 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
     reducer: Reducer<S, M>
 ) : KoinComponent {
     private val actionFlow = MutableSharedFlow<A>()
-    private val _sideEffectFlow = MutableSharedFlow<SE>()
+    private val sideEffectChannel = Channel<SE>()
     private val stateMachineScope = MainScope()
     private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
     private val logger by inject<StateMachineLogger>()
 
-    val sideEffectFlow: CFlow<SE> = _sideEffectFlow.asSharedFlow().wrap()
+    val sideEffectFlow: CFlow<SE> = sideEffectChannel.receiveAsFlow().wrap()
     val stateFlow: CFlow<S> = actionFlow
         .onStart { initialAction?.let { emit(it) } }
         .onEach { logger.log(this, it) }
         .processor({ currentState }, {
-            _sideEffectFlow.emit(it)
+            sideEffectChannel.send(it)
             logger.log(this, it)
         })
         .onEach { logger.log(this, it) }

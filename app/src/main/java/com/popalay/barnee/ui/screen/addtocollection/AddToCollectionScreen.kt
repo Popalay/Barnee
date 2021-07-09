@@ -39,6 +39,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -52,7 +53,9 @@ import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayName
+import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -75,19 +78,30 @@ fun AddToCollectionScreen(
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
+    val snackbarScope = rememberCoroutineScope()
 
-    LifecycleAwareLaunchedEffect(sideEffectFlow, state) { sideEffect ->
+    LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
         when (sideEffect) {
             is AddToCollectionSideEffect.DrinkAddedToFavorites -> {
                 val message = "${sideEffect.drink.displayName.capitalizeFirstChar()} was added to favorites"
-                snackbarHostState.showSnackbar(message, actionLabel = "Change").let { result ->
-                    if (result == SnackbarResult.ActionPerformed) {
-                        onAction(AddToCollectionAction.ChangeCollectionClicked(sideEffect.drink))
+
+                snackbarScope.coroutineContext.cancelChildren()
+                snackbarScope.launch {
+                    snackbarHostState.showSnackbar(message, actionLabel = "Change").let { result ->
+                        if (result == SnackbarResult.ActionPerformed) {
+                            onAction(AddToCollectionAction.ChangeCollectionClicked(sideEffect.drink))
+                        }
                     }
                 }
             }
-            is AddToCollectionSideEffect.ShowAddToCollectionDialog -> bottomSheetState.show()
-            is AddToCollectionSideEffect.HideAddToCollectionDialog -> bottomSheetState.hide()
+        }
+    }
+
+    LaunchedEffect(state.dialogState) {
+        when (state.dialogState) {
+            is AddToCollectionDialogState.ChooseCollectionFor -> bottomSheetState.show()
+            is AddToCollectionDialogState.CreateCollectionFor -> bottomSheetState.show()
+            AddToCollectionDialogState.Empty -> bottomSheetState.hide()
         }
     }
 

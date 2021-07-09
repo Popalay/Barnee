@@ -71,8 +71,6 @@ sealed interface AddToCollectionMutation : Mutation {
 }
 
 sealed interface AddToCollectionSideEffect : SideEffect {
-    object ShowAddToCollectionDialog : AddToCollectionSideEffect
-    object HideAddToCollectionDialog : AddToCollectionSideEffect
     data class DrinkAddedToFavorites(val drink: Drink) : AddToCollectionSideEffect
 }
 
@@ -90,23 +88,18 @@ class AddToCollectionStateMachine(
                 .onEach { sideEffectConsumer(AddToCollectionSideEffect.DrinkAddedToFavorites(it)) }
                 .map { AddToCollectionMutation.Empty },
             filterIsInstance<AddToCollectionAction.ChangeCollectionClicked>()
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.ShowAddToCollectionDialog) }
                 .map { AddToCollectionMutation.DialogState(ChooseCollectionFor(it.drink)) },
             filterIsInstance<AddToCollectionAction.CreateCollectionClicked>()
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.ShowAddToCollectionDialog) }
                 .map { AddToCollectionMutation.DialogState(CreateCollectionFor(it.drink)) },
             filterIsInstance<AddToCollectionAction.BackFromCollectionCreationClicked>()
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.ShowAddToCollectionDialog) }
                 .map { AddToCollectionMutation.DialogState(ChooseCollectionFor(it.drink)) },
             filterIsInstance<AddToCollectionAction.AddToCollectionDialogDismissed>()
                 .map { AddToCollectionMutation.DialogState(Empty) },
             filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
                 .map { collectionRepository.addToCollectionAndNotify(state().newCollectionName, it.drink) }
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.HideAddToCollectionDialog) }
                 .map { AddToCollectionMutation.DialogState(Empty) },
             filterIsInstance<AddToCollectionAction.CollectionClicked>()
                 .map { collectionRepository.addToCollectionAndNotify(it.collection.name, it.drink) }
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.HideAddToCollectionDialog) }
                 .map { AddToCollectionMutation.DialogState(Empty) },
             filterIsInstance<AddToCollectionAction.NewCollectionNameChanged>()
                 .map { AddToCollectionMutation.NewCollectionName(it.name) },

@@ -179,7 +179,7 @@ fun DrinkScreen(
         confirmOffsetChange = { _, _ -> drink != null && listState.firstVisibleItemScrollOffset == 0 }
     )
 
-    LifecycleAwareLaunchedEffect(sideEffectFlow, Unit) { sideEffect ->
+    LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
         when (sideEffect) {
             is DrinkSideEffect.KeepScreenOn -> {
                 activity?.let {
