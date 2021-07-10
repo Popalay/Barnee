@@ -67,6 +67,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.drink.CollectionBanner
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
@@ -118,7 +119,7 @@ fun ShakeToDrinkScreen(
                 Card(
                     elevation = 4.dp,
                     shape = MediumSquircleShape,
-                    modifier = Modifier.aspectRatio(0.8F)
+                    modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
                 ) {
                     StateLayout(
                         value = state.randomDrink,

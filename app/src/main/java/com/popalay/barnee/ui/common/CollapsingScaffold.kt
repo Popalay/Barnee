@@ -47,6 +47,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -209,7 +210,9 @@ fun CollapsingScaffold(
             state.maxOffset to Collapsed,
             0F to Expanded
         )
-        val topPadding by with(LocalDensity.current) { derivedStateOf { state.contentOffset.toDp() } }
+        val topPadding by with(LocalDensity.current) {
+            remember(state.contentOffset) { derivedStateOf { state.contentOffset.toDp() } }
+        }
         val swipeable = Modifier
             .nestedScroll(state.nestedScrollConnection)
             .swipeable(

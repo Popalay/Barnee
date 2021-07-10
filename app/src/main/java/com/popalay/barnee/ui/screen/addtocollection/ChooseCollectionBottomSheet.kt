@@ -27,7 +27,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -41,14 +40,15 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
@@ -98,7 +98,7 @@ private fun BottomSheetCollectionItem(
         Card(
             elevation = 4.dp,
             shape = MediumSquircleShape,
-            modifier = Modifier.aspectRatio(0.8F),
+            modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO),
         ) {
             CollectionCover(
                 images = data.cover,
@@ -110,9 +110,8 @@ private fun BottomSheetCollectionItem(
             style = MaterialTheme.typography.caption,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            textAlign = TextAlign.Center,
             modifier = Modifier
-                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
                 .padding(top = 8.dp)
         )
     }

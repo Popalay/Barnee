@@ -62,6 +62,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 
@@ -123,7 +124,7 @@ private fun CategoryListItem(
     Card(
         elevation = 4.dp,
         shape = MediumSquircleShape,
-        modifier = modifier.aspectRatio(0.8F)
+        modifier = modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
     ) {
         Box(
             modifier = Modifier.clickable(onClick = onClick)
