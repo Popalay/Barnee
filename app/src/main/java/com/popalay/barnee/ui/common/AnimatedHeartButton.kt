@@ -28,6 +28,7 @@ import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -54,6 +55,7 @@ fun AnimatedHeartButton(
         Image(
             painter = painterResource(id = if (isSelected) drawable.ic_heart_filled else drawable.ic_heart),
             contentDescription = "Like",
+            alpha = LocalContentAlpha.current,
             modifier = Modifier.size(transitionData.size)
         )
     }

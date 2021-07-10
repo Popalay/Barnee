@@ -70,6 +70,7 @@ import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.common.topShift
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.util.displayImageUrl
@@ -174,7 +175,7 @@ private fun DrinkListItem(
     Card(
         elevation = 4.dp,
         shape = MediumSquircleShape,
-        modifier = modifier.aspectRatio(0.8F)
+        modifier = modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
     ) {
         Box(
             modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)

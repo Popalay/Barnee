@@ -35,7 +35,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -53,14 +52,13 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Card
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
@@ -70,6 +68,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -95,6 +94,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import com.google.accompanist.coil.rememberCoilPainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
@@ -104,7 +105,6 @@ import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
-import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Result
@@ -120,12 +120,14 @@ import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
+import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
@@ -136,7 +138,6 @@ import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
 import com.popalay.barnee.util.displayText
-import com.popalay.barnee.util.inCollection
 import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
@@ -146,6 +147,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
+import kotlin.math.min
 import kotlin.math.roundToInt
 
 @Composable
@@ -166,9 +168,9 @@ fun DrinkScreen(
     onAction: (DrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    val drink by derivedStateOf { state.drinkWithRelated()?.drink }
+    val drink by remember(state.drinkWithRelated) { derivedStateOf { state.drinkWithRelated()?.drink } }
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
-    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / 0.8F).toPx() }
+    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
     val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
     val activity = findActivity()
     val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -181,15 +183,13 @@ fun DrinkScreen(
 
     LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
         when (sideEffect) {
-            is DrinkSideEffect.KeepScreenOn -> {
-                activity?.let {
-                    if (sideEffect.keep) {
-                        it.window?.addFlags(keepScreenOnFlag)
-                        Toast.makeText(it, "The screen will remain on on this screen", Toast.LENGTH_LONG).show()
-                    } else {
-                        it.window?.clearFlags(keepScreenOnFlag)
-                        Toast.makeText(it, "The screen will turn off as usual", Toast.LENGTH_LONG).show()
-                    }
+            is DrinkSideEffect.KeepScreenOn -> activity?.let {
+                if (sideEffect.keep) {
+                    it.window?.addFlags(keepScreenOnFlag)
+                    Toast.makeText(it, "The screen will remain on on this screen", Toast.LENGTH_LONG).show()
+                } else {
+                    it.window?.clearFlags(keepScreenOnFlag)
+                    Toast.makeText(it, "The screen will turn off as usual", Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -204,45 +204,12 @@ fun DrinkScreen(
     CollapsingScaffold(
         state = collapsingScaffoldState,
         topBar = {
-            val secondaryElementsAlpha by derivedStateOf { if (state.isPlaying) 0F else 1 - collapsingScaffoldState.fraction * 1.5F }
             DrinkAppBar(
-                isPlaying = state.isPlaying,
-                imageContent = {
-                    ImageContent(
-                        image = state.displayImage,
-                        rating = drink?.displayRatingWithMax.orEmpty(),
-                        showPlayButton = !drink?.videoUrl.isNullOrBlank(),
-                        isHeartButtonSelected = drink?.inCollection,
-                        secondaryElementsAlpha = secondaryElementsAlpha,
-                        onHeartClick = { drink?.let { onItemAction(DrinkItemAction.ToggleFavorite(it)) } },
-                        onPlayClick = { onAction(DrinkAction.TogglePlaying) }
-                    )
-                },
-                videoContent = {
-                    YouTubePlayer(
-                        uri = drink?.videoUrl.orEmpty(),
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .background(Color.Black)
-                            .padding(bottom = 16.dp)
-                    )
-                },
-                sharedContent = {
-                    SharedContent(
-                        title = state.displayName,
-                        nutrition = drink?.calories.orEmpty(),
-                        collection = drink?.collection,
-                        isScreenKeptOn = state.isScreenKeptOn,
-                        isPlaying = state.isPlaying,
-                        shouldCutTitle = !drink?.videoUrl.isNullOrBlank(),
-                        secondaryElementsAlpha = secondaryElementsAlpha,
-                        offset = IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()),
-                        scrollFraction = collapsingScaffoldState.fraction,
-                        onKeepScrenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
-                        onShareClick = { onAction(DrinkAction.ShareClicked) }
-                    )
-                },
+                state = state,
+                onAction = onAction,
+                onDrinkAction = onItemAction,
                 scrollFraction = collapsingScaffoldState.fraction,
+                offset = IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()),
                 modifier = Modifier.offset { IntOffset(0, collapsingScaffoldState.topBarOffset.roundToInt()) }
             )
         }
@@ -277,12 +244,8 @@ fun DrinkScreenBody(
             StateLayout(
                 value = drinkWithRelated,
                 loadingState = {
-                    LinearProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(32.dp)
-                            .offset(y = (-26).dp)
-                            .clip(RoundedCornerShape(bottomEnd = 8.dp, bottomStart = 8.dp))
+                    LoadingStateView(
+                        modifier = Modifier.padding(top = 32.dp)
                     )
                 },
                 errorState = {
@@ -330,16 +293,24 @@ fun DrinkScreenBody(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun DrinkAppBar(
-    isPlaying: Boolean,
-    videoContent: @Composable BoxScope.() -> Unit,
-    imageContent: @Composable BoxScope.() -> Unit,
-    sharedContent: @Composable BoxScope.() -> Unit,
+    state: DrinkState,
+    onAction: (DrinkAction) -> Unit,
+    onDrinkAction: (DrinkItemAction) -> Unit,
     scrollFraction: Float,
+    offset: IntOffset,
     modifier: Modifier = Modifier,
 ) {
+    val drink by remember(state.drinkWithRelated) { derivedStateOf { state.drinkWithRelated()?.drink } }
+    val hasVideo by remember(drink) { derivedStateOf { !drink?.videoUrl.isNullOrBlank() } }
+    val titleMaxLines by remember(hasVideo) { derivedStateOf { if (hasVideo) 3 else 6 } }
+    val contentAlpha by remember(state, scrollFraction) {
+        derivedStateOf { if (state.isPlaying) 0F else 1 - (scrollFraction * 1.5F).coerceAtMost(1F) }
+    }
     val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
+
     Card(
         elevation = 4.dp,
         shape = SquircleShape(
@@ -350,97 +321,157 @@ private fun DrinkAppBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(0.8F))
+            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DEFAULT_ASPECT_RATIO))
     ) {
-        Box {
-            Crossfade(isPlaying) {
-                if (it) {
-                    videoContent()
-                } else {
-                    imageContent()
+        Crossfade(state.isPlaying) { isPlaying ->
+            if (isPlaying) {
+                YouTubePlayer(
+                    uri = drink?.videoUrl.orEmpty(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        .padding(bottom = 16.dp)
+                )
+            } else {
+                Image(
+                    painter = rememberCoilPainter(
+                        request = state.displayImage,
+                        requestBuilder = { size -> applyForImageUrl(state.displayImage, size) },
+                        fadeIn = true
+                    ),
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop,
+                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
+                )
+            }
+        }
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .alpha(scrollFraction)
+                .background(MaterialTheme.colors.background)
+        )
+
+        ConstraintLayout {
+            val (actionBar, title, nutrition) = createRefs()
+            val (collection, rating) = createRefs()
+            val (likeButton, playButton) = createRefs()
+            DrinkActionBar(
+                title = state.displayName,
+                titleAlpha = 1 - contentAlpha,
+                isScreenKeptOn = state.isScreenKeptOn,
+                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
+                onShareClicked = { onAction(DrinkAction.ShareClicked) },
+                modifier = Modifier
+                    .constrainAs(actionBar) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .offset { -offset }
+            )
+            CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
+                Text(
+                    text = state.displayName,
+                    style = MaterialTheme.typography.h1,
+                    maxLines = titleMaxLines,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.constrainAs(title) {
+                        start.linkTo(parent.start, 24.dp)
+                        top.linkTo(actionBar.bottom)
+                        width = Dimension.percent(0.7F)
+                    }
+                )
+                Text(
+                    text = drink?.calories.orEmpty(),
+                    style = MaterialTheme.typography.h3,
+                    modifier = Modifier.constrainAs(nutrition) {
+                        start.linkTo(parent.start, 24.dp)
+                        top.linkTo(title.bottom, 8.dp)
+                    }
+                )
+                CollectionBanner(
+                    collection = state.drinkWithRelated()?.drink?.collection,
+                    modifier = Modifier.constrainAs(collection) {
+                        start.linkTo(nutrition.end, 24.dp)
+                        centerVerticallyTo(nutrition)
+                    }
+                )
+                Text(
+                    text = drink?.displayRatingWithMax.orEmpty(),
+                    style = MaterialTheme.typography.h2,
+                    modifier = Modifier.constrainAs(rating) {
+                        start.linkTo(parent.start, 24.dp)
+                        centerVerticallyTo(likeButton)
+                    }
+                )
+                AnimatedVisibility(
+                    visible = drink != null,
+                    modifier = Modifier.constrainAs(likeButton) {
+                        end.linkTo(parent.end, 8.dp)
+                        bottom.linkTo(parent.bottom, 8.dp)
+                    }
+                ) {
+                    AnimatedHeartButton(
+                        onToggle = { onDrinkAction(DrinkItemAction.ToggleFavorite(requireNotNull(drink))) },
+                        isSelected = drink?.collection != null,
+                        iconSize = 32.dp,
+                    )
+                }
+                AnimatedVisibility(
+                    visible = !drink?.videoUrl.isNullOrBlank(),
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                    modifier = Modifier.constrainAs(playButton) {
+                        top.linkTo(nutrition.bottom)
+                        bottom.linkTo(rating.top)
+                        centerHorizontallyTo(parent)
+                    }
+                ) {
+                    PlayButton(onClick = { onAction(DrinkAction.TogglePlaying) })
                 }
             }
-            sharedContent()
         }
     }
 }
 
 @Composable
-private fun SharedContent(
+private fun DrinkActionBar(
     title: String,
-    nutrition: String,
-    collection: Collection?,
+    titleAlpha: Float,
     isScreenKeptOn: Boolean,
-    isPlaying: Boolean,
-    shouldCutTitle: Boolean,
-    offset: IntOffset,
-    scrollFraction: Float,
-    secondaryElementsAlpha: Float,
-    onKeepScrenOnClicked: () -> Unit,
-    onShareClick: () -> Unit
+    onKeepScreenOnClicked: () -> Unit,
+    onShareClicked: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val titleMaxLines = remember(shouldCutTitle) { if (shouldCutTitle) 3 else 6 }
-    val titleAlpha = if (isPlaying) 0F else 1 - (scrollFraction * 1.5F).coerceAtMost(1F)
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .alpha(scrollFraction)
-            .background(MaterialTheme.colors.background)
-    )
-    Column {
-        ActionsAppBar(
-            title = {
-                Text(
-                    text = title,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.alpha(1 - titleAlpha)
-                )
-            },
-            leadingButtons = { BackButton() },
-            trailingButtons = {
-                IconButton(onClick = onKeepScrenOnClicked) {
-                    Icon(
-                        painter = if (isScreenKeptOn) painterResource(R.drawable.ic_light_off) else painterResource(R.drawable.ic_light_on),
-                        contentDescription = "Keep screen on",
-                    )
-                }
-                IconButton(onClick = onShareClick) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Share drink",
-                    )
-                }
-            },
-            modifier = Modifier.offset { -offset }
-        )
-        Text(
-            text = title,
-            style = MaterialTheme.typography.h1,
-            maxLines = titleMaxLines,
-            overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .padding(start = 24.dp)
-                .fillMaxWidth(0.7F)
-                .alpha(titleAlpha)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(start = 24.dp)
-                .fillMaxWidth(0.7F)
-                .alpha(secondaryElementsAlpha)
-        ) {
+    ActionsAppBar(
+        title = {
             Text(
-                text = nutrition,
-                style = MaterialTheme.typography.h3,
+                text = title,
+                color = LocalContentColor.current.copy(alpha = titleAlpha),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.width(24.dp))
-            CollectionBanner(collection)
-        }
-    }
+        },
+        leadingButtons = { BackButton() },
+        trailingButtons = {
+            IconButton(onClick = onKeepScreenOnClicked) {
+                Icon(
+                    painter = if (isScreenKeptOn) painterResource(R.drawable.ic_light_off) else painterResource(R.drawable.ic_light_on),
+                    contentDescription = "Keep screen on",
+                )
+            }
+            IconButton(onClick = onShareClicked) {
+                Icon(
+                    imageVector = Icons.Default.Share,
+                    contentDescription = "Share drink",
+                )
+            }
+        },
+        modifier = modifier
+    )
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -477,74 +508,17 @@ fun CollectionBanner(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
-@Composable
-private fun BoxScope.ImageContent(
-    image: ImageUrl,
-    rating: String,
-    showPlayButton: Boolean,
-    isHeartButtonSelected: Boolean?,
-    secondaryElementsAlpha: Float,
-    onPlayClick: () -> Unit,
-    onHeartClick: () -> Unit
-) {
-    Image(
-        painter = rememberCoilPainter(
-            request = image,
-            requestBuilder = { size -> applyForImageUrl(image, size) },
-            fadeIn = true
-        ),
-        contentDescription = null,
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop,
-        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
-    )
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.BottomStart)
-            .padding(start = 24.dp, end = 8.dp, bottom = 8.dp)
-            .alpha(secondaryElementsAlpha)
-    ) {
-        Text(
-            text = rating,
-            style = MaterialTheme.typography.h2,
-        )
-        Spacer(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1F)
-        )
-        AnimatedVisibility(isHeartButtonSelected != null) {
-            AnimatedHeartButton(
-                onToggle = onHeartClick,
-                isSelected = isHeartButtonSelected == true,
-                iconSize = 32.dp,
-            )
-        }
-    }
-    if (showPlayButton) {
-        PlayButton(
-            onClick = onPlayClick,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 100.dp)
-                .alpha(secondaryElementsAlpha)
-        )
-    }
-}
-
 @Composable
 private fun PlayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Surface(
+        shape = CircleShape,
+        color = LocalContentColor.current.copy(alpha = min(ContentAlpha.disabled, LocalContentAlpha.current)),
         modifier = modifier
             .clip(CircleShape)
             .clickable(onClick = onClick)
-            .background(LocalContentColor.current.copy(alpha = ContentAlpha.disabled))
             .size(72.dp)
     ) {
         Icon(

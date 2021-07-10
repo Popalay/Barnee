@@ -60,6 +60,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.topShift
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 
@@ -122,7 +123,7 @@ fun CollectionItem(
         Card(
             elevation = 4.dp,
             shape = MediumSquircleShape,
-            modifier = Modifier.aspectRatio(0.8F),
+            modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO),
         ) {
             CollectionCover(
                 images = data.cover,

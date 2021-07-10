@@ -2,7 +2,7 @@
 android-minSdk = "28"
 android-targetSdk = "31"
 kotlin = "1.5.10"
-android-gradlePlugin = "7.1.0-alpha02"
+android-gradlePlugin = "7.1.0-alpha03"
 google-services-gradlePlugin = "4.3.8"
 dependencyUpdatesPlugin = "0.39.0"
 
@@ -13,6 +13,7 @@ androidx-lifecycle = "2.4.0-alpha02"
 androidx-datastore = "1.0.0-rc01"
 androidx-espresso = "3.3.0"
 androidx-core-splashscreen = "1.0.0-alpha01"
+androidx-constraintlayout-compose = "1.0.0-alpha08"
 
 accompanist = "0.13.0"
 ktor = "1.6.1"
@@ -42,6 +43,7 @@ androidx-compose-material = { module = "androidx.compose.material:material", ver
 androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidx-compose" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
+androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-datastore-runtime = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "androidx-datastore" }
