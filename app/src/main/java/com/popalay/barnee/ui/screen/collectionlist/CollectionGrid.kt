@@ -25,6 +25,7 @@ package com.popalay.barnee.ui.screen.collectionlist
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -46,7 +47,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.domain.Result
@@ -63,6 +64,7 @@ import com.popalay.barnee.ui.common.topShift
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
+import com.popalay.barnee.ui.util.toIntSize
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -193,13 +195,14 @@ private fun CoverImage(
     image: ImageUrl,
     modifier: Modifier = Modifier
 ) {
-    Image(
-        painter = rememberCoilPainter(
-            request = image,
-            requestBuilder = { size -> applyForImageUrl(image, size) },
-        ),
-        contentDescription = null,
-        contentScale = ContentScale.Crop,
-        modifier = modifier
-    )
+    BoxWithConstraints(modifier = modifier) {
+        Image(
+            painter = rememberImagePainter(
+                data = image,
+                builder = { applyForImageUrl(image, constraints.toIntSize()) },
+            ),
+            contentDescription = null,
+            contentScale = ContentScale.Crop
+        )
+    }
 }

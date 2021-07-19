@@ -25,7 +25,7 @@ package com.popalay.barnee.ui.screen.shaketodrink
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -55,7 +55,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
@@ -71,6 +71,7 @@ import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
@@ -152,11 +153,11 @@ private fun RandomDrink(
     onHeartClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.clickable(onClick = onClick)) {
+    BoxWithConstraints(modifier = modifier.clickable(onClick = onClick)) {
         Image(
-            painter = rememberCoilPainter(
-                request = data.displayImageUrl,
-                requestBuilder = { size -> applyForImageUrl(data.displayImageUrl, size) },
+            painter = rememberImagePainter(
+                data = data.displayImageUrl,
+                builder = { applyForImageUrl(data.displayImageUrl, constraints.toIntSize()) },
             ),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),
