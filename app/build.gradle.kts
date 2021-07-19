@@ -41,6 +41,7 @@ dependencies {
         exclude("com.android.support", "support-annotations")
     }
     implementation(libs.paging.compose)
+    implementation(libs.coil.compose)
     implementation(libs.firebase.dynamicLinks)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.androidx.compose)
@@ -51,7 +52,7 @@ val isCI = System.getenv("CI") == "true"
 println("Is CI environment: $isCI")
 
 android {
-    compileSdkPreview = "S"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
         applicationId = "com.popalay.barnee"
         minSdk = libs.versions.android.minSdk.get().toInt()

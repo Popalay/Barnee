@@ -35,6 +35,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -96,7 +97,7 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
@@ -134,6 +135,7 @@ import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.findActivity
+import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
@@ -333,17 +335,18 @@ private fun DrinkAppBar(
                         .padding(bottom = 16.dp)
                 )
             } else {
-                Image(
-                    painter = rememberCoilPainter(
-                        request = state.displayImage,
-                        requestBuilder = { size -> applyForImageUrl(state.displayImage, size) },
-                        fadeIn = true
-                    ),
-                    contentDescription = null,
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
-                )
+                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+                    Image(
+                        painter = rememberImagePainter(
+                            data = state.displayImage,
+                            builder = { applyForImageUrl(state.displayImage, constraints.toIntSize()) },
+                        ),
+                        contentDescription = null,
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
+                    )
+                }
             }
         }
 

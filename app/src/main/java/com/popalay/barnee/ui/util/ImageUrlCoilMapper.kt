@@ -20,12 +20,11 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.model
+package com.popalay.barnee.ui.util
 
-import kotlinx.serialization.Serializable
+import coil.map.Mapper
+import com.popalay.barnee.data.model.ImageUrl
 
-@Serializable
-data class Image(
-    val uri: ImageUrl,
-    val specificImage: String? = null
-)
+class ImageUrlCoilMapper : Mapper<ImageUrl, String> {
+    override fun map(data: ImageUrl) = data.url
+}

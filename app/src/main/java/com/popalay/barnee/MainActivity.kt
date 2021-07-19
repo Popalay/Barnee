@@ -39,8 +39,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
+import coil.compose.LocalImageLoader
 import coil.util.DebugLogger
-import com.google.accompanist.coil.LocalImageLoader
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
@@ -66,6 +66,7 @@ import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkLis
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.ui.util.ImageUrlCoilMapper
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.util.isDebug
 import org.koin.androidx.compose.get
@@ -92,6 +93,9 @@ class MainActivity : ComponentActivity() {
             val imageLoader = remember {
                 ImageLoader.Builder(context)
                     .logger(if (isDebug) DebugLogger() else null)
+                    .componentRegistry {
+                        add(ImageUrlCoilMapper())
+                    }
                     .build()
             }
 

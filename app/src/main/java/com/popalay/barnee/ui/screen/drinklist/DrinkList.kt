@@ -26,7 +26,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -53,7 +52,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
@@ -73,6 +72,7 @@ import com.popalay.barnee.ui.common.topShift
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
+import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
@@ -177,13 +177,11 @@ private fun DrinkListItem(
         shape = MediumSquircleShape,
         modifier = modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
     ) {
-        Box(
-            modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)
-        ) {
+        BoxWithConstraints(modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)) {
             Image(
-                painter = rememberCoilPainter(
-                    request = data.displayImageUrl,
-                    requestBuilder = { size -> applyForImageUrl(data.displayImageUrl, size) },
+                painter = rememberImagePainter(
+                    data = data.displayImageUrl,
+                    builder = { applyForImageUrl(data.displayImageUrl, constraints.toIntSize()) },
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),

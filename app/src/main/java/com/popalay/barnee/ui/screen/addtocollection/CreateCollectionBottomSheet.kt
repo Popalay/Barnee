@@ -23,6 +23,7 @@
 package com.popalay.barnee.ui.screen.addtocollection
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,12 +49,13 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.coil.rememberCoilPainter
+import coil.compose.rememberImagePainter
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
+import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.displayImageUrl
 
 @Composable
@@ -95,14 +97,16 @@ fun CreateCollectionBottomSheet(
                         .height(96.dp)
                         .aspectRatio(DEFAULT_ASPECT_RATIO)
                 ) {
-                    Image(
-                        painter = rememberCoilPainter(
-                            request = drink.displayImageUrl,
-                            requestBuilder = { size -> applyForImageUrl(drink.displayImageUrl, size) },
-                        ),
-                        contentDescription = null,
-                        contentScale = ContentScale.Crop
-                    )
+                    BoxWithConstraints {
+                        Image(
+                            painter = rememberImagePainter(
+                                data = drink.displayImageUrl,
+                                builder = { applyForImageUrl(drink.displayImageUrl, constraints.toIntSize()) },
+                            ),
+                            contentDescription = null,
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
                 TextField(
                     value = collectionName,

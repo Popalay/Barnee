@@ -31,7 +31,10 @@ import com.popalay.barnee.data.model.ExternalImageUrl
 import com.popalay.barnee.data.model.InternalImageUrl
 
 val Drink.displayImageUrl
-    get() = images.lastOrNull()?.uri ?: EmptyImageUrl
+    get() = images.firstOrNull { it.specificImage == "InEnvironment" }?.uri
+        ?: images.firstOrNull { it.specificImage == "Black" }?.uri
+        ?: images.lastOrNull()?.uri
+        ?: EmptyImageUrl
 
 val Drink.displayName
     get() = name.lowercase().removePrefix("absolut").trim()
