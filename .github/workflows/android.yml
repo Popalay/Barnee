@@ -67,7 +67,7 @@ jobs:
           sarif_file: build/detekt.sarif
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
+        run: ./gradlew clean assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
 
       - name: Generate changellog
         id: generate-release-changelog
