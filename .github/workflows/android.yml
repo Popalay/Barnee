@@ -53,7 +53,7 @@ jobs:
             ~/.gradle/caches/modules-*
             ~/.gradle/caches/jars-*
             ~/.gradle/caches/build-cache-*
-          key: ${{ runner.os }}-gradle-v2-${{ hashFiles('checksum.txt') }}
+          key: ${{ runner.os }}-gradle-${{ hashFiles('checksum.txt') }}
 
       - name: Detekt all
         uses: natiginfo/action-detekt-all@1.17.1
