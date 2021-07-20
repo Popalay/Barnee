@@ -12,7 +12,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
       ANDROID_RELEASE_KEYSTORE_PWD: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PWD }}
