@@ -58,7 +58,13 @@ jobs:
       - name: Detekt all
         uses: natiginfo/action-detekt-all@1.17.1
         with:
-          args: --fail-fast --config .github/detekt.yml
+          args: --fail-fast --config .github/detekt.yml --report sarif:./build/detekt.sarif --base-path .
+
+      - name: Upload SARIF to Github using the upload-sarif action
+        uses: github/codeql-action/upload-sarif@v1
+        if: always()
+        with:
+          sarif_file: build/detekt.sarif
 
       - name: Upload SARIF to Github using the upload-sarif action
         uses: github/codeql-action/upload-sarif@v1
@@ -67,7 +73,7 @@ jobs:
           sarif_file: build/detekt.sarif
 
       - name: Build with Gradle
-        run: ./gradlew assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
+        run: ./gradlew clean assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
 
       - name: Generate changellog
         id: generate-release-changelog
