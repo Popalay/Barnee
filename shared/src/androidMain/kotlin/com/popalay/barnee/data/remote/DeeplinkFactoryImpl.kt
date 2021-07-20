@@ -32,7 +32,8 @@ import com.google.firebase.ktx.Firebase
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
-internal actual class DeeplinkFactoryImpl : DeeplinkFactory {
+internal actual class
+DeeplinkFactoryImpl : DeeplinkFactory {
     override suspend fun build(suffix: String): String = suspendCoroutine { continuation ->
         val googlePlayLink = Uri.parse("https://play.google.com/store/apps/details?id=com.popalay.barnee")
         Firebase.dynamicLinks.shortLinkAsync(ShortDynamicLink.Suffix.SHORT) {
@@ -54,4 +55,6 @@ internal actual class DeeplinkFactoryImpl : DeeplinkFactory {
                 continuation.resume(dynamicLink.uri.toString())
             }
     }
+
+    val A = 3
 }
