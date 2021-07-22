@@ -76,7 +76,7 @@ import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
-import com.popalay.barnee.util.inCollection
+import com.popalay.barnee.util.inCollections
 import org.koin.androidx.compose.getViewModel
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -213,7 +213,7 @@ private fun DrinkListItem(
             }
             AnimatedHeartButton(
                 onToggle = onHeartClick,
-                isSelected = data.inCollection,
+                isSelected = data.inCollections,
                 modifier = Modifier
                     .align(Alignment.TopEnd)
                     .padding(4.dp)

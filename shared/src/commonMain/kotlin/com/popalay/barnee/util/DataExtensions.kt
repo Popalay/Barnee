@@ -28,41 +28,37 @@ import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.EmptyImageUrl
 import com.popalay.barnee.data.model.ExternalImageUrl
+import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.model.InternalImageUrl
 
-val Drink.displayImageUrl
+val Drink.displayImageUrl: ImageUrl
     get() = images.firstOrNull { it.specificImage == "InEnvironment" }?.uri
         ?: images.firstOrNull { it.specificImage == "Black" }?.uri
         ?: images.lastOrNull()?.uri
         ?: EmptyImageUrl
 
-val Drink.displayName
-    get() = name.lowercase().removePrefix("absolut").trim()
+val Drink.displayName: String get() = name.lowercase().removePrefix("absolut").trim()
 
-val Drink.videoUrl
-    get() = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
+val Drink.videoUrl: String? get() = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
 
-val Drink.displayRating
-    get() = (rating / 10F).toIntIfInt().toString()
+val Drink.displayRating: String get() = (rating / 10F).toIntIfInt().toString()
 
-val Drink.displayRatingWithMax
-    get() = displayRating.let { "$it/10" }
+val Drink.displayRatingWithMax: String get() = displayRating.let { "$it/10" }
 
-val Drink.keywords
+val Drink.keywords: List<Category>
     get() = (categories + collections + occasions)
         .filter { it.alias.isNotBlank() }
         .filter { it.text != "unknown" }
 
-val Drink.displayStory
-    get() = story.trim().removeSuffix(".")
+val Drink.displayStory: String get() = story.trim().removeSuffix(".")
 
-val Drink.inCollection
-    get() = collection != null
+val Drink.inCollections: Boolean get() = userCollections.isNotEmpty()
 
-val Drink.calories
-    get() = nutrition.totalCalories.toString().let { "$it kcal" }
+val Drink.calories: String get() = nutrition.totalCalories.toString().let { "$it kcal" }
 
-fun Set<Collection>.with(drink: Drink) = firstOrNull { drink.alias in it.aliases }
+val Drink.collection: Collection? get() = userCollections.firstOrNull()
+
+fun Iterable<Collection>.filter(drink: Drink) = filter { drink.alias in it.aliases }
 
 val AggregationGroup.displayNames get() = values.keys.map { it.replace(' ', '-') to it.lowercase().replace('-', ' ') }
 
@@ -71,10 +67,6 @@ fun String.toImageUrl() = when {
     startsWith("http") || startsWith("https") -> ExternalImageUrl(this)
     else -> InternalImageUrl(this)
 }
-
-fun Collection.isEmpty() = aliases.isEmpty()
-
-fun Collection.isNotEmpty() = !isEmpty()
 
 val Category.displayText get() = text.lowercase()
 

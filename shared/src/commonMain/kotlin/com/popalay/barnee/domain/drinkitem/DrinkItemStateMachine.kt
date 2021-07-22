@@ -31,6 +31,7 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.navigation.DrinkDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.util.inCollections
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -56,10 +57,10 @@ class DrinkItemStateMachine(
         merge(
             filterIsInstance<DrinkItemAction.ToggleFavorite>()
                 .map {
-                    if (it.drink.collection == null) {
-                        collectionRepository.addToCollectionAndNotify(drink = it.drink)
+                    if (it.drink.inCollections) {
+                        collectionRepository.removeFromAllCollectionsAndNotify(it.drink)
                     } else {
-                        collectionRepository.removeFromCollectionAndNotify(it.drink)
+                        collectionRepository.addToCollectionAndNotify(drink = it.drink)
                     }
                 }
                 .map { DrinkItemMutation.Nothing },

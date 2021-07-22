@@ -84,8 +84,8 @@ class AddToCollectionStateMachine(
             filterIsInstance<AddToCollectionAction.Initial>()
                 .take(1)
                 .flatMapLatest { collectionRepository.collectionsUpdate() }
-                .filter { it.collection != null && state().dialogState == Empty }
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.DrinkAddedToFavorites(it)) }
+                .filter { it.second != null && state().dialogState == Empty }
+                .onEach { sideEffectConsumer(AddToCollectionSideEffect.DrinkAddedToFavorites(it.first)) }
                 .map { AddToCollectionMutation.Empty },
             filterIsInstance<AddToCollectionAction.ChangeCollectionClicked>()
                 .map { AddToCollectionMutation.DialogState(ChooseCollectionFor(it.drink)) },

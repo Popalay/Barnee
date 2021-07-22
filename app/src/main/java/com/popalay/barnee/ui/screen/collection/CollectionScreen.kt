@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
@@ -76,17 +77,27 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
             modifier = Modifier.liftOnScroll(listState),
             leadingButtons = { BackButton() },
             trailingButtons = {
-                IconButton(onClick = { onAction(CollectionAction.ShareClicked) }) {
-                    Icon(
-                        imageVector = Icons.Default.Share,
-                        contentDescription = "Share drink",
-                    )
+                AnimatedVisibility(state.isShareButtonVisible) {
+                    IconButton(onClick = { onAction(CollectionAction.ShareClicked) }) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share drink",
+                        )
+                    }
                 }
                 AnimatedVisibility(state.isRemoveButtonVisible) {
                     IconButton(onClick = { onAction(CollectionAction.RemoveClicked) }) {
                         Icon(
                             imageVector = Icons.Default.Delete,
                             contentDescription = "Remove collection",
+                        )
+                    }
+                }
+                AnimatedVisibility(state.isSaveButtonVisible) {
+                    IconButton(onClick = { onAction(CollectionAction.SaveClicked) }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Save collection",
                         )
                     }
                 }
@@ -111,6 +122,6 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
 @Composable
 fun FavoritesScreenPreview() {
     BarneeTheme {
-        CollectionScreen(CollectionState("Favorites", true)) {}
+        CollectionScreen(CollectionState("Favorites", emptySet())) {}
     }
 }

@@ -26,8 +26,6 @@ import com.kuuurt.paging.multiplatform.PagingData
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
-import com.popalay.barnee.data.repository.DrinkRepository
-import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
@@ -37,40 +35,50 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
-data class CollectionInput(val name: String) : Input
+data class CollectionInput(
+    val name: String,
+    val aliases: Set<String>
+) : Input
 
 data class CollectionState(
     val name: String,
-    val isRemoveButtonVisible: Boolean,
+    val aliases: Set<String>,
+    val collection: Collection? = null,
+    val isRemoveButtonVisible: Boolean = false,
+    val isSaveButtonVisible: Boolean = false,
+    val isShareButtonVisible: Boolean = false,
     val drinks: Flow<PagingData<Drink>> = emptyFlow()
 ) : State {
-    constructor(input: CollectionInput) : this(input.name, input.name != Collection.DEFAULT_NAME)
+    constructor(input: CollectionInput) : this(input.name, input.aliases)
 }
 
 sealed interface CollectionAction : Action {
     object Initial : CollectionAction
     object RemoveClicked : CollectionAction
     object ShareClicked : CollectionAction
+    object SaveClicked : CollectionAction
 }
 
 sealed interface CollectionMutation : Mutation {
     object Nothing : CollectionMutation
-    data class Drinks(val data: Flow<PagingData<Drink>>) : CollectionMutation
+    data class Collection(val data: GetCollectionUseCase.Output) : CollectionMutation
 }
 
 class CollectionStateMachine(
     input: CollectionInput,
     collectionRepository: CollectionRepository,
-    drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
+    getCollectionUseCase: GetCollectionUseCase,
     router: Router
 ) : StateMachine<CollectionState, CollectionAction, CollectionMutation, EmptySideEffect>(
     initialState = CollectionState(input),
@@ -79,20 +87,29 @@ class CollectionStateMachine(
         merge(
             filterIsInstance<CollectionAction.Initial>()
                 .take(1)
-                .map { drinkRepository.drinks(DrinksRequest.Collection(state().name)) }
-                .map { CollectionMutation.Drinks(it) },
+                .flatMapLatest { getCollectionUseCase(GetCollectionUseCase.Input(state().name, state().aliases)) }
+                .map { CollectionMutation.Collection(it) },
             filterIsInstance<CollectionAction.RemoveClicked>()
                 .map { collectionRepository.remove(state().name) }
                 .onEach { router.navigate(BackDestination) }
                 .map { CollectionMutation.Nothing },
             filterIsInstance<CollectionAction.ShareClicked>()
-                .map { shareRepository.shareCollection(state().name) }
+                .map { state().collection?.let { shareRepository.shareCollection(it) } }
+                .map { CollectionMutation.Nothing },
+            filterIsInstance<CollectionAction.SaveClicked>()
+                .map { collectionRepository.saveOrMerge(state().name, state().aliases) }
                 .map { CollectionMutation.Nothing }
         )
     },
     reducer = { mutation ->
         when (mutation) {
-            is CollectionMutation.Drinks -> copy(drinks = mutation.data)
+            is CollectionMutation.Collection -> copy(
+                drinks = mutation.data.pagingDataFlow,
+                collection = mutation.data.collection,
+                isRemoveButtonVisible = mutation.data.isCollectionExists && name != Collection.DEFAULT_NAME,
+                isShareButtonVisible = mutation.data.isCollectionExists,
+                isSaveButtonVisible = !mutation.data.isCollectionExists
+            )
             is CollectionMutation.Nothing -> this
         }
     }

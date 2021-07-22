@@ -122,7 +122,7 @@ class MainActivity : ComponentActivity() {
         val router: Router = get()
 
         LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
-            if (destination == BackDestination) navController.popBackStack()
+            if (destination == BackDestination) navController.navigateUp()
             else navController.navigate(destination)
         }
 

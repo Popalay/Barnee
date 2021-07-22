@@ -28,7 +28,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayImageUrl
-import com.popalay.barnee.util.isNotEmpty
+import com.popalay.barnee.util.filter
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -49,10 +49,12 @@ import kotlinx.serialization.json.Json
 interface CollectionRepository {
     fun collections(): Flow<Set<Collection>>
     fun collection(name: String): Flow<Collection>
-    fun collectionsUpdate(): Flow<Drink>
-    suspend fun removeFromCollectionAndNotify(drink: Drink)
+    fun collectionsUpdate(): Flow<Pair<Drink, Collection?>>
+    suspend fun removeFromAllCollectionsAndNotify(drink: Drink)
     suspend fun addToCollectionAndNotify(collectionName: String = "", drink: Drink)
+    suspend fun removeFromCollectionAndNotify(collectionName: String = "", drink: Drink)
     suspend fun remove(name: String)
+    suspend fun saveOrMerge(name: String, aliases: Set<String>)
 }
 
 internal class CollectionRepositoryImpl(
@@ -60,7 +62,7 @@ internal class CollectionRepositoryImpl(
     private val api: Api,
     private val json: Json
 ) : CollectionRepository {
-    private val collectionsUpdateFlow = MutableSharedFlow<Drink>()
+    private val collectionsUpdateFlow = MutableSharedFlow<Pair<Drink, Collection?>>()
 
     init {
         @OptIn(DelicateCoroutinesApi::class)
@@ -70,31 +72,69 @@ internal class CollectionRepositoryImpl(
     }
 
     override suspend fun addToCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
-        val collections = removeFromCollections(drink)
+        val collections = collections().first()
         val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
         val targetCollection = (collections.firstOrNull { it.name == validCollectionName }
             ?: Collection(validCollectionName, emptySet(), emptySet())).let {
             it.copy(aliases = it.aliases + drink.alias, cover = setOf(drink.displayImageUrl) + it.cover)
         }
 
-        collections.toMutableSet().run {
+        val newCollections = collections.toMutableSet().apply {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
-            saveCollections(toSet())
+            toSet()
+            saveCollections(this)
         }
 
-        collectionsUpdateFlow.emit(drink.copy(collection = targetCollection))
+        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to targetCollection)
     }
 
-    override suspend fun removeFromCollectionAndNotify(drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun removeFromCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
+        val collections = collections().first()
+        val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
+        val targetCollection = collections.firstOrNull { it.name == validCollectionName }?.let {
+            it.copy(aliases = it.aliases - drink.alias, cover = it.cover - drink.displayImageUrl)
+        } ?: return@withContext
+
+        val newCollections = collections.toMutableSet().apply {
+            removeAll { it.name == targetCollection.name }
+            add(targetCollection)
+            toSet()
+            saveCollections(this)
+        }
+
+        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to null)
+    }
+
+    override suspend fun removeFromAllCollectionsAndNotify(drink: Drink) = withContext(Dispatchers.Default) {
         val collections = removeFromCollections(drink)
         saveCollections(collections)
-        collectionsUpdateFlow.emit(drink.copy(collection = null))
+        collectionsUpdateFlow.emit(drink.copy(userCollections = emptyList()) to null)
     }
 
     override suspend fun remove(name: String) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         collections.filter { it.name != name }.run {
+            saveCollections(toSet())
+        }
+    }
+
+    override suspend fun saveOrMerge(name: String, aliases: Set<String>) = withContext(Dispatchers.Default) {
+        val collections = collections().first()
+        val targetCollection = aliases.takeIf { it.any(String::isNotEmpty) }
+            ?.let { runCatching { api.drinksByAliases(it, skip = 0, take = 100) }.getOrNull() }
+            ?.let { drinks ->
+                (collections().first().firstOrNull { it.name == name } ?: Collection(name = name)).let { collection ->
+                    collection.copy(
+                        aliases = collection.aliases + drinks.map { it.alias }.toSet(),
+                        cover = collection.cover + drinks.map { it.displayImageUrl }.toSet()
+                    )
+                }
+            } ?: return@withContext
+
+        collections.toMutableSet().apply {
+            removeAll { it.name == targetCollection.name }
+            add(targetCollection)
             saveCollections(toSet())
         }
     }
@@ -111,7 +151,7 @@ internal class CollectionRepositoryImpl(
     override fun collection(name: String): Flow<Collection> = collections()
         .mapNotNull { collection -> collection.firstOrNull { it.name == name } }
 
-    override fun collectionsUpdate(): Flow<Drink> = collectionsUpdateFlow.asSharedFlow()
+    override fun collectionsUpdate(): Flow<Pair<Drink, Collection?>> = collectionsUpdateFlow.asSharedFlow()
 
     private suspend fun saveCollections(collections: Set<Collection>) {
         val serialized = json.encodeToString(collections)
@@ -120,32 +160,25 @@ internal class CollectionRepositoryImpl(
 
     private suspend fun removeFromCollections(drink: Drink): Set<Collection> {
         val collections = collections().first()
-        val targetCollection = collections.firstOrNull { drink.alias in it.aliases } ?: return collections
-        val resultCollection = targetCollection.copy(
-            aliases = targetCollection.aliases - drink.alias,
-            cover = targetCollection.cover - drink.displayImageUrl
-        )
+        val targetCollections = collections.filter(drink)
+        val resultCollections = targetCollections
+            .map {
+                it.copy(
+                    aliases = it.aliases - drink.alias,
+                    cover = it.cover - drink.displayImageUrl
+                )
+            }
+
         return collections.toMutableSet().apply {
-            removeAll { it.name == targetCollection.name }
-            if (resultCollection.isNotEmpty()) add(resultCollection)
+            removeAll { it in targetCollections }
+            if (resultCollections.isNotEmpty()) addAll(resultCollections)
         }.toSet()
     }
 
     private suspend fun runMigration() {
-        localStore.setAsFlow(KEY_FAVORITE_DRINKS).firstOrNull()
-            ?.takeIf { it.any(String::isNotEmpty) }
-            ?.let { runCatching { api.drinksByAliases(it, skip = 0, take = 100) }.getOrNull() }
-            ?.let { drinks ->
-                val collection = collections().first().firstOrNull { it.name == Collection.DEFAULT_NAME }
-                    ?: Collection(
-                        name = Collection.DEFAULT_NAME,
-                        aliases = drinks.map { it.alias }.toSet(),
-                        cover = drinks.map { it.displayImageUrl }.toSet()
-                    )
-                val serialized = json.encodeToString(setOf(collection))
-                localStore.save(KEY_COLLECTION, serialized)
-                localStore.remove(KEY_FAVORITE_DRINKS)
-            }
+        val favoriteAliases = localStore.setAsFlow(KEY_FAVORITE_DRINKS).firstOrNull() ?: return
+        saveOrMerge(KEY_FAVORITE_DRINKS, favoriteAliases)
+        localStore.remove(KEY_FAVORITE_DRINKS)
     }
 
     companion object {

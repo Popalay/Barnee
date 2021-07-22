@@ -137,6 +137,7 @@ import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.findActivity
 import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
+import com.popalay.barnee.util.collection
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
 import com.popalay.barnee.util.displayText
@@ -364,6 +365,7 @@ private fun DrinkAppBar(
             DrinkActionBar(
                 title = state.displayName,
                 titleAlpha = 1 - contentAlpha,
+                isActionsVisible = drink != null,
                 isScreenKeptOn = state.isScreenKeptOn,
                 onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
                 onShareClicked = { onAction(DrinkAction.ShareClicked) },
@@ -440,10 +442,12 @@ private fun DrinkAppBar(
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun DrinkActionBar(
     title: String,
     titleAlpha: Float,
+    isActionsVisible: Boolean,
     isScreenKeptOn: Boolean,
     onKeepScreenOnClicked: () -> Unit,
     onShareClicked: () -> Unit,
@@ -460,17 +464,21 @@ private fun DrinkActionBar(
         },
         leadingButtons = { BackButton() },
         trailingButtons = {
-            IconButton(onClick = onKeepScreenOnClicked) {
-                Icon(
-                    painter = if (isScreenKeptOn) painterResource(R.drawable.ic_light_off) else painterResource(R.drawable.ic_light_on),
-                    contentDescription = "Keep screen on",
-                )
-            }
-            IconButton(onClick = onShareClicked) {
-                Icon(
-                    imageVector = Icons.Default.Share,
-                    contentDescription = "Share drink",
-                )
+            AnimatedVisibility(isActionsVisible) {
+                Row {
+                    IconButton(onClick = onKeepScreenOnClicked) {
+                        Icon(
+                            painter = if (isScreenKeptOn) painterResource(R.drawable.ic_light_off) else painterResource(R.drawable.ic_light_on),
+                            contentDescription = "Keep screen on",
+                        )
+                    }
+                    IconButton(onClick = onShareClicked) {
+                        Icon(
+                            imageVector = Icons.Default.Share,
+                            contentDescription = "Share drink",
+                        )
+                    }
+                }
             }
         },
         modifier = modifier

@@ -47,6 +47,7 @@ import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListIn
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
+import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import com.popalay.barnee.util.EmptyLogger
 import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
@@ -95,6 +96,8 @@ val commonModule = module {
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
     single<Router> { RouterImpl(get()) }
+
+    single { GetCollectionUseCase(get(), get()) }
 
     factory { DiscoveryStateMachine(get(), get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
