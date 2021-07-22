@@ -37,8 +37,8 @@ import com.popalay.barnee.data.repository.DrinksRequest.ForTags
 import com.popalay.barnee.data.repository.DrinksRequest.Random
 import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import com.popalay.barnee.data.repository.DrinksRequest.Search
+import com.popalay.barnee.util.filter
 import com.popalay.barnee.util.toImageUrl
-import com.popalay.barnee.util.with
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -77,7 +77,7 @@ internal class DrinkRepositoryImpl(
     override fun randomDrink(): Flow<Drink> = flow { emit(api.random(skip = 0, take = 1).first()) }
         .flatMapLatest { drink ->
             collectionRepository.collections()
-                .mapLatest { collections -> drink.copy(collection = collections.with(drink)) }
+                .mapLatest { collections -> drink.copy(userCollections = collections.filter(drink)) }
         }
         .distinctUntilChanged()
 
@@ -86,8 +86,8 @@ internal class DrinkRepositoryImpl(
             collectionRepository.collections()
                 .mapLatest { collections ->
                     response.copy(
-                        relatedDrinks = response.relatedDrinks.map { it.copy(collection = collections.with(it)) },
-                        drink = response.drink.copy(collection = collections.with(response.drink))
+                        relatedDrinks = response.relatedDrinks.map { it.copy(userCollections = collections.filter(it)) },
+                        drink = response.drink.copy(userCollections = collections.filter(response.drink))
                     )
                 }
         }
@@ -144,7 +144,7 @@ internal class DrinkRepositoryImpl(
         DrinkPager(request).pages
             .flatMapLatest { pagedDrinks ->
                 collectionRepository.collections()
-                    .map { collections -> pagedDrinks.map { it.copy(collection = collections.with(it)) } }
+                    .map { collections -> pagedDrinks.map { it.copy(userCollections = collections.filter(it)) } }
             }
 
     private fun collection(name: String): Flow<PagingData<Drink>> = collectionRepository.collection(name)
@@ -159,7 +159,7 @@ internal class DrinkRepositoryImpl(
                             } else {
                                 DrinkPager { api.drinksByAliases(newCollection.aliases, it.skip, it.take) }.pages
                             })
-                                .map { drinks -> drinks.map { it.copy(collection = newCollection) } }
+                                .map { drinks -> drinks.map { it.copy(userCollections = listOf(newCollection)) } }
                         }
                 }
         }

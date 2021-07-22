@@ -30,6 +30,5 @@ import kotlinx.serialization.Serializable
 data class FullDrinkResponse(
     val relatedDrinks: List<Drink>,
     @Serializable(with = DrinkListFirstElementTransformer::class)
-    @SerialName("result")
-    val drink: Drink
+    @SerialName("result") val drink: Drink
 )

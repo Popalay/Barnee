@@ -26,7 +26,7 @@ internal interface DeeplinkFactory {
     suspend fun build(suffix: String): String
 
     companion object {
-        const val DEEPLINK_URI_PREFIX = "https://barnee.com"
+        const val DEEPLINK_URI_PREFIX = "https://barnee.com/"
         const val DOMAIN_URI_PREFIX = "https://barnee.page.link"
     }
 }

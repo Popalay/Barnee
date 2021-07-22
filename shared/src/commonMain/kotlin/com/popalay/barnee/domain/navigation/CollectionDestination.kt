@@ -29,11 +29,12 @@ import kotlin.jvm.JvmInline
 value class CollectionDestination private constructor(
     override val destination: String
 ) : Destination {
-    constructor(collection: Collection) : this("collection/${collection.name}")
+    constructor(collection: Collection) : this("collection/${collection.name}?aliases=${collection.aliases.joinToString(",")}")
 
     companion object : RouteProvider {
         const val KEY_NAME = "name"
+        const val KEY_ALIASES = "aliases"
 
-        override val route: String = "collection/{$KEY_NAME}"
+        override val route: String = "collection/{$KEY_NAME}?aliases={$KEY_ALIASES}"
     }
 }

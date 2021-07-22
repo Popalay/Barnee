@@ -73,10 +73,11 @@ import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
+import com.popalay.barnee.util.collection
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRatingWithMax
-import com.popalay.barnee.util.inCollection
+import com.popalay.barnee.util.inCollections
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -204,7 +205,7 @@ private fun RandomDrink(
                 )
                 AnimatedHeartButton(
                     onToggle = onHeartClick,
-                    isSelected = data.inCollection,
+                    isSelected = data.inCollections,
                     iconSize = 32.dp,
                 )
             }

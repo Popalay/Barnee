@@ -115,7 +115,7 @@ class DrinkStateMachine(
                 .onEach { router.navigate(TagDrinksDestination(it.category)) }
                 .map { DrinkMutation.Nothing },
             filterIsInstance<DrinkAction.ShareClicked>()
-                .onEach { shareRepository.shareDrink(state().alias, state().displayName) }
+                .onEach { shareRepository.shareDrink(requireNotNull(state().drinkWithRelated()?.drink)) }
                 .map { DrinkMutation.Nothing },
             filterIsInstance<DrinkAction.KeepScreenOnClicked>()
                 .map { !state().isScreenKeptOn }

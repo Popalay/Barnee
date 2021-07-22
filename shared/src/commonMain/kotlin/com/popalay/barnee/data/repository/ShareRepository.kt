@@ -23,22 +23,27 @@
 package com.popalay.barnee.data.repository
 
 import com.popalay.barnee.data.device.Sharer
+import com.popalay.barnee.data.model.Collection
+import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.remote.DeeplinkFactory
+import com.popalay.barnee.domain.navigation.CollectionDestination
+import com.popalay.barnee.domain.navigation.DrinkDestination
 import com.popalay.barnee.util.capitalizeFirstChar
+import com.popalay.barnee.util.displayName
 
 interface ShareRepository {
-    suspend fun shareDrink(alias: String, displayName: String)
-    suspend fun shareCollection(displayName: String)
+    suspend fun shareDrink(drink: Drink)
+    suspend fun shareCollection(collection: Collection)
 }
 
 internal class ShareRepositoryImpl(
     private val sharer: Sharer,
     private val deeplinkFactory: DeeplinkFactory
 ) : ShareRepository {
-    override suspend fun shareDrink(alias: String, displayName: String) {
-        val text = "Check out how to make a ${displayName.capitalizeFirstChar()}"
+    override suspend fun shareDrink(drink: Drink) {
+        val text = "Check out how to make a ${drink.displayName.capitalizeFirstChar()}"
         val title = "Share drink"
-        val shortUrl = deeplinkFactory.build("/drink/${alias}")
+        val shortUrl = deeplinkFactory.build(DrinkDestination(drink).destination)
 
         sharer.openShareDialog(
             title = title,
@@ -47,14 +52,14 @@ internal class ShareRepositoryImpl(
         )
     }
 
-    override suspend fun shareCollection(displayName: String) {
-        val text = "Check out my collection - ${displayName.capitalizeFirstChar()}"
+    override suspend fun shareCollection(collection: Collection) {
+        val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}"
         val title = "Share collection"
-        val shortUrl = deeplinkFactory.build("/collection/${displayName}")
+        val shortUrl = deeplinkFactory.build(CollectionDestination(collection).destination)
 
         sharer.openShareDialog(
             title = title,
-            text = displayName,
+            text = collection.name,
             content = "$text $shortUrl"
         )
     }
