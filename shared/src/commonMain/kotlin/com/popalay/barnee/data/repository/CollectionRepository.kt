@@ -168,6 +168,7 @@ internal class CollectionRepositoryImpl(
                     cover = it.cover - drink.displayImageUrl
                 )
             }
+            .filter { it.aliases.isNotEmpty() }
 
         return collections.toMutableSet().apply {
             removeAll { it in targetCollections }
