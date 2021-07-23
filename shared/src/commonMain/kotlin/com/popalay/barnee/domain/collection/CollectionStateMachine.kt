@@ -30,7 +30,6 @@ import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.navigation.BackDestination
@@ -69,48 +68,39 @@ sealed interface CollectionAction : Action {
     object SaveClicked : CollectionAction
 }
 
-sealed interface CollectionMutation : Mutation {
-    object Nothing : CollectionMutation
-    data class Collection(val data: GetCollectionUseCase.Output) : CollectionMutation
-}
-
 class CollectionStateMachine(
     input: CollectionInput,
     collectionRepository: CollectionRepository,
     shareRepository: ShareRepository,
     getCollectionUseCase: GetCollectionUseCase,
     router: Router
-) : StateMachine<CollectionState, CollectionAction, CollectionMutation, EmptySideEffect>(
+) : StateMachine<CollectionState, CollectionAction, EmptySideEffect>(
     initialState = CollectionState(input),
     initialAction = CollectionAction.Initial,
-    processor = { state, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<CollectionAction.Initial>()
                 .take(1)
                 .flatMapLatest { getCollectionUseCase(GetCollectionUseCase.Input(state().name, state().aliases)) }
-                .map { CollectionMutation.Collection(it) },
+                .map {
+                    state().copy(
+                        drinks = it.pagingDataFlow,
+                        collection = it.collection,
+                        isRemoveButtonVisible = it.isCollectionExists && state().name != Collection.DEFAULT_NAME,
+                        isShareButtonVisible = it.isCollectionExists,
+                        isSaveButtonVisible = !it.isCollectionExists
+                    )
+                },
             filterIsInstance<CollectionAction.RemoveClicked>()
                 .map { collectionRepository.remove(state().name) }
                 .onEach { router.navigate(BackDestination) }
-                .map { CollectionMutation.Nothing },
+                .map { state() },
             filterIsInstance<CollectionAction.ShareClicked>()
                 .map { state().collection?.let { shareRepository.shareCollection(it) } }
-                .map { CollectionMutation.Nothing },
+                .map { state() },
             filterIsInstance<CollectionAction.SaveClicked>()
                 .map { collectionRepository.saveOrMerge(state().name, state().aliases) }
-                .map { CollectionMutation.Nothing }
+                .map { state() }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is CollectionMutation.Collection -> copy(
-                drinks = mutation.data.pagingDataFlow,
-                collection = mutation.data.collection,
-                isRemoveButtonVisible = mutation.data.isCollectionExists && name != Collection.DEFAULT_NAME,
-                isShareButtonVisible = mutation.data.isCollectionExists,
-                isSaveButtonVisible = !mutation.data.isCollectionExists
-            )
-            is CollectionMutation.Nothing -> this
-        }
     }
 )

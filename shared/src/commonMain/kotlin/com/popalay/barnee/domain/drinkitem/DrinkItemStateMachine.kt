@@ -26,7 +26,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.navigation.DrinkDestination
@@ -44,16 +43,12 @@ sealed interface DrinkItemAction : Action {
     data class DrinkClicked(val drink: Drink) : DrinkItemAction
 }
 
-sealed interface DrinkItemMutation : Mutation {
-    object Nothing : DrinkItemMutation
-}
-
 class DrinkItemStateMachine(
     collectionRepository: CollectionRepository,
     router: Router
-) : StateMachine<DrinkItemState, DrinkItemAction, DrinkItemMutation, EmptySideEffect>(
+) : StateMachine<DrinkItemState, DrinkItemAction, EmptySideEffect>(
     initialState = DrinkItemState,
-    processor = { _, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<DrinkItemAction.ToggleFavorite>()
                 .map {
@@ -63,15 +58,10 @@ class DrinkItemStateMachine(
                         collectionRepository.addToCollectionAndNotify(drink = it.drink)
                     }
                 }
-                .map { DrinkItemMutation.Nothing },
+                .map { state() },
             filterIsInstance<DrinkItemAction.DrinkClicked>()
                 .onEach { router.navigate(DrinkDestination(it.drink)) }
-                .map { DrinkItemMutation.Nothing }
+                .map { state() }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is DrinkItemMutation.Nothing -> this
-        }
     }
 )

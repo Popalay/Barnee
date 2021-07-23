@@ -29,7 +29,6 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
@@ -77,13 +76,6 @@ sealed interface DrinkAction : Action {
     data class CategoryClicked(val category: Category) : DrinkAction
 }
 
-sealed interface DrinkMutation : Mutation {
-    object Nothing : DrinkMutation
-    data class DrinkWithRelated(val data: Result<FullDrinkResponse>) : DrinkMutation
-    data class TogglePlaying(val data: Boolean) : DrinkMutation
-    data class KeepScreenOn(val data: Boolean) : DrinkMutation
-}
-
 sealed interface DrinkSideEffect : SideEffect {
     data class KeepScreenOn(val keep: Boolean) : DrinkSideEffect
 }
@@ -93,42 +85,34 @@ class DrinkStateMachine(
     drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
     router: Router
-) : StateMachine<DrinkState, DrinkAction, DrinkMutation, DrinkSideEffect>(
+) : StateMachine<DrinkState, DrinkAction, DrinkSideEffect>(
     initialState = DrinkState(input),
     initialAction = DrinkAction.Initial,
-    processor = { state, sideEffectConsumer ->
+    reducer = { state, sideEffectConsumer ->
         merge(
             filterIsInstance<DrinkAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.fullDrink(state().alias) }
-                .map { DrinkMutation.DrinkWithRelated(it) },
+                .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.Retry>()
                 .flatMapToResult { drinkRepository.fullDrink(state().alias) }
-                .map { DrinkMutation.DrinkWithRelated(it) },
+                .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
-                .map { DrinkMutation.TogglePlaying(it) },
+                .map { state().copy(isPlaying = it) },
             filterIsInstance<DrinkAction.MoreRecommendedDrinksClicked>()
                 .onEach { router.navigate(SimilarDrinksDestination(state().alias, state().displayName)) }
-                .map { DrinkMutation.Nothing },
+                .map { state() },
             filterIsInstance<DrinkAction.CategoryClicked>()
                 .onEach { router.navigate(TagDrinksDestination(it.category)) }
-                .map { DrinkMutation.Nothing },
+                .map { state() },
             filterIsInstance<DrinkAction.ShareClicked>()
                 .onEach { shareRepository.shareDrink(requireNotNull(state().drinkWithRelated()?.drink)) }
-                .map { DrinkMutation.Nothing },
+                .map { state() },
             filterIsInstance<DrinkAction.KeepScreenOnClicked>()
                 .map { !state().isScreenKeptOn }
                 .onEach { sideEffectConsumer(DrinkSideEffect.KeepScreenOn(it)) }
-                .map { DrinkMutation.KeepScreenOn(it) }
+                .map { state().copy(isScreenKeptOn = it) }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is DrinkMutation.DrinkWithRelated -> copy(drinkWithRelated = mutation.data)
-            is DrinkMutation.TogglePlaying -> copy(isPlaying = mutation.data)
-            is DrinkMutation.KeepScreenOn -> copy(isScreenKeptOn = mutation.data)
-            is DrinkMutation.Nothing -> this
-        }
     }
 )

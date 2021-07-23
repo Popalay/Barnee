@@ -26,7 +26,6 @@ import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -64,59 +63,53 @@ sealed interface AddToCollectionAction : Action {
     data class CollectionClicked(val collection: Collection, val drink: Drink) : AddToCollectionAction
 }
 
-sealed interface AddToCollectionMutation : Mutation {
-    object Empty : AddToCollectionMutation
-    data class DialogState(val data: AddToCollectionDialogState) : AddToCollectionMutation
-    data class NewCollectionName(val data: String) : AddToCollectionMutation
-}
-
 sealed interface AddToCollectionSideEffect : SideEffect {
     data class DrinkAddedToFavorites(val drink: Drink) : AddToCollectionSideEffect
 }
 
 class AddToCollectionStateMachine(
     collectionRepository: CollectionRepository
-) : StateMachine<AddToCollectionState, AddToCollectionAction, AddToCollectionMutation, AddToCollectionSideEffect>(
+) : StateMachine<AddToCollectionState, AddToCollectionAction, AddToCollectionSideEffect>(
     initialState = AddToCollectionState(),
     initialAction = AddToCollectionAction.Initial,
-    processor = { state, sideEffectConsumer ->
+    reducer = { state, sideEffectConsumer ->
         merge(
             filterIsInstance<AddToCollectionAction.Initial>()
                 .take(1)
                 .flatMapLatest { collectionRepository.collectionsUpdate() }
                 .filter { it.second != null && state().dialogState == Empty }
                 .onEach { sideEffectConsumer(AddToCollectionSideEffect.DrinkAddedToFavorites(it.first)) }
-                .map { AddToCollectionMutation.Empty },
-            filterIsInstance<AddToCollectionAction.ChangeCollectionClicked>()
-                .map { AddToCollectionMutation.DialogState(ChooseCollectionFor(it.drink)) },
-            filterIsInstance<AddToCollectionAction.CreateCollectionClicked>()
-                .map { AddToCollectionMutation.DialogState(CreateCollectionFor(it.drink)) },
-            filterIsInstance<AddToCollectionAction.BackFromCollectionCreationClicked>()
-                .map { AddToCollectionMutation.DialogState(ChooseCollectionFor(it.drink)) },
-            filterIsInstance<AddToCollectionAction.AddToCollectionDialogDismissed>()
-                .map { AddToCollectionMutation.DialogState(Empty) },
-            filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
-                .map { collectionRepository.addToCollectionAndNotify(state().newCollectionName, it.drink) }
-                .map { AddToCollectionMutation.DialogState(Empty) },
-            filterIsInstance<AddToCollectionAction.CollectionClicked>()
-                .map { collectionRepository.addToCollectionAndNotify(it.collection.name, it.drink) }
-                .map { AddToCollectionMutation.DialogState(Empty) },
+                .map { state() },
+            merge(
+                filterIsInstance<AddToCollectionAction.ChangeCollectionClicked>()
+                    .map { ChooseCollectionFor(it.drink) },
+                filterIsInstance<AddToCollectionAction.CreateCollectionClicked>()
+                    .map { CreateCollectionFor(it.drink) },
+                filterIsInstance<AddToCollectionAction.BackFromCollectionCreationClicked>()
+                    .map { ChooseCollectionFor(it.drink) },
+                filterIsInstance<AddToCollectionAction.AddToCollectionDialogDismissed>()
+                    .map { Empty },
+                filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
+                    .map { collectionRepository.addToCollectionAndNotify(state().newCollectionName, it.drink) }
+                    .map { Empty },
+                filterIsInstance<AddToCollectionAction.CollectionClicked>()
+                    .map { collectionRepository.addToCollectionAndNotify(it.collection.name, it.drink) }
+                    .map { Empty },
+            )
+                .map {
+                    state().copy(
+                        dialogState = it,
+                        newCollectionName = "",
+                        isNewCollectionValid = false
+                    )
+                },
             filterIsInstance<AddToCollectionAction.NewCollectionNameChanged>()
-                .map { AddToCollectionMutation.NewCollectionName(it.name) },
+                .map {
+                    state().copy(
+                        newCollectionName = it.name,
+                        isNewCollectionValid = it.name.isNotBlank()
+                    )
+                },
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is AddToCollectionMutation.DialogState -> copy(
-                dialogState = mutation.data,
-                newCollectionName = "",
-                isNewCollectionValid = false
-            )
-            is AddToCollectionMutation.NewCollectionName -> copy(
-                newCollectionName = mutation.data,
-                isNewCollectionValid = mutation.data.isNotBlank()
-            )
-            is AddToCollectionMutation.Empty -> this
-        }
     }
 )

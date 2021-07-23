@@ -31,7 +31,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
 
 abstract class StateMachineWrapperViewModel<S : State, A : Action, SE : SideEffect>(
-    private val stateMachine: StateMachine<S, A, *, SE>
+    private val stateMachine: StateMachine<S, A, SE>
 ) : ViewModel() {
     val stateFlow: StateFlow<S> = stateMachine.stateFlow.unwrap() as StateFlow<S>
     val sideEffectFlow: Flow<SE> = stateMachine.sideEffectFlow.unwrap()
