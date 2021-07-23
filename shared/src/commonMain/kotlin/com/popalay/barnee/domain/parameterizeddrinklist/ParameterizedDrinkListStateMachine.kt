@@ -29,7 +29,6 @@ import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import kotlinx.coroutines.flow.Flow
@@ -58,27 +57,18 @@ sealed interface ParameterizedDrinkListAction : Action {
     object Initial : ParameterizedDrinkListAction
 }
 
-sealed interface ParameterizedDrinkListMutation : Mutation {
-    data class Drinks(val data: Flow<PagingData<Drink>>) : ParameterizedDrinkListMutation
-}
-
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, ParameterizedDrinkListMutation, EmptySideEffect>(
+) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, EmptySideEffect>(
     initialState = ParameterizedDrinkListState(input),
     initialAction = ParameterizedDrinkListAction.Initial,
-    processor = { state, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<ParameterizedDrinkListAction.Initial>()
                 .take(1)
                 .map { drinkRepository.drinks(state().request) }
-                .map { ParameterizedDrinkListMutation.Drinks(it) }
+                .map { state().copy(drinks = it) }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is ParameterizedDrinkListMutation.Drinks -> copy(drinks = mutation.data)
-        }
     }
 )

@@ -27,7 +27,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -54,38 +53,26 @@ sealed interface ShakeToDrinkAction : Action {
     object Retry : ShakeToDrinkAction
 }
 
-sealed interface ShakeToDrinkMutation : Mutation {
-    data class RandomDrink(val data: Result<Drink>) : ShakeToDrinkMutation
-}
-
 class ShakeToDrinkStateMachine(
     drinkRepository: DrinkRepository,
     shakeDetector: ShakeDetector
-) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, ShakeToDrinkMutation, EmptySideEffect>(
+) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, EmptySideEffect>(
     initialState = ShakeToDrinkState(),
     initialAction = ShakeToDrinkAction.Initial,
-    processor = { state, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<ShakeToDrinkAction.Initial>()
                 .take(1)
                 .flatMapMerge { detectShakes(shakeDetector) }
                 .flatMapToResult { drinkRepository.randomDrink() }
                 .filter { !(it is Success<Drink> && state().randomDrink is Uninitialized) }
-                .map { ShakeToDrinkMutation.RandomDrink(it) },
+                .map { state().copy(randomDrink = it, shouldShow = it !is Uninitialized) },
             filterIsInstance<ShakeToDrinkAction.Retry>()
                 .flatMapToResult { drinkRepository.randomDrink() }
-                .map { ShakeToDrinkMutation.RandomDrink(it) },
+                .map { state().copy(randomDrink = it, shouldShow = it !is Uninitialized) },
             filterIsInstance<ShakeToDrinkAction.DialogDismissed>()
-                .map { ShakeToDrinkMutation.RandomDrink(Uninitialized()) },
+                .map { state().copy(randomDrink = Uninitialized(), shouldShow = false) },
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is ShakeToDrinkMutation.RandomDrink -> copy(
-                randomDrink = mutation.data,
-                shouldShow = mutation.data !is Uninitialized
-            )
-        }
     }
 )
 

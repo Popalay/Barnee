@@ -26,7 +26,6 @@ import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -49,32 +48,21 @@ sealed interface CollectionListAction : Action {
     data class CollectionClicked(val collection: Collection) : CollectionListAction
 }
 
-sealed interface CollectionListMutation : Mutation {
-    object Nothing : CollectionListMutation
-    data class Collections(val data: Result<Set<Collection>>) : CollectionListMutation
-}
-
 class CollectionListStateMachine(
     collectionRepository: CollectionRepository,
     router: Router
-) : StateMachine<CollectionListState, CollectionListAction, CollectionListMutation, EmptySideEffect>(
+) : StateMachine<CollectionListState, CollectionListAction, EmptySideEffect>(
     initialState = CollectionListState(),
     initialAction = CollectionListAction.Initial,
-    processor = { _, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<CollectionListAction.Initial>()
                 .take(1)
                 .flatMapToResult { collectionRepository.collections() }
-                .map { CollectionListMutation.Collections(it) },
+                .map { state().copy(collections = it) },
             filterIsInstance<CollectionListAction.CollectionClicked>()
                 .onEach { router.navigate(CollectionDestination(it.collection)) }
-                .map { CollectionListMutation.Nothing }
+                .map { state() }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is CollectionListMutation.Collections -> copy(collections = mutation.data)
-            is CollectionListMutation.Nothing -> this
-        }
     }
 )

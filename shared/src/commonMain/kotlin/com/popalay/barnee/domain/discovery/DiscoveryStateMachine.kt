@@ -26,7 +26,6 @@ import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.EmptySideEffect
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -53,38 +52,27 @@ sealed interface DiscoveryAction : Action {
     data class CategoryClicked(val category: Category) : DiscoveryAction
 }
 
-sealed interface DiscoveryMutation : Mutation {
-    object Nothing : DiscoveryMutation
-    data class Categories(val data: Result<List<Category>>) : DiscoveryMutation
-}
-
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
     router: Router
-) : StateMachine<DiscoveryState, DiscoveryAction, DiscoveryMutation, EmptySideEffect>(
+) : StateMachine<DiscoveryState, DiscoveryAction, EmptySideEffect>(
     initialState = DiscoveryState(),
     initialAction = DiscoveryAction.Initial,
-    processor = { _, _ ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<DiscoveryAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.categories() }
-                .map { DiscoveryMutation.Categories(it) },
+                .map { state().copy(categories = it) },
             filterIsInstance<DiscoveryAction.HeartClicked>()
                 .onEach { router.navigate(CollectionsDestination) }
-                .map { DiscoveryMutation.Nothing },
+                .map { state() },
             filterIsInstance<DiscoveryAction.CategoryClicked>()
                 .onEach { router.navigate(QueryDrinksDestination(it.category.alias, it.category.text)) }
-                .map { DiscoveryMutation.Nothing },
+                .map { state() },
             filterIsInstance<DiscoveryAction.SearchClicked>()
                 .onEach { router.navigate(SearchDestination) }
-                .map { DiscoveryMutation.Nothing }
+                .map { state() }
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is DiscoveryMutation.Categories -> copy(categories = mutation.data)
-            is DiscoveryMutation.Nothing -> this
-        }
     }
 )

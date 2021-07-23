@@ -29,7 +29,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.Mutation
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
@@ -65,48 +64,40 @@ sealed interface SearchAction : Action {
     data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction
 }
 
-sealed interface SearchMutation : Mutation {
-    data class AggregationResult(val data: Result<Aggregation>) : SearchMutation
-    data class Drinks(val data: Flow<PagingData<Drink>>) : SearchMutation
-    data class Query(val data: String) : SearchMutation
-    data class Filters(val data: Set<Pair<String, AggregationGroup>>) : SearchMutation
-    object Empty: SearchMutation
-}
-
 sealed interface SearchSideEffect : SideEffect {
     object ShowFilters : SearchSideEffect
 }
 
 class SearchStateMachine(
     drinkRepository: DrinkRepository,
-) : StateMachine<SearchState, SearchAction, SearchMutation, SearchSideEffect>(
+) : StateMachine<SearchState, SearchAction, SearchSideEffect>(
     initialState = SearchState(),
     initialAction = SearchAction.Initial,
-    processor = { state, sideEffectConsumer ->
+    reducer = { state, sideEffectConsumer ->
         merge(
             filterIsInstance<SearchAction.Initial>()
                 .take(1)
                 .flatMapToResult { drinkRepository.aggregation() }
-                .map { SearchMutation.AggregationResult(it) },
+                .map { state().copy(aggregation = it) },
             filterIsInstance<SearchAction.Initial>()
                 .take(1)
                 .map { state().searchRequest(drinkRepository) }
-                .map { SearchMutation.Drinks(it) },
+                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
             filterIsInstance<SearchAction.Retry>()
                 .filter { state().aggregation is Error }
                 .flatMapToResult { drinkRepository.aggregation() }
-                .map { SearchMutation.AggregationResult(it) },
+                .map { state().copy(aggregation = it) },
             filterIsInstance<SearchAction.QueryChanged>()
-                .map { SearchMutation.Query(it.query) },
+                .map { state().copy(searchQuery = it.query) },
             filterIsInstance<SearchAction.QueryChanged>()
                 .debounce(500L)
                 .distinctUntilChanged()
                 .map { state().searchRequest(drinkRepository, it.query) }
-                .map { SearchMutation.Drinks(it) },
+                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
             filterIsInstance<SearchAction.FilterClicked>()
                 .map {
-                    SearchMutation.Filters(
-                        if (it.value in state().selectedFilters) {
+                    state().copy(
+                        selectedFilters = if (it.value in state().selectedFilters) {
                             state().selectedFilters - it.value
                         } else {
                             state().selectedFilters + it.value
@@ -115,26 +106,17 @@ class SearchStateMachine(
                 },
             filterIsInstance<SearchAction.ShowFiltersClicked>()
                 .onEach { sideEffectConsumer(SearchSideEffect.ShowFilters) }
-                .map { SearchMutation.Empty },
+                .map { state() },
             filterIsInstance<SearchAction.FiltersDismissed>()
                 .filter { state().let { it.appliedFilters != it.selectedFilters } }
                 .map { state().searchRequest(drinkRepository) }
-                .map { SearchMutation.Drinks(it) },
+                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
             filterIsInstance<SearchAction.ClearSearchQuery>()
-                .map { SearchMutation.Query("") },
+                .map { state().copy(searchQuery = "") },
             filterIsInstance<SearchAction.ClearSearchQuery>()
                 .map { state().searchRequest(drinkRepository, query = "") }
-                .map { SearchMutation.Drinks(it) },
+                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
         )
-    },
-    reducer = { mutation ->
-        when (mutation) {
-            is SearchMutation.AggregationResult -> copy(aggregation = mutation.data)
-            is SearchMutation.Drinks -> copy(drinks = mutation.data, appliedFilters = selectedFilters)
-            is SearchMutation.Query -> copy(searchQuery = mutation.data)
-            is SearchMutation.Filters -> copy(selectedFilters = mutation.data)
-            is SearchMutation.Empty -> this
-        }
     }
 )
 

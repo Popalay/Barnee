@@ -34,7 +34,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -46,16 +45,14 @@ import org.koin.core.component.inject
 interface Input
 interface State
 interface Action
-interface Mutation
 interface SideEffect
 object EmptySideEffect : SideEffect
 
 @OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
+open class StateMachine<S : State, A : Action, SE : SideEffect>(
     initialState: S,
     initialAction: A? = null,
-    processor: Processor<S, M, SE>,
-    reducer: Reducer<S, M>
+    reducer: Reducer<S, SE>
 ) : KoinComponent {
     private val actionFlow = MutableSharedFlow<A>()
     private val sideEffectChannel = Channel<SE>()
@@ -67,12 +64,10 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
     val stateFlow: CFlow<S> = actionFlow
         .onStart { initialAction?.let { emit(it) } }
         .onEach { logger.log(this, it) }
-        .processor({ currentState }, {
+        .reducer({ currentState }, {
             sideEffectChannel.send(it)
             logger.log(this, it)
         })
-        .onEach { logger.log(this, it) }
-        .map { reducer(currentState, it) }
         .onEach { logger.log(this, it) }
         .stateIn(
             stateMachineScope,
@@ -91,5 +86,4 @@ open class StateMachine<S : State, A : Action, M : Mutation, SE : SideEffect>(
 
 typealias StateProvider<State> = () -> State
 typealias SideEffectConsumer<SideEffect> = suspend (SideEffect) -> Unit
-typealias Processor<State, Mutation, SideEffect> = Flow<Action>.(StateProvider<State>, SideEffectConsumer<SideEffect>) -> Flow<Mutation>
-typealias Reducer<State, Mutation> = State.(mutation: Mutation) -> State
+typealias Reducer<State, SideEffect> = Flow<Action>.(StateProvider<State>, SideEffectConsumer<SideEffect>) -> Flow<State>

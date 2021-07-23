@@ -7,7 +7,7 @@ import Foundation
 import shared
 import SwiftUI
 
-class StateMachineWrapperViewModel<S: shared.State, A: Action, M: Mutation, SE: SideEffect, T: StateMachine<S, A, M, SE>>: ObservableObject {
+class StateMachineWrapperViewModel<S: shared.State, A: Action, SE: SideEffect, T: StateMachine<S, A, SE>>: ObservableObject {
     private let stateMachine: T
     @Published var state: S
 
