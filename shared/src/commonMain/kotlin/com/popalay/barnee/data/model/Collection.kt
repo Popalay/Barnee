@@ -32,5 +32,7 @@ data class Collection(
 ) {
     companion object {
         const val DEFAULT_NAME = "Favorites"
+
+        val firstDefaultThenAlphabeticallyComparator = compareBy<Collection>({ it.name != DEFAULT_NAME }, { it.name })
     }
 }

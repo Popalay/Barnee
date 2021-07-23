@@ -142,7 +142,9 @@ internal class CollectionRepositoryImpl(
     override fun collections(): Flow<Set<Collection>> = localStore.asFlow(KEY_COLLECTION)
         .map { collectionsJson ->
             try {
-                json.decodeFromString<Set<Collection>>(collectionsJson).sortedBy { it.name }.toSet()
+                json.decodeFromString<Set<Collection>>(collectionsJson)
+                    .sortedWith(Collection.firstDefaultThenAlphabeticallyComparator)
+                    .toSet()
             } catch (ignore: SerializationException) {
                 emptySet()
             }
