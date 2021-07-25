@@ -57,13 +57,15 @@ internal class ShareRepositoryImpl(
 
     override suspend fun shareCollection(collection: Collection) {
         val title = "Share collection"
-        val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}"
+        val drinks = collection.aliases
+            .joinToString("\n") { "• ${it.replace('-', ' ').capitalizeFirstChar()}" }
+        val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}:\n$drinks"
         val shortUrl = deeplinkFactory.build(CollectionDestination(collection).destination)
 
         sharer.openShareDialog(
             title = title,
             text = collection.name,
-            content = "$text $shortUrl"
+            content = "$text\n$shortUrl"
         )
     }
 }
