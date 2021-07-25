@@ -41,20 +41,23 @@ internal class ShareRepositoryImpl(
     private val deeplinkFactory: DeeplinkFactory
 ) : ShareRepository {
     override suspend fun shareDrink(drink: Drink) {
-        val text = "Check out how to make a ${drink.displayName.capitalizeFirstChar()}"
         val title = "Share drink"
+        val instruction = drink.instruction.steps
+            .mapIndexed { index, step -> "\t${index + 1}. ${step.text}" }
+            .joinToString("\n")
+        val text = "Check out how to make a ${drink.displayName.capitalizeFirstChar()}:\n$instruction"
         val shortUrl = deeplinkFactory.build(DrinkDestination(drink).destination)
 
         sharer.openShareDialog(
             title = title,
             text = text,
-            content = "$text $shortUrl"
+            content = "$text\n$shortUrl"
         )
     }
 
     override suspend fun shareCollection(collection: Collection) {
-        val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}"
         val title = "Share collection"
+        val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}"
         val shortUrl = deeplinkFactory.build(CollectionDestination(collection).destination)
 
         sharer.openShareDialog(
