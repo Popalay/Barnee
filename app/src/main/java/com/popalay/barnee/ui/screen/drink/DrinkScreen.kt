@@ -109,6 +109,7 @@ import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.domain.Result
+import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkSideEffect
@@ -171,7 +172,6 @@ fun DrinkScreen(
     onAction: (DrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    val drink by remember(state.drinkWithRelated) { derivedStateOf { state.drinkWithRelated()?.drink } }
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
     val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
     val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
@@ -180,8 +180,7 @@ fun DrinkScreen(
     val listState = rememberLazyListState()
     val collapsingScaffoldState = rememberCollapsingScaffoldState(
         minHeight = collapsedToolbarHeightPx,
-        maxHeight = toolbarHeightPx,
-        confirmOffsetChange = { _, _ -> drink != null && listState.firstVisibleItemScrollOffset == 0 }
+        maxHeight = toolbarHeightPx
     )
 
     LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
@@ -206,6 +205,7 @@ fun DrinkScreen(
 
     CollapsingScaffold(
         state = collapsingScaffoldState,
+        isEnabled = state.drinkWithRelated is Success,
         topBar = {
             DrinkAppBar(
                 state = state,

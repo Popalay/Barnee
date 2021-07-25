@@ -44,11 +44,9 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.material.swipeable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -71,16 +69,12 @@ fun rememberCollapsingScaffoldState(
     minHeight: Dp,
     maxHeight: Dp,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    confirmOffsetChange: (currentOffset: Float, delta: Float) -> Boolean = { _, _ -> true },
-    confirmStateChange: (CollapsingScaffoldValue) -> Boolean = { true },
     initialValue: CollapsingScaffoldValue = Expanded
 ): CollapsingScaffoldState = with(LocalDensity.current) {
     rememberCollapsingScaffoldState(
         minHeight = minHeight.toPx(),
         maxHeight = maxHeight.toPx(),
         scaffoldState = scaffoldState,
-        confirmOffsetChange = confirmOffsetChange,
-        confirmStateChange = confirmStateChange,
         initialValue = initialValue
     )
 }
@@ -90,30 +84,14 @@ fun rememberCollapsingScaffoldState(
     minHeight: Float,
     maxHeight: Float,
     scaffoldState: ScaffoldState = rememberScaffoldState(),
-    confirmOffsetChange: (currentOffset: Float, delta: Float) -> Boolean = { _, _ -> true },
-    confirmStateChange: (CollapsingScaffoldValue) -> Boolean = { true },
     initialValue: CollapsingScaffoldValue = Expanded
-): CollapsingScaffoldState {
-    val confirmOffsetChangeState = rememberUpdatedState(confirmOffsetChange)
-    val confirmStateChangeState = rememberUpdatedState(confirmStateChange)
-    return rememberSaveable(
-        saver = CollapsingScaffoldState.Saver(
-            confirmOffsetChangeState,
-            confirmStateChangeState,
-            scaffoldState
-        )
-    ) {
-        CollapsingScaffoldState(
-            minHeightPx = minHeight,
-            maxHeightPx = maxHeight,
-            scaffoldState = scaffoldState,
-            confirmOffsetChange = { currentOffset: Float, delta: Float ->
-                confirmOffsetChangeState.value.invoke(currentOffset, delta)
-            },
-            confirmStateChange = { confirmStateChangeState.value.invoke(it) },
-            initialValue = initialValue
-        )
-    }
+): CollapsingScaffoldState = rememberSaveable(saver = CollapsingScaffoldState.Saver(scaffoldState)) {
+    CollapsingScaffoldState(
+        minHeightPx = minHeight,
+        maxHeightPx = maxHeight,
+        scaffoldState = scaffoldState,
+        initialValue = initialValue
+    )
 }
 
 enum class CollapsingScaffoldValue {
@@ -127,13 +105,10 @@ class CollapsingScaffoldState(
     val minHeightPx: Float,
     val maxHeightPx: Float,
     val scaffoldState: ScaffoldState,
-    val confirmOffsetChange: (currentOffset: Float, delta: Float) -> Boolean,
-    val confirmStateChange: (CollapsingScaffoldValue) -> Boolean,
     initialValue: CollapsingScaffoldValue
 ) : SwipeableState<CollapsingScaffoldValue>(
     initialValue = initialValue,
-    animationSpec = TweenSpec(),
-    confirmStateChange = confirmStateChange
+    animationSpec = TweenSpec()
 ) {
     val fraction: Float by derivedStateOf { offset.value / maxOffset }
     val maxOffset: Float get() = -maxHeightPx + minHeightPx
@@ -144,22 +119,14 @@ class CollapsingScaffoldState(
 
     companion object {
         @Suppress("FunctionName")
-        fun Saver(
-            confirmOffsetChangeState: State<(currentOffset: Float, delta: Float) -> Boolean>,
-            confirmStateChangeState: State<(CollapsingScaffoldValue) -> Boolean>,
-            scaffoldState: ScaffoldState
-        ): Saver<CollapsingScaffoldState, *> = listSaver(
+        fun Saver(scaffoldState: ScaffoldState): Saver<CollapsingScaffoldState, *> = listSaver(
             save = { listOf(it.minHeightPx, it.maxHeightPx, it.currentValue.ordinal) },
             restore = { list ->
                 CollapsingScaffoldState(
                     minHeightPx = list[0].toFloat(),
                     maxHeightPx = list[1].toFloat(),
                     scaffoldState = scaffoldState,
-                    initialValue = values()[list[2].toInt()],
-                    confirmOffsetChange = { currentOffset: Float, delta: Float ->
-                        confirmOffsetChangeState.value(currentOffset, delta)
-                    },
-                    confirmStateChange = { confirmStateChangeState.value(it) }
+                    initialValue = values()[list[2].toInt()]
                 )
             }
         )
@@ -186,6 +153,7 @@ fun CollapsingScaffold(
     drawerScrimColor: Color = DrawerDefaults.scrimColor,
     backgroundColor: Color = MaterialTheme.colors.background,
     contentColor: Color = contentColorFor(backgroundColor),
+    isEnabled: Boolean = true,
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
@@ -218,6 +186,7 @@ fun CollapsingScaffold(
             .swipeable(
                 state = state,
                 anchors = anchors,
+                enabled = isEnabled,
                 orientation = Orientation.Vertical,
                 resistance = null
             )
@@ -233,18 +202,40 @@ fun CollapsingScaffold(
 }
 
 @ExperimentalMaterialApi
-internal val CollapsingScaffoldState.PreUpPostDownNestedScrollConnection: NestedScrollConnection
+internal val <T> SwipeableState<T>.PreUpPostDownNestedScrollConnection: NestedScrollConnection
     get() = object : NestedScrollConnection {
         override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
             val delta = available.toFloat()
-            return if (confirmOffsetChange(offset.value, delta)) performDrag(delta).toOffset()
-            else Offset.Zero
+            return if (delta < 0 && source == NestedScrollSource.Drag) {
+                performDrag(delta).toOffset()
+            } else {
+                Offset.Zero
+            }
+        }
+
+        override fun onPostScroll(
+            consumed: Offset,
+            available: Offset,
+            source: NestedScrollSource
+        ): Offset = if (source == NestedScrollSource.Drag) {
+            performDrag(available.toFloat()).toOffset()
+        } else {
+            Offset.Zero
+        }
+
+        override suspend fun onPreFling(available: Velocity): Velocity {
+            val toFling = Offset(available.x, available.y).toFloat()
+            return if (toFling < 0 && offset.value > Float.NEGATIVE_INFINITY) {
+                performFling(velocity = toFling)
+                available
+            } else {
+                Velocity.Zero
+            }
         }
 
         override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-            val targetValue = if (fraction > 0.5F) Collapsed else Expanded
-            if (confirmStateChange(targetValue)) animateTo(targetValue)
-            return super.onPostFling(consumed, available)
+            performFling(velocity = Offset(available.x, available.y).toFloat())
+            return available
         }
 
         private fun Float.toOffset(): Offset = Offset(0f, this)
