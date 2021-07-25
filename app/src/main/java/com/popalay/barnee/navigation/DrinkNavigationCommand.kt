@@ -28,12 +28,12 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
-import com.popalay.barnee.domain.drink.DrinkInput
-import com.popalay.barnee.domain.navigation.DrinkDestination
-import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_ALIAS
-import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_IMAGE
-import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_NAME
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.state.drink.DrinkInput
+import com.popalay.barnee.domain.state.navigation.DrinkDestination
+import com.popalay.barnee.domain.state.navigation.DrinkDestination.Companion.KEY_ALIAS
+import com.popalay.barnee.domain.state.navigation.DrinkDestination.Companion.KEY_IMAGE
+import com.popalay.barnee.domain.state.navigation.DrinkDestination.Companion.KEY_NAME
+import com.popalay.barnee.domain.state.navigation.RouteProvider
 import com.popalay.barnee.util.toImageUrl
 
 object DrinkNavigationCommand : NavigationCommand<DrinkInput>,

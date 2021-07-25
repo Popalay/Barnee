@@ -39,8 +39,8 @@ import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
-import com.popalay.barnee.domain.discovery.DiscoveryAction
-import com.popalay.barnee.domain.discovery.DiscoveryState
+import com.popalay.barnee.domain.state.discovery.DiscoveryAction
+import com.popalay.barnee.domain.state.discovery.DiscoveryState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme

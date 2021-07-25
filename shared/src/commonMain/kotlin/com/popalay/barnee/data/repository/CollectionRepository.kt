@@ -23,7 +23,6 @@
 package com.popalay.barnee.data.repository
 
 import com.popalay.barnee.data.local.LocalStore
-import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.util.capitalizeFirstChar
@@ -59,7 +58,7 @@ interface CollectionRepository {
 
 internal class CollectionRepositoryImpl(
     private val localStore: LocalStore,
-    private val api: Api,
+    private val api: com.popalay.barnee.data.remote.Api,
     private val json: Json
 ) : CollectionRepository {
     private val collectionsUpdateFlow = MutableSharedFlow<Pair<Drink, Collection?>>()

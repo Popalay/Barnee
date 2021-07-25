@@ -30,8 +30,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.navigation.Destination
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.state.navigation.Destination
+import com.popalay.barnee.domain.state.navigation.RouteProvider
 
 const val DEEPLINK_PREFIX = "https://barnee.com/"
 

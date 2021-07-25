@@ -75,9 +75,9 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
-import com.popalay.barnee.domain.search.SearchAction
-import com.popalay.barnee.domain.search.SearchSideEffect
-import com.popalay.barnee.domain.search.SearchState
+import com.popalay.barnee.domain.state.search.SearchAction
+import com.popalay.barnee.domain.state.search.SearchSideEffect
+import com.popalay.barnee.domain.state.search.SearchState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.EmptyStateView

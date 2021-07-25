@@ -57,9 +57,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.domain.drinkitem.DrinkItemAction
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
+import com.popalay.barnee.domain.state.drinkitem.DrinkItemAction
+import com.popalay.barnee.domain.state.shakedrink.ShakeToDrinkAction
+import com.popalay.barnee.domain.state.shakedrink.ShakeToDrinkState
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView

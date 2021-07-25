@@ -39,8 +39,8 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListState
+import com.popalay.barnee.domain.state.parameterizeddrinklist.ParameterizedDrinkListInput
+import com.popalay.barnee.domain.state.parameterizeddrinklist.ParameterizedDrinkListState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll

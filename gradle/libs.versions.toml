@@ -16,6 +16,9 @@ androidx-espresso = "3.3.0"
 androidx-core-splashscreen = "1.0.0-alpha01"
 androidx-constraintlayout-compose = "1.0.0-alpha08"
 
+kotlinx-coroutines = "1.5.1-native-mt"
+kotlinx-serialization = "1.2.2"
+
 accompanist = "0.14.0"
 ktor = "1.6.1"
 exoplayer = "2.14.2"
@@ -23,7 +26,6 @@ youtubeExtractor = "master-SNAPSHOT"
 junit = "4.13.2"
 androidx-test = "1.1.2"
 logback = "1.2.3"
-coroutines = "1.5.1-native-mt"
 koin = "3.1.2"
 multiplatformsettings = "0.7.7"
 firebase-dynamicLinks = "20.1.0"
@@ -78,6 +80,10 @@ multiplatformsettings-noarg = { module = "com.russhwolf:multiplatform-settings-n
 multiplatformsettings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines-native-mt", version.ref = "multiplatformsettings" }
 multiplatformsettings-datastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "multiplatformsettings" }
 
+#KotlinX
+kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinx-coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinx-serialization" }
+
 #Others
 exoplayer = { module = "com.google.android.exoplayer:exoplayer", version.ref = "exoplayer" }
 youtubeExtractor = { module = "com.github.HaarigerHarald:android-youtubeExtractor", version.ref = "youtubeExtractor" }
@@ -85,7 +91,6 @@ firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-k
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
 multiplatformpaging = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "multiplatformpaging" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 
 [bundles]

@@ -28,11 +28,10 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import androidx.navigation.navDeepLink
-import com.popalay.barnee.domain.collection.CollectionInput
-import com.popalay.barnee.domain.navigation.CollectionDestination
-import com.popalay.barnee.domain.navigation.CollectionDestination.Companion.KEY_ALIASES
-import com.popalay.barnee.domain.navigation.CollectionDestination.Companion.KEY_NAME
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.state.collection.CollectionInput
+import com.popalay.barnee.domain.state.navigation.CollectionDestination
+import com.popalay.barnee.domain.state.navigation.CollectionDestination.Companion.KEY_NAME
+import com.popalay.barnee.domain.state.navigation.RouteProvider
 
 object CollectionNavigationCommand : NavigationCommand<CollectionInput>,
     RouteProvider by CollectionDestination.Companion {

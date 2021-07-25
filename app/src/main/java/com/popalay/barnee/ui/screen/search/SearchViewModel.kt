@@ -22,10 +22,10 @@
 
 package com.popalay.barnee.ui.screen.search
 
-import com.popalay.barnee.domain.search.SearchAction
-import com.popalay.barnee.domain.search.SearchSideEffect
-import com.popalay.barnee.domain.search.SearchState
-import com.popalay.barnee.domain.search.SearchStateMachine
+import com.popalay.barnee.domain.state.search.SearchAction
+import com.popalay.barnee.domain.state.search.SearchSideEffect
+import com.popalay.barnee.domain.state.search.SearchState
+import com.popalay.barnee.domain.state.search.SearchStateMachine
 import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class SearchViewModel(

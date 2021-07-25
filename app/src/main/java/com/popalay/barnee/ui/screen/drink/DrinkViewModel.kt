@@ -22,10 +22,10 @@
 
 package com.popalay.barnee.ui.screen.drink
 
-import com.popalay.barnee.domain.drink.DrinkAction
-import com.popalay.barnee.domain.drink.DrinkSideEffect
-import com.popalay.barnee.domain.drink.DrinkState
-import com.popalay.barnee.domain.drink.DrinkStateMachine
+import com.popalay.barnee.domain.state.drink.DrinkAction
+import com.popalay.barnee.domain.state.drink.DrinkSideEffect
+import com.popalay.barnee.domain.state.drink.DrinkState
+import com.popalay.barnee.domain.state.drink.DrinkStateMachine
 import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class DrinkViewModel(

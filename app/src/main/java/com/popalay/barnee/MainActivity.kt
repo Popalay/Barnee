@@ -45,8 +45,8 @@ import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
-import com.popalay.barnee.domain.navigation.BackDestination
-import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.state.navigation.BackDestination
+import com.popalay.barnee.domain.state.navigation.Router
 import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
@@ -55,7 +55,6 @@ import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
 import com.popalay.barnee.navigation.TagDrinksNavigationCommand
-import com.popalay.barnee.navigation.navigate
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
 import com.popalay.barnee.ui.screen.collection.CollectionScreen

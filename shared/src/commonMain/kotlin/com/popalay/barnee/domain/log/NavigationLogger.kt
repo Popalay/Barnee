@@ -22,8 +22,8 @@
 
 package com.popalay.barnee.domain.log
 
-import com.popalay.barnee.domain.navigation.Destination
-import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.state.navigation.Destination
+import com.popalay.barnee.domain.state.navigation.Router
 import com.popalay.barnee.util.Logger
 
 class NavigationLogger(private val logger: Logger) {

@@ -54,8 +54,8 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.domain.drinkitem.DrinkItemAction
-import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
+import com.popalay.barnee.domain.state.drinkitem.DrinkItemAction
+import com.popalay.barnee.domain.state.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding

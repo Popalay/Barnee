@@ -44,10 +44,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.navigationBarsPadding
-import com.popalay.barnee.domain.addtocollection.AddToCollectionAction
-import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState
-import com.popalay.barnee.domain.addtocollection.AddToCollectionSideEffect
-import com.popalay.barnee.domain.addtocollection.AddToCollectionState
+import com.popalay.barnee.domain.state.addtocollection.AddToCollectionAction
+import com.popalay.barnee.domain.state.addtocollection.AddToCollectionDialogState
+import com.popalay.barnee.domain.state.addtocollection.AddToCollectionSideEffect
+import com.popalay.barnee.domain.state.addtocollection.AddToCollectionState
 import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.collectAsStateWithLifecycle

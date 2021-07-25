@@ -27,11 +27,11 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.navArgument
 import com.popalay.barnee.data.repository.DrinksRequest
-import com.popalay.barnee.domain.navigation.QueryDrinksDestination
-import com.popalay.barnee.domain.navigation.QueryDrinksDestination.Companion.KEY_NAME
-import com.popalay.barnee.domain.navigation.QueryDrinksDestination.Companion.KEY_QUERY
-import com.popalay.barnee.domain.navigation.RouteProvider
-import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
+import com.popalay.barnee.domain.state.navigation.QueryDrinksDestination
+import com.popalay.barnee.domain.state.navigation.QueryDrinksDestination.Companion.KEY_NAME
+import com.popalay.barnee.domain.state.navigation.QueryDrinksDestination.Companion.KEY_QUERY
+import com.popalay.barnee.domain.state.navigation.RouteProvider
+import com.popalay.barnee.domain.state.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.util.capitalizeFirstChar
 
 object QueryDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInput>,

@@ -42,9 +42,9 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.popalay.barnee.domain.collection.CollectionAction
-import com.popalay.barnee.domain.collection.CollectionInput
-import com.popalay.barnee.domain.collection.CollectionState
+import com.popalay.barnee.domain.state.collection.CollectionAction
+import com.popalay.barnee.domain.state.collection.CollectionInput
+import com.popalay.barnee.domain.state.collection.CollectionState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll

@@ -22,8 +22,8 @@
 
 package com.popalay.barnee.navigation
 
-import com.popalay.barnee.domain.navigation.DiscoveryDestination
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.state.navigation.DiscoveryDestination
+import com.popalay.barnee.domain.state.navigation.RouteProvider
 
 object DiscoveryNavigationCommand : NavigationCommand<Nothing>,
     RouteProvider by DiscoveryDestination

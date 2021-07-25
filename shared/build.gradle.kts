@@ -61,6 +61,7 @@ kotlin {
 
         commonMain {
             dependencies {
+                implementation(project(":data-bridge"))
                 implementation(libs.ktor.core)
                 implementation(libs.ktor.serialization)
                 implementation(libs.ktor.logging)

@@ -33,8 +33,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.popalay.barnee.domain.collectionlist.CollectionListAction
-import com.popalay.barnee.domain.collectionlist.CollectionListState
+import com.popalay.barnee.domain.state.collectionlist.CollectionListAction
+import com.popalay.barnee.domain.state.collectionlist.CollectionListState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll

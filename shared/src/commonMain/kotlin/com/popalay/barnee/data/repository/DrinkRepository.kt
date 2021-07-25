@@ -37,7 +37,6 @@ import com.popalay.barnee.data.repository.DrinksRequest.ForTags
 import com.popalay.barnee.data.repository.DrinksRequest.Random
 import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import com.popalay.barnee.data.repository.DrinksRequest.Search
-import com.popalay.barnee.util.filter
 import com.popalay.barnee.util.toImageUrl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -59,7 +58,7 @@ interface DrinkRepository {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DrinkRepositoryImpl(
-    private val api: Api,
+    private val api: com.popalay.barnee.data.remote.Api,
     private val collectionRepository: CollectionRepository
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =
