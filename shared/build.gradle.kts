@@ -24,9 +24,9 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.10"
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
+    alias(libs.plugins.kotlin.serialization)
 }
 
 // CocoaPods requires the podspec to have a version.

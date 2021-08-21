@@ -85,12 +85,6 @@ android {
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             }
         }
-
-        lint {
-            isCheckReleaseBuilds = false
-            isCheckDependencies = true
-            isIgnoreTestSources = true
-        }
     }
 
     compileOptions {
