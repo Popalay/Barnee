@@ -34,7 +34,9 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.data.repository.ShareRepositoryImpl
+import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
+import com.popalay.barnee.domain.app.AppStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
@@ -113,15 +115,16 @@ val commonModule = module {
     single { GetCollectionUseCase(get(), get()) }
     single<NotificationActionHandler> { NotificationActionHandlerImpl(get()) }
 
+    factory { AppStateMachine(get()) }
     factory { DiscoveryStateMachine(get(), get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
-    factory { DrinkItemStateMachine(get(), get()) }
+    factory { DrinkItemStateMachine(get(), get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
-    factory { AddToCollectionStateMachine(get()) }
+    factory { (input: AddToCollectionInput) -> AddToCollectionStateMachine(input, get(), get(), get()) }
 }
 
 expect val platformModule: Module

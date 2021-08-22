@@ -20,27 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.screen.app
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.screen.app.ComposeApp
-import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.domain.app.AppAction
+import com.popalay.barnee.domain.app.AppSideEffect
+import com.popalay.barnee.domain.app.AppState
+import com.popalay.barnee.domain.app.AppStateMachine
+import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
-    }
-}
+class AppViewModel(
+    stateMachine: AppStateMachine,
+) : StateMachineWrapperViewModel<AppState, AppAction, AppSideEffect>(stateMachine)

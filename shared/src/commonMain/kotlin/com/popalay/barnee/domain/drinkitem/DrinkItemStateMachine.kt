@@ -30,6 +30,12 @@ import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.navigation.DrinkDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.notification.ChangeCollection
+import com.popalay.barnee.domain.notification.Notification
+import com.popalay.barnee.domain.notification.NotificationService
+import com.popalay.barnee.domain.notification.NotificationShowPolicy
+import com.popalay.barnee.util.capitalizeFirstChar
+import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.inCollections
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
@@ -45,7 +51,8 @@ sealed interface DrinkItemAction : Action {
 
 class DrinkItemStateMachine(
     collectionRepository: CollectionRepository,
-    router: Router
+    router: Router,
+    notificationService: NotificationService
 ) : StateMachine<DrinkItemState, DrinkItemAction, EmptySideEffect>(
     initialState = DrinkItemState,
     reducer = { state, _ ->
@@ -53,9 +60,15 @@ class DrinkItemStateMachine(
             filterIsInstance<DrinkItemAction.ToggleFavorite>()
                 .map {
                     if (it.drink.inCollections) {
-                        collectionRepository.removeFromAllCollectionsAndNotify(it.drink)
+                        collectionRepository.removeFromAllCollections(it.drink)
                     } else {
-                        collectionRepository.addToCollectionAndNotify(drink = it.drink)
+                        collectionRepository.addToCollection(drink = it.drink)
+                        val notification = Notification.Snackbar(
+                            message = "${it.drink.displayName.capitalizeFirstChar()} was added to favorites",
+                            showPolicy = NotificationShowPolicy.CancelPrevious,
+                            action = ChangeCollection(it.drink)
+                        )
+                        notificationService.notify(notification)
                     }
                 }
                 .map { state() },

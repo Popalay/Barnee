@@ -20,27 +20,37 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.domain.app
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.screen.app.ComposeApp
-import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.SideEffect
+import com.popalay.barnee.domain.State
+import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.notification.NotificationAction
+import com.popalay.barnee.domain.notification.NotificationService
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
-    }
+object AppState : State
+
+sealed interface AppAction : Action {
+    object Initial : AppAction
+    data class OnNotificationAction(val action: NotificationAction) : AppAction
 }
+
+object AppSideEffect : SideEffect
+
+class AppStateMachine(
+    notificationService: NotificationService
+) : StateMachine<AppState, AppAction, AppSideEffect>(
+    initialState = AppState,
+    initialAction = AppAction.Initial,
+    reducer = { state, _ ->
+        merge(
+            filterIsInstance<AppAction.OnNotificationAction>()
+                .map { notificationService.handle(it.action) }
+                .map { state() },
+        )
+    }
+)

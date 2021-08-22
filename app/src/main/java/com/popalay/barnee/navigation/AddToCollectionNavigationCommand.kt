@@ -20,27 +20,25 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.navigation
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.screen.app.ComposeApp
-import com.popalay.barnee.ui.theme.BarneeTheme
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavType
+import androidx.navigation.compose.NamedNavArgument
+import androidx.navigation.compose.navArgument
+import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
+import com.popalay.barnee.domain.navigation.AddToCollectionDestination
+import com.popalay.barnee.domain.navigation.AddToCollectionDestination.Companion.KEY_ALIAS
+import com.popalay.barnee.domain.navigation.RouteProvider
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
+object AddToCollectionNavigationCommand : NavigationCommand<AddToCollectionInput>,
+    RouteProvider by AddToCollectionDestination {
+    override val arguments: List<NamedNavArgument> = listOf(
+        navArgument(KEY_ALIAS) { type = NavType.StringType },
+    )
+
+    override fun parseInput(backStackEntry: NavBackStackEntry): AddToCollectionInput {
+        val alias = backStackEntry.arguments?.getString(KEY_ALIAS).orEmpty()
+        return AddToCollectionInput(alias = alias)
     }
 }

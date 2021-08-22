@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.popalay.barnee.data.model.Collection
+import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
@@ -55,6 +56,7 @@ import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ChooseCollectionBottomSheet(
+    drink: Drink,
     onCollectionClicked: (Collection) -> Unit,
     onCreateNewClicked: () -> Unit
 ) {

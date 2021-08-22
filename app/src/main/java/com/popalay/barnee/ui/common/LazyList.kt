@@ -35,7 +35,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Dp
@@ -143,7 +142,7 @@ fun <T : Any> LazyListScope.itemsInGridIndexed(
                     Box(modifier = Modifier.weight(1f)) {
                         val index = row * columns + column
                         if (index < lazyPagingItems.itemCount) {
-                            val item by lazyPagingItems.getAsState(index)
+                            val item = lazyPagingItems[index]
                             itemContent(index, item)
                         }
                     }

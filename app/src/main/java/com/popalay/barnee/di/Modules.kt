@@ -23,6 +23,7 @@
 package com.popalay.barnee.di
 
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionViewModel
+import com.popalay.barnee.ui.screen.app.AppViewModel
 import com.popalay.barnee.ui.screen.collection.CollectionViewModel
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
 import com.popalay.barnee.ui.screen.discovery.DiscoveryViewModel
@@ -35,6 +36,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val uiModule = module {
+    viewModel { AppViewModel(get { it }) }
     viewModel { DiscoveryViewModel(get { it }) }
     viewModel { DrinkViewModel(get { it }) }
     viewModel { SearchViewModel(get { it }) }

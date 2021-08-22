@@ -20,27 +20,13 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.util
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.screen.app.ComposeApp
-import com.popalay.barnee.ui.theme.BarneeTheme
+import androidx.compose.material.SnackbarDuration
+import com.popalay.barnee.domain.notification.NotificationDuration
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
-    }
+fun NotificationDuration.toSnackbarDuration() = when (this) {
+    NotificationDuration.Short -> SnackbarDuration.Short
+    NotificationDuration.Long -> SnackbarDuration.Long
+    NotificationDuration.Indefinite -> SnackbarDuration.Indefinite
 }

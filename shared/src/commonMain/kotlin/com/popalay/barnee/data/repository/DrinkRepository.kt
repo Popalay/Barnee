@@ -48,13 +48,13 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 interface DrinkRepository {
     fun drinks(request: DrinksRequest): Flow<PagingData<Drink>>
     fun randomDrink(): Flow<Drink>
     fun fullDrink(alias: String): Flow<FullDrinkResponse>
+    fun drink(alias: String): Flow<Drink>
     fun aggregation(): Flow<Aggregation>
     fun categories(): Flow<List<Category>>
 }
@@ -68,12 +68,12 @@ internal class DrinkRepositoryImpl(
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =
         when (request) {
-            is RelatedTo -> requestPage { api.similarDrinks(request.alias) }
-            is ForTags -> requestPage { api.drinksByTags(request.tags, it.skip, it.take) }
-            is ForQuery -> requestPage { api.drinks(request.query, it.skip, it.take) }
-            is ByAliases -> requestPage { api.drinksByAliases(request.aliases, it.skip, it.take) }
-            is Random -> requestPage { api.random(it.skip, it.take) }
-            is Search -> requestPage { searchDrinks(request.query, request.filters, it) }
+            is RelatedTo -> requestPage { api.similarDrinks(request.alias).cache() }
+            is ForTags -> requestPage { api.drinksByTags(request.tags, it.skip, it.take).cache() }
+            is ForQuery -> requestPage { api.drinks(request.query, it.skip, it.take).cache() }
+            is ByAliases -> requestPage { api.drinksByAliases(request.aliases, it.skip, it.take).cache() }
+            is Random -> requestPage { api.random(it.skip, it.take).cache() }
+            is Search -> requestPage { searchDrinks(request.query, request.filters, it).cache() }
             is Collection -> collection(request.name)
         }
             .distinctUntilChanged()
@@ -86,7 +86,7 @@ internal class DrinkRepositoryImpl(
         .distinctUntilChanged()
 
     override fun fullDrink(alias: String): Flow<FullDrinkResponse> =
-        flow { emit(fullDrinkCache.peek(alias) ?: api.getFullDrink(alias)) }
+        flow { emit(fullDrinkCache.peek(alias) ?: api.getFullDrink(alias).cache()) }
             .flatMapLatest { response ->
                 collectionRepository.collections()
                     .mapLatest { collections ->
@@ -96,7 +96,16 @@ internal class DrinkRepositoryImpl(
                         )
                     }
             }
-            .onEach { fullDrinkCache.put(it.drink.alias, it) }
+            .distinctUntilChanged()
+
+    override fun drink(alias: String): Flow<Drink> =
+        flow { emit(drinkCache.peek(alias) ?: api.getFullDrink(alias).drink.cache()) }
+            .flatMapLatest { response ->
+                collectionRepository.collections()
+                    .mapLatest { collections ->
+                        response.copy(userCollections = collections.filter(response))
+                    }
+            }
             .distinctUntilChanged()
 
     override fun aggregation(): Flow<Aggregation> = flow { emit(api.getAggregation()) }
@@ -156,7 +165,7 @@ internal class DrinkRepositoryImpl(
     private fun collection(name: String): Flow<PagingData<Drink>> = collectionRepository.collection(name)
         .take(1)
         .flatMapLatest { collection ->
-            DrinkPager { api.drinksByAliases(collection.aliases, it.skip, it.take) }.pages
+            DrinkPager { api.drinksByAliases(collection.aliases, it.skip, it.take).cache() }.pages
                 .flatMapLatest { pagedDrinks ->
                     collectionRepository.collection(name)
                         .flatMapLatest { newCollection ->
@@ -182,4 +191,8 @@ internal class DrinkRepositoryImpl(
 
         return api.searchDrinks(searchRequest, pageRequest.skip, pageRequest.take)
     }
+
+    private fun Drink.cache() = also { drinkCache.put(it.alias, it) }
+    private fun List<Drink>.cache() = also { drinks -> drinkCache.putAll(drinks.associateBy { it.alias }) }
+    private fun FullDrinkResponse.cache() = also { fullDrinkCache.put(it.drink.alias, it) }
 }

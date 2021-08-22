@@ -112,5 +112,5 @@ private fun String.extractYouTubeUrl(context: Context, onResult: (String) -> Uni
             val videoUrl = ytFiles?.get(22)?.url.orEmpty()
             onResult(videoUrl)
         }
-    }.extract(this, true, true)
+    }.extract(this)
 }

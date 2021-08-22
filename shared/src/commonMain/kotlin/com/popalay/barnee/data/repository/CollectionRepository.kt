@@ -33,8 +33,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -49,10 +47,9 @@ import kotlinx.serialization.json.Json
 interface CollectionRepository {
     fun collections(): Flow<Set<Collection>>
     fun collection(name: String): Flow<Collection>
-    fun collectionsUpdate(): Flow<Pair<Drink, Collection?>>
-    suspend fun removeFromAllCollectionsAndNotify(drink: Drink)
-    suspend fun addToCollectionAndNotify(collectionName: String = "", drink: Drink)
-    suspend fun removeFromCollectionAndNotify(collectionName: String = "", drink: Drink)
+    suspend fun removeFromAllCollections(drink: Drink)
+    suspend fun addToCollection(collectionName: String = "", drink: Drink)
+    suspend fun removeFromCollection(collectionName: String = "", drink: Drink)
     suspend fun remove(name: String)
     suspend fun saveOrMerge(name: String, aliases: Set<String>)
 }
@@ -62,8 +59,6 @@ internal class CollectionRepositoryImpl(
     private val api: Api,
     private val json: Json
 ) : CollectionRepository {
-    private val collectionsUpdateFlow = MutableSharedFlow<Pair<Drink, Collection?>>()
-
     init {
         @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
@@ -71,7 +66,7 @@ internal class CollectionRepositoryImpl(
         }
     }
 
-    override suspend fun addToCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun addToCollection(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
         val targetCollection = (collections.firstOrNull { it.name == validCollectionName }
@@ -79,37 +74,30 @@ internal class CollectionRepositoryImpl(
             it.copy(aliases = it.aliases + drink.alias, cover = setOf(drink.displayImageUrl) + it.cover)
         }
 
-        val newCollections = collections.toMutableSet().apply {
+        collections.toMutableSet().run {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
-            toSet()
             saveCollections(this)
         }
-
-        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to targetCollection)
     }
 
-    override suspend fun removeFromCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun removeFromCollection(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
         val targetCollection = collections.firstOrNull { it.name == validCollectionName }?.let {
             it.copy(aliases = it.aliases - drink.alias, cover = it.cover - drink.displayImageUrl)
         } ?: return@withContext
 
-        val newCollections = collections.toMutableSet().apply {
+        collections.toMutableSet().run {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
-            toSet()
             saveCollections(this)
         }
-
-        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to null)
     }
 
-    override suspend fun removeFromAllCollectionsAndNotify(drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun removeFromAllCollections(drink: Drink) = withContext(Dispatchers.Default) {
         val collections = removeFromCollections(drink)
         saveCollections(collections)
-        collectionsUpdateFlow.emit(drink.copy(userCollections = emptyList()) to null)
     }
 
     override suspend fun remove(name: String) = withContext(Dispatchers.Default) {
@@ -135,7 +123,7 @@ internal class CollectionRepositoryImpl(
         collections.toMutableSet().apply {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
-            saveCollections(toSet())
+            saveCollections(this)
         }
     }
 
@@ -152,8 +140,6 @@ internal class CollectionRepositoryImpl(
 
     override fun collection(name: String): Flow<Collection> = collections()
         .mapNotNull { collection -> collection.firstOrNull { it.name == name } }
-
-    override fun collectionsUpdate(): Flow<Pair<Drink, Collection?>> = collectionsUpdateFlow.asSharedFlow()
 
     private suspend fun saveCollections(collections: Set<Collection>) {
         val serialized = json.encodeToString(collections)

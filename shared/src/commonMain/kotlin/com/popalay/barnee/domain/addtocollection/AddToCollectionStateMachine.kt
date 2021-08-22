@@ -25,76 +25,73 @@ package com.popalay.barnee.domain.addtocollection
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
+import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.Input
+import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.ChooseCollectionFor
-import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.CreateCollectionFor
-import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.Empty
-import kotlinx.coroutines.flow.filter
+import com.popalay.barnee.domain.Uninitialized
+import com.popalay.barnee.domain.flatMapToResult
+import com.popalay.barnee.domain.navigation.BackDestination
+import com.popalay.barnee.domain.navigation.Router
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
+
+data class AddToCollectionInput(
+    val alias: String
+) : Input
 
 data class AddToCollectionState(
+    val alias: String,
+    val drink: Result<Drink> = Uninitialized(),
     val newCollectionName: String = "",
     val isNewCollectionValid: Boolean = false,
-    val dialogState: AddToCollectionDialogState = Empty
-) : State
+    val dialogState: AddToCollectionDialogState = AddToCollectionDialogState.ChooseCollection
+) : State {
+    constructor(input: AddToCollectionInput) : this(input.alias)
+}
 
-sealed class AddToCollectionDialogState {
-    object Empty : AddToCollectionDialogState()
-    data class ChooseCollectionFor(val drink: Drink) : AddToCollectionDialogState()
-    data class CreateCollectionFor(val drink: Drink) : AddToCollectionDialogState()
+enum class AddToCollectionDialogState {
+    ChooseCollection,
+    CreateCollection
 }
 
 sealed interface AddToCollectionAction : Action {
     object Initial : AddToCollectionAction
-    object AddToCollectionDialogDismissed : AddToCollectionAction
-    data class SaveCollectionClicked(val drink: Drink) : AddToCollectionAction
-    data class CreateCollectionClicked(val drink: Drink) : AddToCollectionAction
-    data class BackFromCollectionCreationClicked(val drink: Drink) : AddToCollectionAction
-    data class ChangeCollectionClicked(val drink: Drink) : AddToCollectionAction
+    object SaveCollectionClicked : AddToCollectionAction
+    object CreateCollectionClicked : AddToCollectionAction
+    object BackFromCollectionCreationClicked : AddToCollectionAction
+    object ChangeCollectionClicked : AddToCollectionAction
     data class NewCollectionNameChanged(val name: String) : AddToCollectionAction
-    data class CollectionClicked(val collection: Collection, val drink: Drink) : AddToCollectionAction
+    data class CollectionClicked(val collection: Collection) : AddToCollectionAction
 }
 
-sealed interface AddToCollectionSideEffect : SideEffect {
-    data class DrinkAddedToFavorites(val drink: Drink) : AddToCollectionSideEffect
-}
+object AddToCollectionSideEffect : SideEffect
 
 class AddToCollectionStateMachine(
-    collectionRepository: CollectionRepository
+    input: AddToCollectionInput,
+    collectionRepository: CollectionRepository,
+    drinkRepository: DrinkRepository,
+    router: Router
 ) : StateMachine<AddToCollectionState, AddToCollectionAction, AddToCollectionSideEffect>(
-    initialState = AddToCollectionState(),
+    initialState = AddToCollectionState(input),
     initialAction = AddToCollectionAction.Initial,
-    reducer = { state, sideEffectConsumer ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<AddToCollectionAction.Initial>()
-                .take(1)
-                .flatMapLatest { collectionRepository.collectionsUpdate() }
-                .filter { it.second != null && state().dialogState == Empty }
-                .onEach { sideEffectConsumer(AddToCollectionSideEffect.DrinkAddedToFavorites(it.first)) }
-                .map { state() },
+                .flatMapToResult { drinkRepository.drink(state().alias) }
+                .map { state().copy(drink = it) },
             merge(
                 filterIsInstance<AddToCollectionAction.ChangeCollectionClicked>()
-                    .map { ChooseCollectionFor(it.drink) },
+                    .map { AddToCollectionDialogState.ChooseCollection },
                 filterIsInstance<AddToCollectionAction.CreateCollectionClicked>()
-                    .map { CreateCollectionFor(it.drink) },
+                    .map { AddToCollectionDialogState.CreateCollection },
                 filterIsInstance<AddToCollectionAction.BackFromCollectionCreationClicked>()
-                    .map { ChooseCollectionFor(it.drink) },
-                filterIsInstance<AddToCollectionAction.AddToCollectionDialogDismissed>()
-                    .map { Empty },
-                filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
-                    .map { collectionRepository.addToCollectionAndNotify(state().newCollectionName, it.drink) }
-                    .map { Empty },
-                filterIsInstance<AddToCollectionAction.CollectionClicked>()
-                    .map { collectionRepository.addToCollectionAndNotify(it.collection.name, it.drink) }
-                    .map { Empty },
+                    .map { AddToCollectionDialogState.ChooseCollection },
             )
                 .map {
                     state().copy(
@@ -103,6 +100,14 @@ class AddToCollectionStateMachine(
                         isNewCollectionValid = false
                     )
                 },
+            filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
+                .map { state().drink()?.let { collectionRepository.addToCollection(state().newCollectionName, it) } }
+                .onEach { router.navigate(BackDestination) }
+                .map { state() },
+            filterIsInstance<AddToCollectionAction.CollectionClicked>()
+                .map { action -> state().drink()?.let { collectionRepository.addToCollection(action.collection.name, it) } }
+                .onEach { router.navigate(BackDestination) }
+                .map { state() },
             filterIsInstance<AddToCollectionAction.NewCollectionNameChanged>()
                 .map {
                     state().copy(

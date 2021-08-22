@@ -20,27 +20,19 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.domain.navigation
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.screen.app.ComposeApp
-import com.popalay.barnee.ui.theme.BarneeTheme
+import com.popalay.barnee.data.model.Drink
+import kotlin.jvm.JvmInline
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
+@JvmInline
+value class AddToCollectionDestination private constructor(
+    override val destination: String
+) : Destination {
+    constructor(drink: Drink) : this("drink/${drink.alias}/collections")
+
+    companion object : RouteProvider {
+        const val KEY_ALIAS = "alias"
+        override val route: String = "drink/{$KEY_ALIAS}/collections"
     }
 }
