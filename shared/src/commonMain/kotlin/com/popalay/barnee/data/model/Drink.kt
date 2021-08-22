@@ -36,9 +36,9 @@ data class Drink(
     internal val rating: Int,
     internal val story: String = "",
     internal val images: List<Image> = emptyList(),
-    internal val categories: List<Category> = emptyList(),
-    internal val occasions: List<Category> = emptyList(),
-    internal val collections: List<Category> = emptyList(),
+    internal val categories: List<Category?> = emptyList(),
+    internal val occasions: List<Category?> = emptyList(),
+    internal val collections: List<Category?> = emptyList(),
     internal val videos: List<Video> = emptyList(),
     @SerialName("nutritions") internal val nutrition: Nutrition = Nutrition(0)
 )

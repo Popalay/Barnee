@@ -47,6 +47,7 @@ val Drink.displayRatingWithMax: String get() = displayRating.let { "$it/10" }
 
 val Drink.keywords: List<Category>
     get() = (categories + collections + occasions)
+        .filterNotNull()
         .filter { it.alias.isNotBlank() }
         .filter { it.text != "unknown" }
 

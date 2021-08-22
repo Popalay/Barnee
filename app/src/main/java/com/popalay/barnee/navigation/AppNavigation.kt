@@ -22,13 +22,15 @@
 
 package com.popalay.barnee.navigation
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.NamedNavArgument
-import androidx.navigation.compose.composable
+import com.google.accompanist.navigation.animation.composable
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.navigation.Destination
 import com.popalay.barnee.domain.navigation.RouteProvider
@@ -39,9 +41,10 @@ fun NavController.navigate(destination: Destination) {
     navigate(destination.destination)
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 fun <T : Input> NavGraphBuilder.navigationNode(
     command: NavigationCommand<T>,
-    content: @Composable (NavBackStackEntry) -> Unit
+    content: @Composable AnimatedVisibilityScope.(NavBackStackEntry) -> Unit
 ) {
     composable(
         route = command.route,

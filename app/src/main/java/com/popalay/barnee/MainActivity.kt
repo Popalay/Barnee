@@ -26,6 +26,11 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -36,13 +41,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.navigation.animation.AnimatedNavHost
+import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.domain.navigation.BackDestination
@@ -84,12 +89,12 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalAnimatedInsets::class)
+    @OptIn(ExperimentalAnimatedInsets::class, ExperimentalAnimationApi::class)
     @Composable
     fun ComposeApp() {
         ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
             val context = LocalContext.current
-            val navController = rememberNavController()
+            val navController = rememberAnimatedNavController()
             val imageLoader = remember {
                 ImageLoader.Builder(context)
                     .logger(if (isDebug) DebugLogger() else null)
@@ -102,7 +107,7 @@ class MainActivity : ComponentActivity() {
             LaunchedEffect(Unit) {
                 Firebase.dynamicLinks.getDynamicLink(intent)
                     .addOnSuccessListener { pendingDynamicLinkData ->
-                        pendingDynamicLinkData?.link?.let {
+                        pendingDynamicLinkData.link?.let {
                             navController.popBackStack(navController.graph.id, false)
                             navController.navigate(it)
                         }
@@ -117,6 +122,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalAnimationApi::class)
     @Composable
     fun NavigationGraph(navController: NavHostController) {
         val router: Router = get()
@@ -126,7 +132,18 @@ class MainActivity : ComponentActivity() {
             else navController.navigate(destination)
         }
 
-        NavHost(navController, startDestination = DiscoveryNavigationCommand.route) {
+        AnimatedNavHost(
+            navController = navController,
+            startDestination = DiscoveryNavigationCommand.route,
+            enterTransition = { _, _ ->
+                slideIntoContainer(AnimatedContentScope.SlideDirection.Up, animationSpec = tween()) +
+                        fadeIn(animationSpec = tween())
+            },
+            exitTransition = { _, _ ->
+                slideOutOfContainer(AnimatedContentScope.SlideDirection.Down, animationSpec = tween()) +
+                        fadeOut(animationSpec = tween())
+            }
+        ) {
             navigationNode(DiscoveryNavigationCommand) {
                 DiscoveryScreen()
             }
