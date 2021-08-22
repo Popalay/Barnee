@@ -22,8 +22,11 @@
 
 package com.popalay.barnee.di
 
+import com.popalay.barnee.data.local.Cache
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
+import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.CollectionRepositoryImpl
@@ -63,6 +66,7 @@ import io.ktor.http.ContentType
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
+import org.koin.core.qualifier.named
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
 
@@ -92,10 +96,12 @@ val commonModule = module {
             }
         }
     }
-    single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
+    single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(named<Drink>()), get(named<FullDrinkResponse>())) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
     single<Router> { RouterImpl(get()) }
+    single(named<Drink>()) { Cache<String, Drink>() }
+    single(named<FullDrinkResponse>()) { Cache<String, FullDrinkResponse>() }
 
     single { GetCollectionUseCase(get(), get()) }
 

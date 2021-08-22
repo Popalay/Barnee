@@ -25,6 +25,7 @@ package com.popalay.barnee.data.repository
 import com.kuuurt.paging.multiplatform.PagingData
 import com.kuuurt.paging.multiplatform.filter
 import com.kuuurt.paging.multiplatform.map
+import com.popalay.barnee.data.local.Cache
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
@@ -47,6 +48,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 interface DrinkRepository {
@@ -60,7 +62,9 @@ interface DrinkRepository {
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DrinkRepositoryImpl(
     private val api: Api,
-    private val collectionRepository: CollectionRepository
+    private val collectionRepository: CollectionRepository,
+    private val drinkCache: Cache<String, Drink>,
+    private val fullDrinkCache: Cache<String, FullDrinkResponse>
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =
         when (request) {
@@ -81,17 +85,19 @@ internal class DrinkRepositoryImpl(
         }
         .distinctUntilChanged()
 
-    override fun fullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
-        .flatMapLatest { response ->
-            collectionRepository.collections()
-                .mapLatest { collections ->
-                    response.copy(
-                        relatedDrinks = response.relatedDrinks.map { it.copy(userCollections = collections.filter(it)) },
-                        drink = response.drink.copy(userCollections = collections.filter(response.drink))
-                    )
-                }
-        }
-        .distinctUntilChanged()
+    override fun fullDrink(alias: String): Flow<FullDrinkResponse> =
+        flow { emit(fullDrinkCache.peek(alias) ?: api.getFullDrink(alias)) }
+            .flatMapLatest { response ->
+                collectionRepository.collections()
+                    .mapLatest { collections ->
+                        response.copy(
+                            relatedDrinks = response.relatedDrinks.map { it.copy(userCollections = collections.filter(it)) },
+                            drink = response.drink.copy(userCollections = collections.filter(response.drink))
+                        )
+                    }
+            }
+            .onEach { fullDrinkCache.put(it.drink.alias, it) }
+            .distinctUntilChanged()
 
     override fun aggregation(): Flow<Aggregation> = flow { emit(api.getAggregation()) }
 
