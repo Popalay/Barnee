@@ -46,6 +46,11 @@ import com.popalay.barnee.domain.log.NavigationLogger
 import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.RouterImpl
+import com.popalay.barnee.domain.notification.NotificationActionHandler
+import com.popalay.barnee.domain.notification.NotificationActionHandlerImpl
+import com.popalay.barnee.domain.notification.NotificationLogger
+import com.popalay.barnee.domain.notification.NotificationService
+import com.popalay.barnee.domain.notification.NotificationServiceImpl
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -74,6 +79,7 @@ val commonModule = module {
     single { if (isDebug) RealLogger() else EmptyLogger }
     single { StateMachineLogger(get()) }
     single { NavigationLogger(get()) }
+    single { NotificationLogger(get()) }
 
     single { Api(get()) }
     single<LocalStore> { LocalStoreImpl(get()) }
@@ -99,11 +105,13 @@ val commonModule = module {
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(named<Drink>()), get(named<FullDrinkResponse>())) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
+    single<NotificationService> { NotificationServiceImpl(get(), get()) }
     single<Router> { RouterImpl(get()) }
     single(named<Drink>()) { Cache<String, Drink>() }
     single(named<FullDrinkResponse>()) { Cache<String, FullDrinkResponse>() }
 
     single { GetCollectionUseCase(get(), get()) }
+    single<NotificationActionHandler> { NotificationActionHandlerImpl(get()) }
 
     factory { DiscoveryStateMachine(get(), get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
