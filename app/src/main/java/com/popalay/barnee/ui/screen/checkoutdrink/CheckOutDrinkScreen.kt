@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.screen.shaketodrink
+package com.popalay.barnee.ui.screen.checkoutdrink
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
@@ -54,12 +54,11 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import coil.compose.rememberImagePainter
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkAction
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkState
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
@@ -81,67 +80,60 @@ import com.popalay.barnee.util.inCollections
 import org.koin.androidx.compose.getViewModel
 
 @Composable
-fun ShakeToDrinkScreen() {
-    ShakeToDrinkScreen(getViewModel(), getViewModel())
+fun CheckOutDrinkScreen() {
+    CheckOutDrinkScreen(getViewModel(), getViewModel())
 }
 
 @Composable
-fun ShakeToDrinkScreen(viewModel: ShakeToDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
+fun CheckOutDrinkScreen(viewModel: CheckOutDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    ShakeToDrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
+    CheckOutDrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
 }
 
 @Composable
-fun ShakeToDrinkScreen(
-    state: ShakeToDrinkState,
-    onAction: (ShakeToDrinkAction) -> Unit,
+fun CheckOutDrinkScreen(
+    state: CheckOutDrinkState,
+    onAction: (CheckOutDrinkAction) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
-    if (state.shouldShow) {
-        val hapticFeedback = LocalHapticFeedback.current
-        LaunchedEffect(Unit) {
-            hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
-        }
+    val hapticFeedback = LocalHapticFeedback.current
+    LaunchedEffect(Unit) {
+        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+    }
 
-        Dialog(onDismissRequest = { onAction(ShakeToDrinkAction.DialogDismissed) }) {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp)
-            ) {
-                Text(
-                    text = "Check it out! \uD83D\uDE32\uD83D\uDE0B",
-                    style = MaterialTheme.typography.h2,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                        .padding(bottom = 16.dp)
-                )
-                Card(
-                    elevation = 4.dp,
-                    shape = MediumSquircleShape,
-                    modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
-                ) {
-                    StateLayout(
-                        value = state.randomDrink,
-                        loadingState = { LoadingStateView() },
-                        errorState = {
-                            ErrorAndRetryStateView(
-                                onRetry = { onAction(ShakeToDrinkAction.Retry) }
-                            )
-                        }
-                    ) { value ->
-                        RandomDrink(
-                            data = value,
-                            onClick = {
-                                onAction(ShakeToDrinkAction.DialogDismissed)
-                                onItemAction(DrinkItemAction.DrinkClicked(value))
-                            },
-                            onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
-                        )
-                    }
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Check it out! \uD83D\uDE32\uD83D\uDE0B",
+            style = MaterialTheme.typography.h2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally)
+                .padding(bottom = 16.dp)
+        )
+        Card(
+            elevation = 4.dp,
+            shape = MediumSquircleShape,
+            modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
+        ) {
+            StateLayout(
+                value = state.randomDrink,
+                loadingState = { LoadingStateView() },
+                errorState = {
+                    ErrorAndRetryStateView(
+                        onRetry = { onAction(CheckOutDrinkAction.Retry) }
+                    )
                 }
+            ) { value ->
+                RandomDrink(
+                    data = value,
+                    onClick = { onItemAction(DrinkItemAction.DrinkClicked(value)) },
+                    onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
+                )
             }
         }
     }
@@ -216,8 +208,8 @@ private fun RandomDrink(
 @Preview("Light Theme", widthDp = 360, heightDp = 640)
 @Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun ShakeToDrinkScreenPreview() {
+fun CheckOutDrinkScreenPreview() {
     BarneeTheme {
-        ShakeToDrinkScreen()
+        CheckOutDrinkScreen()
     }
 }

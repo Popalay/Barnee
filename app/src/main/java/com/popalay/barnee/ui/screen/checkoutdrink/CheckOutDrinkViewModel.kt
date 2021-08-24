@@ -20,9 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.domain.navigation
+package com.popalay.barnee.ui.screen.checkoutdrink
 
-sealed interface Destination {
-    val destination: String
-    val launchSingleTop: Boolean get() = false
-}
+import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkAction
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkState
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkStateMachine
+import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
+
+class CheckOutDrinkViewModel(
+    stateMachine: CheckOutDrinkStateMachine
+) : StateMachineWrapperViewModel<CheckOutDrinkState, CheckOutDrinkAction, EmptySideEffect>(stateMachine)

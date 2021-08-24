@@ -37,6 +37,7 @@ import com.popalay.barnee.data.repository.ShareRepositoryImpl
 import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
 import com.popalay.barnee.domain.app.AppStateMachine
+import com.popalay.barnee.domain.checkoutdrink.CheckOutDrinkStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
@@ -56,7 +57,6 @@ import com.popalay.barnee.domain.notification.NotificationServiceImpl
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
-import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import com.popalay.barnee.util.EmptyLogger
 import com.popalay.barnee.util.RealLogger
@@ -115,13 +115,13 @@ val commonModule = module {
     single { GetCollectionUseCase(get(), get()) }
     single<NotificationActionHandler> { NotificationActionHandlerImpl(get()) }
 
-    factory { AppStateMachine(get()) }
+    factory { AppStateMachine(get(), get(), get()) }
     factory { DiscoveryStateMachine(get(), get()) }
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
     factory { DrinkItemStateMachine(get(), get(), get()) }
-    factory { ShakeToDrinkStateMachine(get(), get()) }
+    factory { CheckOutDrinkStateMachine(get()) }
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
     factory { (input: AddToCollectionInput) -> AddToCollectionStateMachine(input, get(), get(), get()) }

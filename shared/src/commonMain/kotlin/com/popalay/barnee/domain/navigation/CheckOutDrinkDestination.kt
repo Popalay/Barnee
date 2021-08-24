@@ -22,7 +22,8 @@
 
 package com.popalay.barnee.domain.navigation
 
-sealed interface Destination {
-    val destination: String
-    val launchSingleTop: Boolean get() = false
+object CheckOutDrinkDestination : Destination, RouteProvider {
+    override val destination: String = "drink/checkout"
+    override val route: String = "drink/checkout"
+    override val launchSingleTop: Boolean = true
 }

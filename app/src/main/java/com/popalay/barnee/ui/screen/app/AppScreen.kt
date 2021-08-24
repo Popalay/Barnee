@@ -67,6 +67,7 @@ import com.popalay.barnee.domain.notification.NotificationAction
 import com.popalay.barnee.domain.notification.NotificationService
 import com.popalay.barnee.domain.notification.NotificationShowPolicy
 import com.popalay.barnee.navigation.AddToCollectionNavigationCommand
+import com.popalay.barnee.navigation.CheckOutDrinkNavigationCommand
 import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
@@ -78,15 +79,16 @@ import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigate
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.navigation.navigationNodeBottomSheet
+import com.popalay.barnee.navigation.navigationNodeDialog
 import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
+import com.popalay.barnee.ui.screen.checkoutdrink.CheckOutDrinkScreen
 import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
-import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.ImageUrlCoilMapper
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
@@ -122,7 +124,6 @@ fun ComposeApp(viewModel: AppViewModel) {
         CompositionLocalProvider(LocalImageLoader provides imageLoader) {
             NavigationGraph()
             Notifications { viewModel.processAction(AppAction.OnNotificationAction(it)) }
-            ShakeToDrinkScreen()
         }
     }
 }
@@ -189,7 +190,9 @@ private fun NavigationGraph() {
 
     LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
         if (destination == BackDestination) navController.navigateUp()
-        else navController.navigate(destination)
+        else navController.navigate(destination) {
+            launchSingleTop = destination.launchSingleTop
+        }
     }
 
     ModalBottomSheetLayout(
@@ -238,6 +241,9 @@ private fun NavigationGraph() {
             }
             navigationNodeBottomSheet(AddToCollectionNavigationCommand) {
                 AddToCollectionScreen(AddToCollectionNavigationCommand.parseInput(it))
+            }
+            navigationNodeDialog(CheckOutDrinkNavigationCommand) {
+                CheckOutDrinkScreen()
             }
         }
     }
