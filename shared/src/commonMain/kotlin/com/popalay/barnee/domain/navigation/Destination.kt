@@ -24,5 +24,4 @@ package com.popalay.barnee.domain.navigation
 
 sealed interface Destination {
     val destination: String
-    val launchSingleTop: Boolean get() = false
 }

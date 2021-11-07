@@ -20,8 +20,9 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.domain.checkoutdrink
+package com.popalay.barnee.domain.shakedrink
 
+import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
@@ -29,36 +30,61 @@ import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.take
 
-data class CheckOutDrinkState(
-    val randomDrink: Result<Drink> = Uninitialized()
+data class ShakeToDrinkState(
+    val randomDrink: Result<Drink> = Uninitialized(),
+    val shouldShow: Boolean = false
 ) : State
 
-sealed interface CheckOutDrinkAction : Action {
-    object Initial : CheckOutDrinkAction
-    object Retry : CheckOutDrinkAction
+sealed interface ShakeToDrinkAction : Action {
+    object Initial : ShakeToDrinkAction
+    object DialogDismissed : ShakeToDrinkAction
+    object Retry : ShakeToDrinkAction
 }
 
-class CheckOutDrinkStateMachine(
-    drinkRepository: DrinkRepository
-) : StateMachine<CheckOutDrinkState, CheckOutDrinkAction, EmptySideEffect>(
-    initialState = CheckOutDrinkState(),
-    initialAction = CheckOutDrinkAction.Initial,
+class ShakeToDrinkStateMachine(
+    drinkRepository: DrinkRepository,
+    shakeDetector: ShakeDetector
+) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, EmptySideEffect>(
+    initialState = ShakeToDrinkState(),
+    initialAction = ShakeToDrinkAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<CheckOutDrinkAction.Initial>()
+            filterIsInstance<ShakeToDrinkAction.Initial>()
                 .take(1)
+                .flatMapMerge { detectShakes(shakeDetector) }
                 .flatMapToResult { drinkRepository.randomDrink() }
-                .map { state().copy(randomDrink = it) },
-            filterIsInstance<CheckOutDrinkAction.Retry>()
+                .filter { !(it is Success<Drink> && state().randomDrink is Uninitialized) }
+                .map { state().copy(randomDrink = it, shouldShow = it !is Uninitialized) },
+            filterIsInstance<ShakeToDrinkAction.Retry>()
                 .flatMapToResult { drinkRepository.randomDrink() }
-                .map { state().copy(randomDrink = it) },
+                .map { state().copy(randomDrink = it, shouldShow = it !is Uninitialized) },
+            filterIsInstance<ShakeToDrinkAction.DialogDismissed>()
+                .map { state().copy(randomDrink = Uninitialized(), shouldShow = false) },
         )
     }
 )
+
+private fun detectShakes(shakeDetector: ShakeDetector) = callbackFlow {
+    shakeDetector.start {
+        try {
+            trySend(true)
+        } catch (ignore: Exception) {
+            // Handle exception from the channel: failure in flow or premature closing
+        }
+    }
+    awaitClose {
+        shakeDetector.stop()
+    }
+}

@@ -30,9 +30,7 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptionsBuilder
 import androidx.navigation.compose.NamedNavArgument
-import androidx.navigation.compose.dialog
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.google.accompanist.navigation.material.bottomSheet
@@ -42,8 +40,8 @@ import com.popalay.barnee.domain.navigation.RouteProvider
 
 const val DEEPLINK_PREFIX = "https://barnee.com/"
 
-fun NavController.navigate(destination: Destination, builder: NavOptionsBuilder.() -> Unit = {}) {
-    navigate(destination.destination, builder)
+fun NavController.navigate(destination: Destination) {
+    navigate(destination.destination)
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -65,18 +63,6 @@ fun <T : Input> NavGraphBuilder.navigationNodeBottomSheet(
     content: @Composable ColumnScope.(NavBackStackEntry) -> Unit
 ) {
     bottomSheet(
-        route = command.route,
-        deepLinks = command.deeplinks,
-        arguments = command.arguments,
-        content = content
-    )
-}
-
-fun <T : Input> NavGraphBuilder.navigationNodeDialog(
-    command: NavigationCommand<T>,
-    content: @Composable (NavBackStackEntry) -> Unit
-) {
-    dialog(
         route = command.route,
         deepLinks = command.deeplinks,
         arguments = command.arguments,

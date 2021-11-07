@@ -22,23 +22,15 @@
 
 package com.popalay.barnee.domain.app
 
-import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.navigation.CheckOutDrinkDestination
-import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.notification.NotificationAction
 import com.popalay.barnee.domain.notification.NotificationService
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.filterIsInstance
-import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.take
 
 object AppState : State
 
@@ -50,35 +42,15 @@ sealed interface AppAction : Action {
 object AppSideEffect : SideEffect
 
 class AppStateMachine(
-    notificationService: NotificationService,
-    shakeDetector: ShakeDetector,
-    router: Router
+    notificationService: NotificationService
 ) : StateMachine<AppState, AppAction, AppSideEffect>(
     initialState = AppState,
     initialAction = AppAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<AppAction.Initial>()
-                .take(1)
-                .flatMapMerge { detectShakes(shakeDetector) }
-                .onEach { router.navigate(CheckOutDrinkDestination) }
-                .map { state() },
             filterIsInstance<AppAction.OnNotificationAction>()
                 .map { notificationService.handle(it.action) }
                 .map { state() },
         )
     }
 )
-
-private fun detectShakes(shakeDetector: ShakeDetector) = callbackFlow {
-    shakeDetector.start {
-        try {
-            trySend(true)
-        } catch (ignore: Exception) {
-            // Handle exception from the channel: failure in flow or premature closing
-        }
-    }
-    awaitClose {
-        shakeDetector.stop()
-    }
-}

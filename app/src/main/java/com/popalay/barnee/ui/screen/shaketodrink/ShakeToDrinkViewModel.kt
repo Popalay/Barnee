@@ -20,11 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.ui.screen.shaketodrink
 
-import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
-import com.popalay.barnee.domain.navigation.CheckOutDrinkDestination
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
+import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
-object CheckOutDrinkNavigationCommand : NavigationCommand<AddToCollectionInput>,
-    RouteProvider by CheckOutDrinkDestination
+class ShakeToDrinkViewModel(
+    stateMachine: ShakeToDrinkStateMachine
+) : StateMachineWrapperViewModel<ShakeToDrinkState, ShakeToDrinkAction, EmptySideEffect>(stateMachine)
