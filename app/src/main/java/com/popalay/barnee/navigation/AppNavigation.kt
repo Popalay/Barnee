@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,11 +23,11 @@
 package com.popalay.barnee.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.NamedNavArgument
 import androidx.navigation.compose.composable
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.navigation.Destination

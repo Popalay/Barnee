@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.5.10"
+    kotlin("plugin.serialization") version "1.6.10"
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
 }
@@ -48,9 +48,10 @@ kotlin {
     sourceSets {
         all {
             languageSettings.apply {
-                useExperimentalAnnotation("kotlin.RequiresOptIn")
-                useExperimentalAnnotation("kotlinx.coroutines.ExperimentalCoroutinesApi")
-                useExperimentalAnnotation("kotlinx.coroutines.FlowPreview")
+                optIn("kotlin.RequiresOptIn")
+                optIn("kotlinx.coroutines.ExperimentalCoroutinesApi")
+                optIn("kotlinx.coroutines.FlowPreview")
+                optIn("com.russhwolf.settings.ExperimentalSettingsApi")
             }
         }
         configurations {
@@ -96,4 +97,5 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
     }
+    namespace = "com.popalay.barnee.shared"
 }

@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright (c) 2021 Denys Nykyforov
+  ~ Copyright (c) 2022 Denys Nykyforov
   ~
   ~ Permission is hereby granted, free of charge, to any person obtaining a copy
   ~ of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
         <item name="android:navigationBarColor">@color/navigation_bar_color</item>
         <item name="android:windowLightStatusBar">@bool/use_light_status_bar</item>
         <item name="android:windowLightNavigationBar">@bool/use_light_nav_bar</item>
-        <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/ic_launcher_foreground</item>
         <item name="windowSplashScreenBackground">#FF1C2126</item>
         <item name="postSplashScreenTheme">@style/Theme.Barnee</item>
     </style>

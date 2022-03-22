@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,6 +29,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.Fail
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
@@ -84,7 +85,7 @@ class SearchStateMachine(
                 .map { state().searchRequest(drinkRepository) }
                 .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
             filterIsInstance<SearchAction.Retry>()
-                .filter { state().aggregation is Error }
+                .filter { state().aggregation is Fail }
                 .flatMapToResult { drinkRepository.aggregation() }
                 .map { state().copy(aggregation = it) },
             filterIsInstance<SearchAction.QueryChanged>()
