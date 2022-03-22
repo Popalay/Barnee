@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,6 @@ import androidx.navigation.compose.rememberNavController
 import coil.ImageLoader
 import coil.compose.LocalImageLoader
 import coil.util.DebugLogger
-import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
@@ -84,7 +83,6 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    @OptIn(ExperimentalAnimatedInsets::class)
     @Composable
     fun ComposeApp() {
         ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {

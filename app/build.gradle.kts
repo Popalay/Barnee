@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -87,9 +87,9 @@ android {
         }
 
         lint {
-            isCheckReleaseBuilds = false
-            isCheckDependencies = true
-            isIgnoreTestSources = true
+            checkReleaseBuilds = false
+            checkDependencies = true
+            ignoreTestSources = true
         }
     }
 
@@ -106,4 +106,5 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.androidx.compose.get()
     }
+    namespace = "com.popalay.barnee"
 }

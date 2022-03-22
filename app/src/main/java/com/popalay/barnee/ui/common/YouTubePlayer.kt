@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -40,10 +40,10 @@ import androidx.lifecycle.LifecycleOwner
 import at.huber.youtubeExtractor.VideoMeta
 import at.huber.youtubeExtractor.YouTubeExtractor
 import at.huber.youtubeExtractor.YtFile
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.SimpleExoPlayer
 import com.google.android.exoplayer2.source.ProgressiveMediaSource
-import com.google.android.exoplayer2.ui.PlayerView
+import com.google.android.exoplayer2.ui.StyledPlayerView
 import com.google.android.exoplayer2.upstream.DefaultHttpDataSource
 import com.google.android.exoplayer2.util.Util
 
@@ -57,12 +57,12 @@ fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
     var position by rememberSaveable { mutableStateOf(0L) }
 
     val exoPlayer = remember {
-        SimpleExoPlayer.Builder(context).build()
+        ExoPlayer.Builder(context).build()
     }
 
     fun updateState() {
         autoPlay = exoPlayer.playWhenReady
-        window = exoPlayer.currentWindowIndex
+        window = exoPlayer.currentMediaItemIndex
         position = 0L.coerceAtLeast(exoPlayer.contentPosition)
     }
 
@@ -86,7 +86,7 @@ fun YouTubePlayer(uri: String, modifier: Modifier = Modifier) {
 
     AndroidView(
         factory = {
-            PlayerView(context).also { playerView ->
+            StyledPlayerView(context).also { playerView ->
                 playerView.player = exoPlayer
                 lifecycle.addObserver(object : DefaultLifecycleObserver {
                     override fun onResume(owner: LifecycleOwner) {
@@ -112,5 +112,5 @@ private fun String.extractYouTubeUrl(context: Context, onResult: (String) -> Uni
             val videoUrl = ytFiles?.get(22)?.url.orEmpty()
             onResult(videoUrl)
         }
-    }.extract(this, true, true)
+    }.extract(this)
 }
