@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 package com.popalay.barnee.data.model
 
+import com.popalay.barnee.data.transformer.SanitizeStringTransformer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -32,9 +33,9 @@ data class Drink(
     val ingredients: List<Ingredient> = emptyList(),
     val userCollections: List<Collection> = emptyList(),
     @SerialName("howToMix") val instruction: Instruction = Instruction(emptyList()),
-    internal val name: String,
+    @Serializable(with = SanitizeStringTransformer::class) internal val name: String,
     internal val rating: Int,
-    internal val story: String = "",
+    @Serializable(with = SanitizeStringTransformer::class) internal val story: String = "",
     internal val images: List<Image> = emptyList(),
     internal val categories: List<Category> = emptyList(),
     internal val occasions: List<Category> = emptyList(),

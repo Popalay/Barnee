@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,11 +22,12 @@
 
 package com.popalay.barnee.data.model
 
+import com.popalay.barnee.data.transformer.SanitizeStringTransformer
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Category(
-    val text: String,
+    @Serializable(with = SanitizeStringTransformer::class) val text: String,
     val alias: String = "",
     val imageUrl: ImageUrl = EmptyImageUrl
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ object InstructionStepTransformer : KSerializer<InstructionStep> {
     private val regex by lazy { "[\\[][\\w ,'-]+[|][\\w]+[|][\\w\\W]{8}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{12}+[]]".toRegex() }
 
     override val descriptor: SerialDescriptor = buildClassSerialDescriptor("InstructionStep") {
-        element("text", String.serializer().descriptor)
+        element("text", SanitizeStringTransformer.descriptor)
         element("milliliters", Double.serializer().descriptor)
     }
 
@@ -46,7 +46,7 @@ object InstructionStepTransformer : KSerializer<InstructionStep> {
         var milliliters = 0.0
         while (true) {
             when (val index = decodeElementIndex(descriptor)) {
-                0 -> text = decodeStringElement(descriptor, 0)
+                0 -> text = decodeSerializableElement(descriptor, 0, SanitizeStringTransformer)
                 1 -> milliliters = decodeDoubleElement(descriptor, 1)
                 CompositeDecoder.DECODE_DONE -> break
                 else -> error("Unexpected index: $index")

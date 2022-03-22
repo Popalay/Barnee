@@ -116,7 +116,7 @@ class SearchStateMachine(
                 .map { state().copy(searchQuery = "") },
             filterIsInstance<SearchAction.ClearSearchQuery>()
                 .map { state().searchRequest(drinkRepository, query = "") }
-                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
+                .map { state().copy(drinks = it, searchQuery = "", appliedFilters = state().selectedFilters) },
         )
     }
 )

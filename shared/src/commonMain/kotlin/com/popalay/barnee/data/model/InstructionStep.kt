@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021 Denys Nykyforov
+ * Copyright (c) 2022 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,4 +26,6 @@ import com.popalay.barnee.data.transformer.InstructionStepTransformer
 import kotlinx.serialization.Serializable
 
 @Serializable(with = InstructionStepTransformer::class)
-data class InstructionStep(val text: String)
+data class InstructionStep(
+   val text: String
+)
