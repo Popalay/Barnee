@@ -61,10 +61,12 @@ jobs:
           args: --fail-fast --config .github/detekt.yml --report sarif:./reports/detekt.sarif
 
       - name: Upload SARIF to Github using the upload-sarif action
-        uses: github/codeql-action/upload-sarif@v1
+        uses: github/codeql-action/upload-sarif@v1.1.5
         if: always()
         with:
           sarif_file: ./reports/detekt.sarif
+          sha: ${{ env.GITHUB_SHA }}
+          ref: ${{ env.GITHUB_REF }}
 
       - name: Build with Gradle
         run: ./gradlew assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
@@ -92,7 +94,7 @@ jobs:
 
       - name: Publish to Play store
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: r0adkll/upload-google-play@v1
+        uses: r0adkll/upload-google-play@v1.0.15
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_ACCOUNT_JSON }}
           packageName: com.popalay.barnee
