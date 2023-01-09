@@ -52,14 +52,13 @@ import com.popalay.barnee.util.EmptyLogger
 import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
 import io.ktor.client.HttpClient
-import io.ktor.client.features.json.JsonFeature
-import io.ktor.client.features.json.serializer.KotlinxSerializer
-import io.ktor.client.features.logging.DEFAULT
-import io.ktor.client.features.logging.EMPTY
-import io.ktor.client.features.logging.LogLevel
-import io.ktor.client.features.logging.Logger
-import io.ktor.client.features.logging.Logging
-import io.ktor.http.ContentType
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.DEFAULT
+import io.ktor.client.plugins.logging.EMPTY
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
 import org.koin.core.module.Module
@@ -82,9 +81,8 @@ val commonModule = module {
     }
     single {
         HttpClient {
-            install(JsonFeature) {
-                serializer = KotlinxSerializer(get())
-                accept(ContentType.Application.Json)
+            install(ContentNegotiation) {
+                json(get())
             }
             install(Logging) {
                 logger = if (isDebug) Logger.DEFAULT else Logger.EMPTY

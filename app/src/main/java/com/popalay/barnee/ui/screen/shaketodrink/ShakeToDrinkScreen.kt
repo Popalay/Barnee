@@ -50,12 +50,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
@@ -70,7 +72,7 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
@@ -156,9 +158,10 @@ private fun RandomDrink(
 ) {
     BoxWithConstraints(modifier = modifier.clickable(onClick = onClick)) {
         Image(
-            painter = rememberImagePainter(
-                data = data.displayImageUrl,
-                builder = { applyForImageUrl(data.displayImageUrl, constraints.toIntSize()) },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .applyForImageUrl(data.displayImageUrl, constraints.toIntSize())
+                    .build()
             ),
             contentDescription = null,
             modifier = Modifier.fillMaxSize(),

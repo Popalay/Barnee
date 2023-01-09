@@ -27,7 +27,6 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -88,6 +87,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -97,7 +97,9 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
-import coil.compose.rememberImagePainter
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
@@ -134,7 +136,6 @@ import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.findActivity
 import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.calories
@@ -296,7 +297,6 @@ fun DrinkScreenBody(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun DrinkAppBar(
     state: DrinkState,
@@ -338,9 +338,10 @@ private fun DrinkAppBar(
             } else {
                 BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
                     Image(
-                        painter = rememberImagePainter(
-                            data = state.displayImage,
-                            builder = { applyForImageUrl(state.displayImage, constraints.toIntSize()) },
+                        painter = rememberAsyncImagePainter(
+                            ImageRequest.Builder(LocalContext.current)
+                                .applyForImageUrl(state.displayImage, constraints.toIntSize())
+                                .build()
                         ),
                         contentDescription = null,
                         modifier = Modifier.fillMaxSize(),
@@ -442,7 +443,6 @@ private fun DrinkAppBar(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun DrinkActionBar(
     title: String,
@@ -485,7 +485,6 @@ private fun DrinkActionBar(
     )
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun CollectionBanner(
     collection: Collection?,
@@ -592,7 +591,9 @@ private fun Story(
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = if (isTextCollapsed) "More" else "Less",
-                    modifier = Modifier.size(8.dp).rotate(arrowRotation.toFloat())
+                    modifier = Modifier
+                        .size(8.dp)
+                        .rotate(arrowRotation.toFloat())
                 )
             }
         }
@@ -681,13 +682,11 @@ private fun RecommendedDrinks(
             Text(
                 text = "Recommended",
                 style = MaterialTheme.typography.subtitle1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1F)
             )
+            Spacer(modifier = Modifier.fillMaxSize().weight(1F))
             TextButton(
                 onClick = onShowMoreClick,
-                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onBackground)
+                colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onBackground),
             ) {
                 Text(
                     text = "More",
@@ -697,7 +696,9 @@ private fun RecommendedDrinks(
                 Icon(
                     painter = painterResource(R.drawable.ic_arrow_back),
                     contentDescription = "More",
-                    modifier = Modifier.size(8.dp).rotate(180F)
+                    modifier = Modifier
+                        .size(8.dp)
+                        .rotate(180F)
                 )
             }
         }

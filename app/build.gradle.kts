@@ -20,8 +20,6 @@
  * SOFTWARE.
  */
 
-import org.jetbrains.kotlin.gradle.plugin.PLUGIN_CLASSPATH_CONFIGURATION_NAME
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -29,12 +27,13 @@ plugins {
 }
 
 dependencies {
-    add(PLUGIN_CLASSPATH_CONFIGURATION_NAME, libs.androidx.compose.compiler)
     implementation(project(":shared"))
+    implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.exoplayer)
     implementation(libs.youtubeExtractor) {
@@ -85,12 +84,17 @@ android {
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             }
         }
+    }
 
-        lint {
-            checkReleaseBuilds = false
-            checkDependencies = true
-            ignoreTestSources = true
-        }
+    lint {
+        checkReleaseBuilds = false
+        checkDependencies = true
+        ignoreTestSources = true
+    }
+
+    buildFeatures {
+        buildConfig = true
+        compose = true
     }
 
     compileOptions {
@@ -101,10 +105,11 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
         kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
+        kotlinOptions.freeCompilerArgs += "-Xopt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi"
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.get()
+        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
     }
     namespace = "com.popalay.barnee"
 }

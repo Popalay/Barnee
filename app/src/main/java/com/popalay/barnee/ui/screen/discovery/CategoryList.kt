@@ -22,7 +22,6 @@
 
 package com.popalay.barnee.ui.screen.discovery
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -45,10 +44,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
@@ -67,7 +68,6 @@ import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CategoryGrid(
     categories: Result<List<Category>>,
@@ -115,7 +115,6 @@ fun CategoryGrid(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun CategoryListItem(
     data: Category,
@@ -129,9 +128,11 @@ private fun CategoryListItem(
     ) {
         BoxWithConstraints(modifier = Modifier.clickable(onClick = onClick)) {
             Image(
-                painter = rememberImagePainter(
-                    data = data.imageUrl,
-                    builder = { applyForImageUrl(data.imageUrl, constraints.toIntSize()) },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .data(data.imageUrl)
+                        .applyForImageUrl(data.imageUrl, constraints.toIntSize())
+                        .build()
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),

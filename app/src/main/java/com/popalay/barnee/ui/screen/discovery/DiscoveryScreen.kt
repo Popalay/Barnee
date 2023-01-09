@@ -44,7 +44,7 @@ import com.popalay.barnee.domain.discovery.DiscoveryState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 
 @Composable

@@ -46,7 +46,7 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 

@@ -24,7 +24,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization") version "1.6.10"
+    kotlin("plugin.serialization") version libs.versions.kotlin
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
 }
@@ -54,17 +54,14 @@ kotlin {
                 optIn("com.russhwolf.settings.ExperimentalSettingsApi")
             }
         }
-        configurations {
-            all {
-                exclude("com.russhwolf", "multiplatform-settings-coroutines")
-            }
-        }
 
         commonMain {
             dependencies {
                 implementation(libs.ktor.core)
                 implementation(libs.ktor.serialization)
                 implementation(libs.ktor.logging)
+                implementation(libs.ktor.contentNegotiation)
+                implementation(libs.ktor.json)
                 implementation(libs.logback.classic)
                 implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.koin.core)
@@ -94,8 +91,11 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
-        targetSdk = libs.versions.android.targetSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
     }
     namespace = "com.popalay.barnee.shared"
+
+    buildFeatures {
+        buildConfig = true
+    }
 }

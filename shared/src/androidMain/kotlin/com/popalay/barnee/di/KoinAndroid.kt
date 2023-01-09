@@ -34,8 +34,8 @@ import com.popalay.barnee.data.remote.DeeplinkFactory
 import com.popalay.barnee.data.remote.DeeplinkFactoryImpl
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
-import com.russhwolf.settings.coroutines.FlowSettings
 import com.russhwolf.settings.datastore.DataStoreSettings
+import com.russhwolf.settings.coroutines.FlowSettings
 import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore("Settings")

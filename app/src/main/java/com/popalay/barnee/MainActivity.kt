@@ -29,7 +29,6 @@ import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
@@ -39,8 +38,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
+import coil.Coil
 import coil.ImageLoader
-import coil.compose.LocalImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
@@ -92,28 +91,26 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val imageLoader = remember {
                 ImageLoader.Builder(context)
-                    .logger(if (isDebug) DebugLogger() else null)
-                    .componentRegistry {
+                    .logger(if (isDebug) DebugLogger() else null).components {
                         add(ImageUrlCoilMapper())
                     }
                     .build()
             }
 
             LaunchedEffect(Unit) {
-                Firebase.dynamicLinks.getDynamicLink(intent)
-                    .addOnSuccessListener { pendingDynamicLinkData ->
-                        pendingDynamicLinkData?.link?.let {
-                            navController.popBackStack(navController.graph.id, false)
-                            navController.navigate(it)
-                        }
+                Firebase.dynamicLinks.getDynamicLink(intent).addOnSuccessListener { pendingDynamicLinkData ->
+                    pendingDynamicLinkData?.link?.let {
+                        navController.popBackStack(navController.graph.id, false)
+                        navController.navigate(it)
                     }
+                }
+
+                Coil.setImageLoader(imageLoader)
             }
 
-            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                NavigationGraph(navController)
-                AddToCollectionScreen()
-                ShakeToDrinkScreen()
-            }
+            NavigationGraph(navController)
+            AddToCollectionScreen()
+            ShakeToDrinkScreen()
         }
     }
 

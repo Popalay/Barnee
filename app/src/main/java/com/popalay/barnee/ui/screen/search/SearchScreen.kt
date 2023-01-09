@@ -24,7 +24,6 @@ package com.popalay.barnee.ui.screen.search
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -59,11 +58,12 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalTextInputService
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -88,7 +88,7 @@ import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
-import com.popalay.barnee.ui.util.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayNames
 import kotlinx.coroutines.flow.Flow
 import org.koin.androidx.compose.getViewModel
@@ -104,7 +104,7 @@ fun SearchScreen(viewModel: SearchViewModel) {
     SearchScreen(state, viewModel.sideEffectFlow, viewModel::processAction)
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
 fun SearchScreen(
     state: SearchState,
@@ -112,12 +112,12 @@ fun SearchScreen(
     onAction: (SearchAction) -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
-    val textInputService = LocalTextInputService.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
         when (sideEffect) {
             SearchSideEffect.ShowFilters -> {
-                textInputService?.hideSoftwareKeyboard()
+                keyboardController?.hide()
                 bottomSheetState.show()
             }
         }
@@ -150,8 +150,8 @@ fun SearchScreen(
             }
         }
     ) {
-        Scaffold {
-            Column {
+        Scaffold { contentPadding ->
+            Column(Modifier.padding(contentPadding)) {
                 val listState = rememberLazyListState()
                 val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
 
@@ -185,7 +185,6 @@ fun SearchScreen(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun SearchTextField(
     value: String,

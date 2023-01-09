@@ -23,8 +23,9 @@
 package com.popalay.barnee.ui.util
 
 import coil.map.Mapper
+import coil.request.Options
 import com.popalay.barnee.data.model.ImageUrl
 
 class ImageUrlCoilMapper : Mapper<ImageUrl, String> {
-    override fun map(data: ImageUrl) = data.url
+    override fun map(data: ImageUrl, options: Options): String = data.url
 }

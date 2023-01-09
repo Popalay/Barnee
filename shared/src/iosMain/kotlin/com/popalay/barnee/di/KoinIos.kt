@@ -28,8 +28,8 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
-import com.russhwolf.settings.AppleSettings
 import com.russhwolf.settings.ExperimentalSettingsApi
+import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.component.KoinComponent
@@ -41,7 +41,7 @@ import platform.Foundation.NSUserDefaults
 actual val platformModule = module {
     single {
         val delegate = NSUserDefaults("Settings")
-        AppleSettings(delegate).toFlowSettings()
+        NSUserDefaultsSettings(delegate).toFlowSettings()
     }
 }
 

@@ -22,7 +22,6 @@
 
 package com.popalay.barnee.ui.screen.collectionlist
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -46,9 +45,11 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.domain.Result
@@ -67,7 +68,6 @@ import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun CollectionGrid(
     collections: Result<Set<Collection>>,
@@ -198,9 +198,10 @@ private fun CoverImage(
 ) {
     BoxWithConstraints(modifier = modifier) {
         Image(
-            painter = rememberImagePainter(
-                data = image,
-                builder = { applyForImageUrl(image, constraints.toIntSize()) },
+            painter = rememberAsyncImagePainter(
+                ImageRequest.Builder(LocalContext.current)
+                    .applyForImageUrl(image, constraints.toIntSize())
+                    .build()
             ),
             contentDescription = null,
             contentScale = ContentScale.Crop,

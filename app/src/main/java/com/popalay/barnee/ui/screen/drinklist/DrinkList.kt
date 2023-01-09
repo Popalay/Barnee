@@ -48,11 +48,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import coil.compose.rememberImagePainter
+import coil.compose.rememberAsyncImagePainter
+import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
@@ -179,9 +181,10 @@ private fun DrinkListItem(
     ) {
         BoxWithConstraints(modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)) {
             Image(
-                painter = rememberImagePainter(
-                    data = data.displayImageUrl,
-                    builder = { applyForImageUrl(data.displayImageUrl, constraints.toIntSize()) },
+                painter = rememberAsyncImagePainter(
+                    ImageRequest.Builder(LocalContext.current)
+                        .applyForImageUrl(data.displayImageUrl, constraints.toIntSize())
+                        .build()
                 ),
                 contentDescription = null,
                 modifier = Modifier.fillMaxSize(),
