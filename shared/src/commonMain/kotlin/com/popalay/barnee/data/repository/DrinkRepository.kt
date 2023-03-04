@@ -98,22 +98,17 @@ internal class DrinkRepositoryImpl(
     override fun categories(): Flow<List<Category>> = flowOf(
         listOf(
             Category(
-                text = "Non-alcoholic",
-                alias = "is/not/alcoholic",
-                imageUrl = "v1618923872/categories/non-alcoholic.webp".toImageUrl()
-            ),
-            Category(
-                text = "The most famous",
+                text = "Iconic",
                 alias = "story/the famous",
                 imageUrl = "v1618925730/categories/most-famous.webp".toImageUrl()
             ),
             Category(
-                text = "Top rated",
+                text = "Popular",
                 alias = "rating/80",
                 imageUrl = "v1618925107/categories/top-rated.jpg".toImageUrl()
             ),
             Category(
-                text = "Easy to do",
+                text = "Quick-fix",
                 alias = "skill/easy",
                 imageUrl = "v1618923610/categories/easy-to-do.webp".toImageUrl()
             ),
@@ -123,17 +118,22 @@ internal class DrinkRepositoryImpl(
                 imageUrl = "v1618923901/categories/hot.webp".toImageUrl()
             ),
             Category(
-                text = "Cold",
+                text = "Colling",
                 alias = "not/hot",
                 imageUrl = "v1618925541/categories/cold.webp".toImageUrl()
             ),
             Category(
-                text = "Carbonated",
+                text = "Fizzy",
                 alias = "is/carbonated",
                 imageUrl = "v1618923638/categories/carbonated.webp".toImageUrl()
             ),
             Category(
-                text = "Non-carbonated",
+                text = "Virgin",
+                alias = "is/not/alcoholic",
+                imageUrl = "v1618923872/categories/non-alcoholic.webp".toImageUrl()
+            ),
+            Category(
+                text = "Still",
                 alias = "not/carbonated",
                 imageUrl = "v1618923780/categories/non-carbonated.webp".toImageUrl()
             )
