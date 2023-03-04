@@ -104,8 +104,12 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=kotlin.RequiresOptIn"
-        kotlinOptions.freeCompilerArgs += "-Xopt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi"
+        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
+        kotlinOptions.freeCompilerArgs += "-opt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi"
+    }
+
+    packagingOptions {
+        resources.excludes.add("META-INF/INDEX.LIST")
     }
 
     composeOptions {
