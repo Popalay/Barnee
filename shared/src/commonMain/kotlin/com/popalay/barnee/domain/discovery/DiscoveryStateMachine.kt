@@ -32,6 +32,7 @@ import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
 import com.popalay.barnee.domain.navigation.CollectionsDestination
+import com.popalay.barnee.domain.navigation.HouseBarDestination
 import com.popalay.barnee.domain.navigation.QueryDrinksDestination
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.SearchDestination
@@ -49,6 +50,7 @@ sealed interface DiscoveryAction : Action {
     object Initial : DiscoveryAction
     object HeartClicked : DiscoveryAction
     object SearchClicked : DiscoveryAction
+    object HouseBarClicked : DiscoveryAction
     data class CategoryClicked(val category: Category) : DiscoveryAction
 }
 
@@ -72,7 +74,10 @@ class DiscoveryStateMachine(
                 .map { state() },
             filterIsInstance<DiscoveryAction.SearchClicked>()
                 .onEach { router.navigate(SearchDestination) }
-                .map { state() }
+                .map { state() },
+            filterIsInstance<DiscoveryAction.HouseBarClicked>()
+                .onEach { router.navigate(HouseBarDestination) }
+                .map { state() },
         )
     }
 )

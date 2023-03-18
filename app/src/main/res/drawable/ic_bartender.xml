@@ -1,0 +1,33 @@
+<!--
+  ~ Copyright (c) 2023 Denys Nykyforov
+  ~
+  ~ Permission is hereby granted, free of charge, to any person obtaining a copy
+  ~ of this software and associated documentation files (the "Software"), to deal
+  ~ in the Software without restriction, including without limitation the rights
+  ~ to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  ~ copies of the Software, and to permit persons to whom the Software is
+  ~ furnished to do so, subject to the following conditions:
+  ~
+  ~ The above copyright notice and this permission notice shall be included in all
+  ~ copies or substantial portions of the Software.
+  ~
+  ~ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  ~ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  ~ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  ~ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  ~ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  ~ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  ~ SOFTWARE.
+  -->
+
+<vector android:height="24dp"
+    android:viewportHeight="256"
+    android:viewportWidth="236"
+    android:width="24dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+    <path
+        android:fillColor="#EEAF75"
+        android:pathData="M2,118v27h23v109h185V145h24v-27H2zM109.73,229.99c0.74,0.07 1.34,0.82 1.26,1.63c-0.07,0.82 -0.74,1.27 -1.63,1.27H80.92c-0.89,0 -1.56,-0.45 -1.64,-1.27c-0.07,-0.81 0.45,-1.56 1.27,-1.63l11.73,-1.48v-20.13c-22.43,-6.83 -9.95,-32.01 -7.5,-38.69h20.72c2.45,6.68 14.93,31.86 -7.5,38.69v20.13L109.73,229.99zM156.89,230.14c0,1.48 -1.26,2.75 -2.75,2.75h-27.03c-1.49,0 -2.75,-1.19 -2.75,-2.75v-49.68c0,-6.46 4.53,-11.88 10.55,-13.37v-22.2h11.51v22.2c6.01,1.49 10.47,6.91 10.47,13.37V230.14zM127.78,214.77h25.69v-25.7h-25.69V214.77zM146,52H89c-15.59,0 -28,13.41 -28,29v32h20V86c0,-1.71 1.29,-3 3,-3s3,1.29 3,3v27h61V86c0,-1.71 1.29,-3 3,-3s3,1.29 3,3v27h20V81C174,65.51 161.49,52 146,52zM117.5,2c-12.47,0 -22.63,10.16 -22.63,22.63c0,12.46 10.06,22.62 22.63,22.62c12.37,0 22.62,-10.16 22.62,-22.62C140.12,12.16 129.97,2 117.5,2z"
+        />
+</vector>

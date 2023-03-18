@@ -50,6 +50,7 @@ import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
+import com.popalay.barnee.navigation.HouseBarNavigationCommand
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
@@ -61,6 +62,7 @@ import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
+import com.popalay.barnee.ui.screen.housebar.HouseBarScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -147,6 +149,9 @@ class MainActivity : ComponentActivity() {
             }
             navigationNode(SearchNavigationCommand) {
                 SearchScreen()
+            }
+            navigationNode(HouseBarNavigationCommand) {
+                HouseBarScreen()
             }
         }
     }

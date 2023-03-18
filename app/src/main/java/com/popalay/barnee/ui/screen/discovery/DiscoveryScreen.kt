@@ -35,6 +35,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
@@ -44,7 +45,6 @@ import com.popalay.barnee.domain.discovery.DiscoveryState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -65,6 +65,7 @@ private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -
         DiscoveryAppBar(
             onHeartClick = { onAction(DiscoveryAction.HeartClicked) },
             onSearchClick = { onAction(DiscoveryAction.SearchClicked) },
+            onHouseBarClick = { onAction(DiscoveryAction.HouseBarClicked) },
             modifier = Modifier.liftOnScroll(listState)
         )
         CategoryGrid(
@@ -85,12 +86,19 @@ private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -
 private fun DiscoveryAppBar(
     onHeartClick: () -> Unit,
     onSearchClick: () -> Unit,
+    onHouseBarClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ActionsAppBar(
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
+            IconButton(onClick = onHouseBarClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_bartender),
+                    contentDescription = "House bar",
+                )
+            }
             IconButton(onClick = onHeartClick) {
                 Icon(
                     painter = painterResource(R.drawable.ic_favorites),
