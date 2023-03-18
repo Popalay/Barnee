@@ -22,25 +22,20 @@
 
 package com.popalay.barnee.ui.screen.housebar
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.FabPosition
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.popalay.barnee.R
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
@@ -55,20 +50,21 @@ fun HouseBarScreen() {
             )
         },
         floatingActionButtonPosition = FabPosition.Center,
-        floatingActionButton = {
-            ExtendedFloatingActionButton(
-                text = { Text(text = "Shake cocktail") },
-                icon = {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_cocktail_shaker),
-                        contentDescription = "Shake cocktail"
-                    )
-                },
-                backgroundColor = MaterialTheme.colors.primary,
-                onClick = { /*TODO*/ },
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-        },
+//        floatingActionButton = {
+//            ExtendedFloatingActionButton(
+//                text = { Text(text = "Shake cocktail") },
+//                icon = {
+//                    Icon(
+//                        painter = painterResource(id = R.drawable.ic_cocktail_shaker),
+//                        contentDescription = "Shake cocktail"
+//                    )
+//                },
+//                interactionSource = remember { MutableInteractionSource() },
+//                backgroundColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.disabled),
+//                onClick = { /*TODO*/ },
+//                modifier = Modifier.padding(bottom = 16.dp)
+//            )
+//        },
     ) { innerPadding ->
         HouseBarComponents(
             modifier = Modifier.padding(innerPadding)
@@ -91,34 +87,16 @@ private fun HouseBarAppBar(
 private fun HouseBarComponents(
     modifier: Modifier = Modifier,
 ) {
-    Column(
-        modifier = modifier.padding(horizontal = 16.dp)
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .padding(32.dp)
+            .fillMaxSize()
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Spirits")
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = "Add spirit"
-                )
-            }
-        }
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            Text(text = "Other ingredients")
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_add),
-                    contentDescription = "Add ingredient"
-                )
-            }
-        }
+        Text(
+            style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)),
+            textAlign = TextAlign.Center,
+            text = "House bar and AI generated cocktails will be available soon.\nStay tuned! \uD83C\uDF78\uD83D\uDCA5"
+        )
     }
 }
