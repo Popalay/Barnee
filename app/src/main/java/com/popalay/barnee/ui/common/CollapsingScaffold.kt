@@ -66,21 +66,6 @@ import com.popalay.barnee.ui.common.CollapsingScaffoldValue.values
 
 @Composable
 fun rememberCollapsingScaffoldState(
-    minHeight: Dp,
-    maxHeight: Dp,
-    scaffoldState: ScaffoldState = rememberScaffoldState(),
-    initialValue: CollapsingScaffoldValue = Expanded
-): CollapsingScaffoldState = with(LocalDensity.current) {
-    rememberCollapsingScaffoldState(
-        minHeight = minHeight.toPx(),
-        maxHeight = maxHeight.toPx(),
-        scaffoldState = scaffoldState,
-        initialValue = initialValue
-    )
-}
-
-@Composable
-fun rememberCollapsingScaffoldState(
     minHeight: Float,
     maxHeight: Float,
     scaffoldState: ScaffoldState = rememberScaffoldState(),

@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.screen.housebar
+package com.popalay.barnee.ui.screen.bartender
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -41,11 +41,11 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 
 @Composable
-fun HouseBarScreen() {
+fun BartenderScreen() {
     val listState = rememberLazyListState()
     Scaffold(
         topBar = {
-            HouseBarAppBar(
+            BartenderAppBar(
                 modifier = Modifier.liftOnScroll(listState)
             )
         },
@@ -66,25 +66,25 @@ fun HouseBarScreen() {
 //            )
 //        },
     ) { innerPadding ->
-        HouseBarComponents(
+        BartenderComponents(
             modifier = Modifier.padding(innerPadding)
         )
     }
 }
 
 @Composable
-private fun HouseBarAppBar(
+private fun BartenderAppBar(
     modifier: Modifier = Modifier,
 ) {
     ActionsAppBar(
-        title = "House Bar",
+        title = "Your Bartender",
         modifier = modifier,
         leadingButtons = { BackButton() },
     )
 }
 
 @Composable
-private fun HouseBarComponents(
+private fun BartenderComponents(
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -96,7 +96,7 @@ private fun HouseBarComponents(
         Text(
             style = MaterialTheme.typography.h6.copy(color = MaterialTheme.colors.onBackground.copy(alpha = ContentAlpha.medium)),
             textAlign = TextAlign.Center,
-            text = "House bar and AI generated cocktails will be available soon.\nStay tuned! \uD83C\uDF78\uD83D\uDCA5"
+            text = "Home bar and AI generated cocktails will be available soon.\nStay tuned! \uD83C\uDF78\uD83D\uDCA5"
         )
     }
 }

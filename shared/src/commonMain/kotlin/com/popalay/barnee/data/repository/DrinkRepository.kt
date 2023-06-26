@@ -108,7 +108,7 @@ internal class DrinkRepositoryImpl(
                 imageUrl = "v1618925107/categories/top-rated.jpg".toImageUrl()
             ),
             Category(
-                text = "Quick-fix",
+                text = "Easy",
                 alias = "skill/easy",
                 imageUrl = "v1618923610/categories/easy-to-do.webp".toImageUrl()
             ),

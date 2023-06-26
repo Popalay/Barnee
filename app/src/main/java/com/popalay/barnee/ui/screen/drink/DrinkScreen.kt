@@ -146,11 +146,11 @@ import com.popalay.barnee.util.displayText
 import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
-import com.popalay.barnee.util.videoUrl
+import com.popalay.barnee.util.videoId
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 import org.koin.androidx.compose.getViewModel
+import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -307,7 +307,7 @@ private fun DrinkAppBar(
     modifier: Modifier = Modifier,
 ) {
     val drink by remember(state.drinkWithRelated) { derivedStateOf { state.drinkWithRelated()?.drink } }
-    val hasVideo by remember(drink) { derivedStateOf { !drink?.videoUrl.isNullOrBlank() } }
+    val hasVideo by remember(drink) { derivedStateOf { !drink?.videoId.isNullOrBlank() } }
     val titleMaxLines by remember(hasVideo) { derivedStateOf { if (hasVideo) 3 else 6 } }
     val contentAlpha by remember(state, scrollFraction) {
         derivedStateOf { if (state.isPlaying) 0F else 1 - (scrollFraction * 1.5F).coerceAtMost(1F) }
@@ -329,7 +329,7 @@ private fun DrinkAppBar(
         Crossfade(state.isPlaying) { isPlaying ->
             if (isPlaying) {
                 YouTubePlayer(
-                    uri = drink?.videoUrl.orEmpty(),
+                    videoId = drink?.videoId.orEmpty(),
                     modifier = Modifier
                         .fillMaxSize()
                         .background(Color.Black)
@@ -427,7 +427,7 @@ private fun DrinkAppBar(
                     )
                 }
                 AnimatedVisibility(
-                    visible = !drink?.videoUrl.isNullOrBlank(),
+                    visible = !drink?.videoId.isNullOrBlank(),
                     enter = fadeIn(),
                     exit = fadeOut(),
                     modifier = Modifier.constrainAs(playButton) {
@@ -490,7 +490,7 @@ fun CollectionBanner(
     collection: Collection?,
     modifier: Modifier = Modifier
 ) {
-    val router: Router = get()
+    val router: Router = koinInject()
     val scope = rememberCoroutineScope()
 
     AnimatedVisibility(

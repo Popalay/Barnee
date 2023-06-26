@@ -25,8 +25,6 @@ package com.popalay.barnee.domain
 import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.util.CFlow
 import com.popalay.barnee.util.wrap
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.channels.Channel
@@ -48,7 +46,6 @@ interface Action
 interface SideEffect
 object EmptySideEffect : SideEffect
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
 open class StateMachine<S : State, A : Action, SE : SideEffect>(
     initialState: S,
     initialAction: A? = null,

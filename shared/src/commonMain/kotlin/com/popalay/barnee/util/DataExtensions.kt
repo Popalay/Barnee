@@ -39,7 +39,7 @@ val Drink.displayImageUrl: ImageUrl
 
 val Drink.displayName: String get() = name.lowercase().removePrefix("absolut").trim()
 
-val Drink.videoUrl: String? get() = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
+val Drink.videoId: String? get() = videos.firstOrNull()?.youtube
 
 val Drink.displayRating: String get() = (rating / 10F).toIntIfInt().toString()
 

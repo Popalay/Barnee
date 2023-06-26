@@ -20,9 +20,10 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.domain.navigation
+package com.popalay.barnee.navigation
 
-object HouseBarDestination : Destination, RouteProvider {
-    override val destination = "house_bar"
-    override val route: String = "house_bar"
-}
+import com.popalay.barnee.domain.navigation.BartenderDestination
+import com.popalay.barnee.domain.navigation.RouteProvider
+
+object BartenderNavigationCommand : NavigationCommand<Nothing>,
+    RouteProvider by BartenderDestination

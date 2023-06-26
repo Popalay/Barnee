@@ -81,7 +81,6 @@ import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.inCollections
 import org.koin.androidx.compose.getViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrinkGrid(
     drinks: LazyPagingItems<Drink>,

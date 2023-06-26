@@ -65,7 +65,7 @@ private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -
         DiscoveryAppBar(
             onHeartClick = { onAction(DiscoveryAction.HeartClicked) },
             onSearchClick = { onAction(DiscoveryAction.SearchClicked) },
-            onHouseBarClick = { onAction(DiscoveryAction.HouseBarClicked) },
+            onBartenderClick = { onAction(DiscoveryAction.HouseBarClicked) },
             modifier = Modifier.liftOnScroll(listState)
         )
         CategoryGrid(
@@ -86,17 +86,17 @@ private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -
 private fun DiscoveryAppBar(
     onHeartClick: () -> Unit,
     onSearchClick: () -> Unit,
-    onHouseBarClick: () -> Unit,
+    onBartenderClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ActionsAppBar(
         title = stringResource(string.app_name),
         modifier = modifier,
         trailingButtons = {
-            IconButton(onClick = onHouseBarClick) {
+            IconButton(onClick = onBartenderClick) {
                 Icon(
                     painter = painterResource(R.drawable.ic_bartender),
-                    contentDescription = "House bar",
+                    contentDescription = "Your bartender",
                 )
             }
             IconButton(onClick = onHeartClick) {

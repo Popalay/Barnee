@@ -50,7 +50,7 @@ import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.HouseBarNavigationCommand
+import com.popalay.barnee.navigation.BartenderNavigationCommand
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
@@ -62,7 +62,7 @@ import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.housebar.HouseBarScreen
+import com.popalay.barnee.ui.screen.bartender.BartenderScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -70,7 +70,7 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.ImageUrlCoilMapper
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.util.isDebug
-import org.koin.androidx.compose.get
+import org.koin.compose.koinInject
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun NavigationGraph(navController: NavHostController) {
-        val router: Router = get()
+        val router: Router = koinInject()
 
         LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
             if (destination == BackDestination) navController.navigateUp()
@@ -150,8 +150,8 @@ class MainActivity : ComponentActivity() {
             navigationNode(SearchNavigationCommand) {
                 SearchScreen()
             }
-            navigationNode(HouseBarNavigationCommand) {
-                HouseBarScreen()
+            navigationNode(BartenderNavigationCommand) {
+                BartenderScreen()
             }
         }
     }

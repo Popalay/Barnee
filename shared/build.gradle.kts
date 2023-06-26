@@ -39,6 +39,8 @@ kotlin {
     iOSTarget("ios") {}
     android()
 
+    jvmToolchain(8)
+
     cocoapods {
         // Configure fields required by CocoaPods.
         summary = "Some description for a Kotlin/Native module"
@@ -98,4 +100,12 @@ android {
     buildFeatures {
         buildConfig = true
     }
+}
+
+// https://youtrack.jetbrains.com/issue/KT-55751
+configurations {
+    val myAttribute = Attribute.of("dummy.attribute", String::class.java)
+
+    named("podDebugFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
+    named("podReleaseFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
 }

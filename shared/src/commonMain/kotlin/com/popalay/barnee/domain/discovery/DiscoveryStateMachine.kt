@@ -32,7 +32,7 @@ import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
 import com.popalay.barnee.domain.navigation.CollectionsDestination
-import com.popalay.barnee.domain.navigation.HouseBarDestination
+import com.popalay.barnee.domain.navigation.BartenderDestination
 import com.popalay.barnee.domain.navigation.QueryDrinksDestination
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.SearchDestination
@@ -76,7 +76,7 @@ class DiscoveryStateMachine(
                 .onEach { router.navigate(SearchDestination) }
                 .map { state() },
             filterIsInstance<DiscoveryAction.HouseBarClicked>()
-                .onEach { router.navigate(HouseBarDestination) }
+                .onEach { router.navigate(BartenderDestination) }
                 .map { state() },
         )
     }
