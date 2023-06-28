@@ -30,9 +30,11 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -144,6 +146,7 @@ import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
 import com.popalay.barnee.util.displayText
 import com.popalay.barnee.util.isDefault
+import com.popalay.barnee.util.isGenerated
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoId
@@ -277,19 +280,21 @@ fun DrinkScreenBody(
                         instruction = value.drink.instruction,
                         modifier = Modifier.padding(horizontal = 24.dp)
                     )
-                    Divider(modifier = Modifier.padding(vertical = 24.dp))
                     if (value.drink.keywords.isNotEmpty()) {
+                        Divider(modifier = Modifier.padding(vertical = 24.dp))
                         Keywords(
                             keywords = value.drink.keywords,
                             onClick = { onCategoryClicked(it) },
                             modifier = Modifier.padding(horizontal = 16.dp)
                         )
-                        Divider(modifier = Modifier.padding(vertical = 24.dp))
                     }
-                    RecommendedDrinks(
-                        data = value.relatedDrinks,
-                        onShowMoreClick = onMoreRecommendedDrinksClicked,
-                    )
+                    if (value.relatedDrinks.isNotEmpty()) {
+                        Divider(modifier = Modifier.padding(vertical = 24.dp))
+                        RecommendedDrinks(
+                            data = value.relatedDrinks,
+                            onShowMoreClick = onMoreRecommendedDrinksClicked,
+                        )
+                    }
                     Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
                 }
             }
@@ -361,8 +366,7 @@ private fun DrinkAppBar(
 
         ConstraintLayout {
             val (actionBar, title, nutrition) = createRefs()
-            val (collection, rating) = createRefs()
-            val (likeButton, playButton) = createRefs()
+            val (collection, bottomSection, playButton) = createRefs()
             DrinkActionBar(
                 title = state.displayName,
                 titleAlpha = 1 - contentAlpha,
@@ -405,26 +409,33 @@ private fun DrinkAppBar(
                         centerVerticallyTo(nutrition)
                     }
                 )
-                Text(
-                    text = drink?.displayRatingWithMax.orEmpty(),
-                    style = MaterialTheme.typography.h2,
-                    modifier = Modifier.constrainAs(rating) {
-                        start.linkTo(parent.start, 24.dp)
-                        centerVerticallyTo(likeButton)
-                    }
-                )
                 AnimatedVisibility(
                     visible = drink != null,
-                    modifier = Modifier.constrainAs(likeButton) {
+                    enter = slideInVertically { it },
+                    modifier = Modifier.constrainAs(bottomSection) {
+                        start.linkTo(parent.start, 24.dp)
                         end.linkTo(parent.end, 8.dp)
-                        bottom.linkTo(parent.bottom, 8.dp)
+                        bottom.linkTo(parent.bottom, 16.dp)
+                        width = Dimension.fillToConstraints
                     }
                 ) {
-                    AnimatedHeartButton(
-                        onToggle = { onDrinkAction(DrinkItemAction.ToggleFavorite(requireNotNull(drink))) },
-                        isSelected = drink?.collection != null,
-                        iconSize = 32.dp,
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = if (drink?.isGenerated == true) "AI ✨" else drink?.displayRatingWithMax.orEmpty(),
+                            style = MaterialTheme.typography.h2,
+                        )
+
+                        if (drink?.isGenerated == false) {
+                            AnimatedHeartButton(
+                                onToggle = { onDrinkAction(DrinkItemAction.ToggleFavorite(requireNotNull(drink))) },
+                                isSelected = drink?.collection != null,
+                                iconSize = 32.dp,
+                            )
+                        }
+                    }
                 }
                 AnimatedVisibility(
                     visible = !drink?.videoId.isNullOrBlank(),
@@ -432,7 +443,7 @@ private fun DrinkAppBar(
                     exit = fadeOut(),
                     modifier = Modifier.constrainAs(playButton) {
                         top.linkTo(nutrition.bottom)
-                        bottom.linkTo(rating.top)
+                        bottom.linkTo(bottomSection.top)
                         centerHorizontallyTo(parent)
                     }
                 ) {
@@ -683,7 +694,11 @@ private fun RecommendedDrinks(
                 text = "Recommended",
                 style = MaterialTheme.typography.subtitle1,
             )
-            Spacer(modifier = Modifier.fillMaxSize().weight(1F))
+            Spacer(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .weight(1F)
+            )
             TextButton(
                 onClick = onShowMoreClick,
                 colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colors.onBackground),

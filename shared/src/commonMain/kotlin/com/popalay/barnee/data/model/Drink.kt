@@ -28,13 +28,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Drink(
-    val id: String,
-    val alias: String,
+    val id: String = "",
+    val alias: String = "",
     val ingredients: List<Ingredient> = emptyList(),
     val userCollections: List<Collection> = emptyList(),
     @SerialName("howToMix") val instruction: Instruction = Instruction(emptyList()),
     @Serializable(with = SanitizeStringTransformer::class) internal val name: String,
-    internal val rating: Int,
+    internal val rating: Int = 0,
     @Serializable(with = SanitizeStringTransformer::class) internal val story: String = "",
     internal val images: List<Image> = emptyList(),
     internal val categories: List<Category> = emptyList(),

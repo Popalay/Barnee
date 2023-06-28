@@ -22,8 +22,10 @@
 
 package com.popalay.barnee.di
 
+import com.aallam.openai.client.OpenAI
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
+import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.CollectionRepositoryImpl
@@ -90,10 +92,11 @@ val commonModule = module {
             }
         }
     }
-    single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
+    single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
     single<Router> { RouterImpl(get()) }
+    single<AiApi> { AiApi(get(), get(), get()) }
 
     single { GetCollectionUseCase(get(), get()) }
 

@@ -46,6 +46,7 @@ object QueryDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListIn
         val name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()
         return ParameterizedDrinkListInput(
             request = DrinksRequest.ForQuery(query),
+            emptyStateMessage = "No drinks found for \"$query\"",
             title = name.capitalizeFirstChar()
         )
     }

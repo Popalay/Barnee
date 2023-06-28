@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.take
 data class ParameterizedDrinkListInput(
     val request: DrinksRequest,
     val title: String,
+    val emptyStateMessage: String,
     val titleHighlighted: String = ""
 ) : Input
 
@@ -48,9 +49,10 @@ data class ParameterizedDrinkListState(
     val request: DrinksRequest,
     val title: String,
     val titleHighlighted: String,
+    val emptyStateMessage: String,
     val drinks: Flow<PagingData<Drink>> = emptyFlow()
 ) : State {
-    constructor(input: ParameterizedDrinkListInput) : this(input.request, input.title, input.titleHighlighted)
+    constructor(input: ParameterizedDrinkListInput) : this(input.request, input.title, input.titleHighlighted, input.emptyStateMessage)
 }
 
 sealed interface ParameterizedDrinkListAction : Action {

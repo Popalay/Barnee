@@ -26,13 +26,16 @@ import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.navigation.NavHostController
@@ -46,11 +49,11 @@ import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.navigation.BartenderNavigationCommand
 import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.BartenderNavigationCommand
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
@@ -58,11 +61,11 @@ import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigate
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
+import com.popalay.barnee.ui.screen.bartender.ShakeCocktailButton
 import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.bartender.BartenderScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -151,7 +154,12 @@ class MainActivity : ComponentActivity() {
                 SearchScreen()
             }
             navigationNode(BartenderNavigationCommand) {
-                BartenderScreen()
+                ParameterizedDrinkListScreen(
+                    input = BartenderNavigationCommand.parseInput(it),
+                    floatingActionButton = {
+                        ShakeCocktailButton(Modifier.padding(bottom = 16.dp))
+                    }
+                )
             }
         }
     }

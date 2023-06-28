@@ -32,6 +32,7 @@ import kotlinx.serialization.encoding.CompositeDecoder
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.encoding.decodeStructure
+import kotlinx.serialization.encoding.encodeStructure
 
 object InstructionStepTransformer : KSerializer<InstructionStep> {
     private val regex by lazy { "[\\[][\\w ,'-]+[|][\\w]+[|][\\w\\W]{8}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{4}-[\\w\\W]{12}+[]]".toRegex() }
@@ -59,7 +60,7 @@ object InstructionStepTransformer : KSerializer<InstructionStep> {
         InstructionStep(displayText)
     }
 
-    override fun serialize(encoder: Encoder, value: InstructionStep) {
-        error("Serialization is not supported")
+    override fun serialize(encoder: Encoder, value: InstructionStep) = encoder.encodeStructure(descriptor) {
+        encodeStringElement(descriptor, index = 0, value.text)
     }
 }

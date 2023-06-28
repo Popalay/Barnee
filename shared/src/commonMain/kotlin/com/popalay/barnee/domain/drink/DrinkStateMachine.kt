@@ -47,13 +47,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class DrinkInput(
-    val alias: String,
+    val identifier: String,
     val name: String,
     val image: ImageUrl
 ) : Input
 
 data class DrinkState(
-    val alias: String,
+    val identifier: String,
     val name: String,
     val image: ImageUrl,
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
@@ -63,7 +63,7 @@ data class DrinkState(
     val displayName = drinkWithRelated()?.drink?.displayName ?: name
     val displayImage = drinkWithRelated()?.drink?.displayImageUrl ?: image
 
-    constructor(input: DrinkInput) : this(input.alias, input.name, input.image)
+    constructor(input: DrinkInput) : this(input.identifier, input.name, input.image)
 }
 
 sealed interface DrinkAction : Action {
@@ -92,16 +92,16 @@ class DrinkStateMachine(
         merge(
             filterIsInstance<DrinkAction.Initial>()
                 .take(1)
-                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().identifier) }
                 .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.Retry>()
-                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().identifier) }
                 .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
                 .map { state().copy(isPlaying = it) },
             filterIsInstance<DrinkAction.MoreRecommendedDrinksClicked>()
-                .onEach { router.navigate(SimilarDrinksDestination(state().alias, state().displayName)) }
+                .onEach { router.navigate(SimilarDrinksDestination(state().identifier, state().displayName)) }
                 .map { state() },
             filterIsInstance<DrinkAction.CategoryClicked>()
                 .onEach { router.navigate(TagDrinksDestination(it.category)) }

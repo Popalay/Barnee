@@ -69,6 +69,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
+                implementation(libs.openai.client)
                 api(libs.multiplatformpaging)
             }
         }

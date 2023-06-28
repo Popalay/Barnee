@@ -45,6 +45,10 @@ val Drink.displayRating: String get() = (rating / 10F).toIntIfInt().toString()
 
 val Drink.displayRatingWithMax: String get() = displayRating.let { "$it/10" }
 
+val Drink.isGenerated: Boolean get() = id.startsWith("generated_")
+
+val Drink.identifier: String get() = alias.ifBlank { id }
+
 val Drink.keywords: List<Category>
     get() = (categories + collections + occasions)
         .filter { it.alias.isNotBlank() }
@@ -63,9 +67,9 @@ fun Iterable<Collection>.filter(drink: Drink) = filter { drink.alias in it.alias
 val AggregationGroup.displayNames get() = values.keys.map { it.replace(' ', '-') to it.lowercase().replace('-', ' ') }
 
 fun String.toImageUrl() = when {
-    isBlank() -> EmptyImageUrl
+    isBlank()                                 -> EmptyImageUrl
     startsWith("http") || startsWith("https") -> ExternalImageUrl(this)
-    else -> InternalImageUrl(this)
+    else                                      -> InternalImageUrl(this)
 }
 
 val Category.displayText get() = text.lowercase()

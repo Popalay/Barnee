@@ -20,32 +20,37 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.domain.navigation
+package com.popalay.barnee.domain.bartender
 
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.data.model.ImageUrl
-import com.popalay.barnee.util.displayImageUrl
-import com.popalay.barnee.util.displayName
-import com.popalay.barnee.util.identifier
-import kotlin.jvm.JvmInline
+import com.popalay.barnee.data.repository.DrinkRepository
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.Result
+import com.popalay.barnee.domain.SideEffect
+import com.popalay.barnee.domain.State
+import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.Uninitialized
+import kotlinx.coroutines.flow.merge
 
-@JvmInline
-value class DrinkDestination private constructor(
-    override val destination: String
-) : Destination {
-    constructor(
-        identifier: String,
-        name: String,
-        image: ImageUrl
-    ) : this("drink/$identifier?$KEY_IMAGE=$image&$KEY_NAME=$name")
-
-    constructor(drink: Drink) : this(drink.identifier, drink.displayName, drink.displayImageUrl)
-
-    companion object : RouteProvider {
-        const val KEY_IDENTIFIER = "identifier"
-        const val KEY_NAME = "name"
-        const val KEY_IMAGE = "image"
-
-        override val route: String = "drink/{$KEY_IDENTIFIER}?$KEY_IMAGE={$KEY_IMAGE}&$KEY_NAME={$KEY_NAME}"
-    }
+data class BartenderState(
+    val generatedDrink: Result<Drink> = Uninitialized(),
+) : State {
 }
+
+sealed interface BartenderAction : Action {
+    object Initial : BartenderAction
+}
+
+sealed interface BartenderSideEffect : SideEffect {
+}
+
+class BartenderStateMachine(
+    drinkRepository: DrinkRepository,
+) : StateMachine<BartenderState, BartenderAction, BartenderSideEffect>(
+    initialState = BartenderState(),
+    initialAction = BartenderAction.Initial,
+    reducer = { state, sideEffectConsumer ->
+        merge(
+        )
+    }
+)

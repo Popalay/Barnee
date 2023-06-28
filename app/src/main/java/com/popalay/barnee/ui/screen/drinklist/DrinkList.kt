@@ -79,6 +79,7 @@ import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.inCollections
+import com.popalay.barnee.util.isGenerated
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -208,18 +209,20 @@ private fun DrinkListItem(
                         .padding(end = 8.dp)
                 )
                 Text(
-                    text = data.displayRating,
+                    text = if (data.isGenerated) "AI ✨" else data.displayRating,
                     style = MaterialTheme.typography.h3,
                     color = MaterialTheme.colors.primary
                 )
             }
-            AnimatedHeartButton(
-                onToggle = onHeartClick,
-                isSelected = data.inCollections,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp)
-            )
+            if(!data.isGenerated) {
+                AnimatedHeartButton(
+                    onToggle = onHeartClick,
+                    isSelected = data.inCollections,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                )
+            }
         }
     }
 }

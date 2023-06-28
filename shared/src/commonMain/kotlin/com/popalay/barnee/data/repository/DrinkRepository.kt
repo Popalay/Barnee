@@ -25,19 +25,24 @@ package com.popalay.barnee.data.repository
 import com.kuuurt.paging.multiplatform.PagingData
 import com.kuuurt.paging.multiplatform.filter
 import com.kuuurt.paging.multiplatform.map
+import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
+import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.DrinksRequest.ByAliases
 import com.popalay.barnee.data.repository.DrinksRequest.Collection
 import com.popalay.barnee.data.repository.DrinksRequest.ForQuery
 import com.popalay.barnee.data.repository.DrinksRequest.ForTags
+import com.popalay.barnee.data.repository.DrinksRequest.Generated
 import com.popalay.barnee.data.repository.DrinksRequest.Random
 import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import com.popalay.barnee.data.repository.DrinksRequest.Search
+import com.popalay.barnee.util.Logger
 import com.popalay.barnee.util.filter
+import com.popalay.barnee.util.identifier
 import com.popalay.barnee.util.toImageUrl
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -47,12 +52,16 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
+import kotlinx.serialization.json.Json
 
 interface DrinkRepository {
     fun drinks(request: DrinksRequest): Flow<PagingData<Drink>>
     fun randomDrink(): Flow<Drink>
-    fun fullDrink(alias: String): Flow<FullDrinkResponse>
+    fun fullDrink(identifier: String): Flow<FullDrinkResponse>
+    fun drinkForPrompt(prompt: String): Flow<Drink>
     fun aggregation(): Flow<Aggregation>
     fun categories(): Flow<List<Category>>
 }
@@ -60,17 +69,22 @@ interface DrinkRepository {
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DrinkRepositoryImpl(
     private val api: Api,
+    private val aiApi: AiApi,
+    private val localStore: LocalStore,
+    private val json: Json,
+    private val logger: Logger,
     private val collectionRepository: CollectionRepository
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =
         when (request) {
-            is RelatedTo -> requestPage { api.similarDrinks(request.alias) }
-            is ForTags -> requestPage { api.drinksByTags(request.tags, it.skip, it.take) }
-            is ForQuery -> requestPage { api.drinks(request.query, it.skip, it.take) }
-            is ByAliases -> requestPage { api.drinksByAliases(request.aliases, it.skip, it.take) }
-            is Random -> requestPage { api.random(it.skip, it.take) }
-            is Search -> requestPage { searchDrinks(request.query, request.filters, it) }
+            is RelatedTo  -> requestPage { api.similarDrinks(request.alias) }
+            is ForTags    -> requestPage { api.drinksByTags(request.tags, it.skip, it.take) }
+            is ForQuery   -> requestPage { api.drinks(request.query, it.skip, it.take) }
+            is ByAliases  -> requestPage { api.drinksByAliases(request.aliases, it.skip, it.take) }
+            is Random     -> requestPage { api.random(it.skip, it.take) }
+            is Search     -> requestPage { searchDrinks(request.query, request.filters, it) }
             is Collection -> collection(request.name)
+            is Generated  -> generatedDrinks()
         }
             .distinctUntilChanged()
 
@@ -81,15 +95,30 @@ internal class DrinkRepositoryImpl(
         }
         .distinctUntilChanged()
 
-    override fun fullDrink(alias: String): Flow<FullDrinkResponse> = flow { emit(api.getFullDrink(alias)) }
-        .flatMapLatest { response ->
+    override fun fullDrink(identifier: String): Flow<FullDrinkResponse> =
+        if (identifier.startsWith("generated_")) {
+            generatedFullDrink(identifier)
+        } else {
+            flow { emit(api.getFullDrink(identifier)) }
+        }
+            .flatMapLatest { response ->
+                collectionRepository.collections()
+                    .mapLatest { collections ->
+                        response.copy(
+                            relatedDrinks = response.relatedDrinks.map { it.copy(userCollections = collections.filter(it)) },
+                            drink = response.drink.copy(userCollections = collections.filter(response.drink))
+                        )
+                    }
+            }
+            .distinctUntilChanged()
+
+    override fun drinkForPrompt(prompt: String): Flow<Drink> = flow { emit(aiApi.getDrinkByPrompt(prompt)) }
+        .onEach { drink ->
+            localStore.saveToSet(KEY_GENERATED_DRINKS, json.encodeToString(Drink.serializer(), drink))
+        }
+        .flatMapLatest { drink ->
             collectionRepository.collections()
-                .mapLatest { collections ->
-                    response.copy(
-                        relatedDrinks = response.relatedDrinks.map { it.copy(userCollections = collections.filter(it)) },
-                        drink = response.drink.copy(userCollections = collections.filter(response.drink))
-                    )
-                }
+                .mapLatest { collections -> drink.copy(userCollections = collections.filter(drink)) }
         }
         .distinctUntilChanged()
 
@@ -147,6 +176,16 @@ internal class DrinkRepositoryImpl(
                     .map { collections -> pagedDrinks.map { it.copy(userCollections = collections.filter(it)) } }
             }
 
+    private fun generatedDrinks(): Flow<PagingData<Drink>> = localStore.setAsFlow(KEY_GENERATED_DRINKS)
+        .map { stringSet -> stringSet.filter(String::isNotBlank).map { json.decodeFromString(Drink.serializer(), it) } }
+        .flatMapLatest { drinks -> requestPage { drinks } }
+
+    private fun generatedFullDrink(identifier: String): Flow<FullDrinkResponse> = localStore.setAsFlow(KEY_GENERATED_DRINKS)
+        .map { stringSet -> stringSet.filter(String::isNotBlank).map { json.decodeFromString(Drink.serializer(), it) } }
+        .mapNotNull { drinks -> drinks.firstOrNull { it.identifier == identifier } }
+        .map { FullDrinkResponse(emptyList(), it) }
+        .distinctUntilChanged()
+
     private fun collection(name: String): Flow<PagingData<Drink>> = collectionRepository.collection(name)
         .take(1)
         .flatMapLatest { collection ->
@@ -175,5 +214,9 @@ internal class DrinkRepositoryImpl(
             .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
 
         return api.searchDrinks(searchRequest, pageRequest.skip, pageRequest.take)
+    }
+
+    companion object {
+        private const val KEY_GENERATED_DRINKS = "KEY_GENERATED_DRINKS"
     }
 }

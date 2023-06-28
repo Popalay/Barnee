@@ -30,7 +30,7 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.navigation.DrinkDestination
-import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_ALIAS
+import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_IDENTIFIER
 import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_IMAGE
 import com.popalay.barnee.domain.navigation.DrinkDestination.Companion.KEY_NAME
 import com.popalay.barnee.domain.navigation.RouteProvider
@@ -39,7 +39,7 @@ import com.popalay.barnee.util.toImageUrl
 object DrinkNavigationCommand : NavigationCommand<DrinkInput>,
     RouteProvider by DrinkDestination.Companion {
     override val arguments: List<NamedNavArgument> = listOf(
-        navArgument(KEY_ALIAS) { type = NavType.StringType },
+        navArgument(KEY_IDENTIFIER) { type = NavType.StringType },
         navArgument(KEY_IMAGE) { type = NavType.StringType },
         navArgument(KEY_NAME) { type = NavType.StringType }
     )
@@ -49,7 +49,7 @@ object DrinkNavigationCommand : NavigationCommand<DrinkInput>,
     )
 
     override fun parseInput(backStackEntry: NavBackStackEntry) = DrinkInput(
-        alias = backStackEntry.arguments?.getString(KEY_ALIAS).orEmpty(),
+        identifier = backStackEntry.arguments?.getString(KEY_IDENTIFIER).orEmpty(),
         image = backStackEntry.arguments?.getString(KEY_IMAGE).orEmpty().toImageUrl(),
         name = backStackEntry.arguments?.getString(KEY_NAME).orEmpty()
     )
