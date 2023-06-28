@@ -30,27 +30,58 @@ import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
+import com.popalay.barnee.domain.navigation.BackDestination
+import com.popalay.barnee.domain.navigation.Router
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onCompletion
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.take
 
 data class BartenderState(
     val generatedDrink: Result<Drink> = Uninitialized(),
+    val prompt: String = "",
+    val isLoading: Boolean = false,
+    val isError: Boolean = false,
 ) : State {
+    val isPromptValid = prompt.isNotBlank() && prompt.length >= 3
 }
 
 sealed interface BartenderAction : Action {
+    data class OnPromptChanged(val prompt: String) : BartenderAction
+    object OnGenerateDrinkClicked : BartenderAction
+    object OnCloseClicked : BartenderAction
     object Initial : BartenderAction
 }
 
-sealed interface BartenderSideEffect : SideEffect {
-}
+sealed interface BartenderSideEffect : SideEffect
 
 class BartenderStateMachine(
     drinkRepository: DrinkRepository,
+    router: Router,
 ) : StateMachine<BartenderState, BartenderAction, BartenderSideEffect>(
     initialState = BartenderState(),
     initialAction = BartenderAction.Initial,
-    reducer = { state, sideEffectConsumer ->
+    reducer = { state, _ ->
         merge(
+            filterIsInstance<BartenderAction.OnPromptChanged>()
+                .map { state().copy(prompt = it.prompt) },
+            filterIsInstance<BartenderAction.OnGenerateDrinkClicked>()
+                .flatMapLatest {
+                    drinkRepository.drinkForPrompt(state().prompt)
+                        .take(1)
+                        .map { state().copy(isLoading = false, isError = false) }
+                        .onStart { emit(state().copy(isLoading = true, isError = false)) }
+                        .catch { emit(state().copy(isError = true, isLoading = false)) }
+                        .onCompletion { router.navigate(BackDestination) }
+                },
+            filterIsInstance<BartenderAction.OnCloseClicked>()
+                .onEach { router.navigate(BackDestination) }
+                .map { state() },
         )
     }
 )

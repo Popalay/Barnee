@@ -22,10 +22,19 @@
 
 package com.popalay.barnee.navigation
 
-import com.popalay.barnee.domain.navigation.BartenderDestination
+import androidx.navigation.NavBackStackEntry
+import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.domain.navigation.GeneratedDrinksDestination
 import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 
-object BartenderNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by BartenderDestination {
-    override val navigationType: NavigationCommand.NavigationType = NavigationCommand.NavigationType.BottomSheet
+object GeneratedDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInput>,
+    RouteProvider by GeneratedDrinksDestination {
+
+    override fun parseInput(backStackEntry: NavBackStackEntry): ParameterizedDrinkListInput =
+        ParameterizedDrinkListInput(
+            request = DrinksRequest.Generated,
+            emptyStateMessage = "No have no generated drinks yet.\nLet's make some! 🍸",
+            title = "Your Bartender",
+        )
 }

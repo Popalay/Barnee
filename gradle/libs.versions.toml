@@ -59,6 +59,7 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 #Accompanist
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
+accompanist-navigation = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
 
 #Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -96,5 +97,5 @@ openai-client = { module = "com.aallam.openai:openai-client", version.ref = "ope
 [bundles]
 androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime"]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
-accompanist = ["accompanist-insets", "accompanist-flowlayout"]
+accompanist = ["accompanist-insets", "accompanist-flowlayout", "accompanist-navigation"]
 koin = ["koin-android", "koin-core", "koin-compose"]

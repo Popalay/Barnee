@@ -20,12 +20,9 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.navigation.BartenderDestination
-import com.popalay.barnee.domain.navigation.RouteProvider
-
-object BartenderNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by BartenderDestination {
-    override val navigationType: NavigationCommand.NavigationType = NavigationCommand.NavigationType.BottomSheet
+object GeneratedDrinksDestination : Destination, RouteProvider {
+    override val destination = "generated-drinks"
+    override val route: String = "generated-drinks"
 }

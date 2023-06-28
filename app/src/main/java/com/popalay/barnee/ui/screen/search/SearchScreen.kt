@@ -50,7 +50,6 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
@@ -68,6 +67,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.navigationBarsHeight
@@ -80,6 +80,7 @@ import com.popalay.barnee.domain.search.SearchSideEffect
 import com.popalay.barnee.domain.search.SearchState
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
+import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.EmptyStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
@@ -88,7 +89,6 @@ import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.util.displayNames
 import kotlinx.coroutines.flow.Flow
 import org.koin.androidx.compose.getViewModel
@@ -192,7 +192,7 @@ private fun SearchTextField(
     onClearClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    TextField(
+    BarneeTextField(
         value = value,
         leadingIcon = {
             Icon(

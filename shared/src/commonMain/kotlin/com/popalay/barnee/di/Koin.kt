@@ -34,6 +34,7 @@ import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.data.repository.ShareRepositoryImpl
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
+import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
@@ -95,6 +96,7 @@ val commonModule = module {
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
+    single<OpenAI> { OpenAI(token = "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") } // TODO: Move to config
     single<Router> { RouterImpl(get()) }
     single<AiApi> { AiApi(get(), get(), get()) }
 
@@ -109,6 +111,7 @@ val commonModule = module {
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
     factory { AddToCollectionStateMachine(get()) }
+    factory { BartenderStateMachine(get(), get()) }
 }
 
 expect val platformModule: Module

@@ -45,6 +45,9 @@ import coil.Coil
 import coil.ImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.ModalBottomSheetLayout
+import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.domain.navigation.BackDestination
@@ -54,6 +57,7 @@ import com.popalay.barnee.navigation.CollectionNavigationCommand
 import com.popalay.barnee.navigation.CollectionsNavigationCommand
 import com.popalay.barnee.navigation.DiscoveryNavigationCommand
 import com.popalay.barnee.navigation.DrinkNavigationCommand
+import com.popalay.barnee.navigation.GeneratedDrinksNavigationCommand
 import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
 import com.popalay.barnee.navigation.SearchNavigationCommand
 import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
@@ -61,6 +65,7 @@ import com.popalay.barnee.navigation.TagDrinksNavigationCommand
 import com.popalay.barnee.navigation.navigate
 import com.popalay.barnee.navigation.navigationNode
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
+import com.popalay.barnee.ui.screen.bartender.BartenderScreen
 import com.popalay.barnee.ui.screen.bartender.ShakeCocktailButton
 import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
@@ -89,11 +94,13 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterialNavigationApi::class)
     @Composable
     fun ComposeApp() {
         ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
             val context = LocalContext.current
-            val navController = rememberNavController()
+            val bottomSheetNavigator = rememberBottomSheetNavigator()
+            val navController = rememberNavController(bottomSheetNavigator)
             val imageLoader = remember {
                 ImageLoader.Builder(context)
                     .logger(if (isDebug) DebugLogger() else null).components {
@@ -113,9 +120,17 @@ class MainActivity : ComponentActivity() {
                 Coil.setImageLoader(imageLoader)
             }
 
-            NavigationGraph(navController)
-            AddToCollectionScreen()
-            ShakeToDrinkScreen()
+            ModalBottomSheetLayout(
+                bottomSheetNavigator = bottomSheetNavigator,
+                sheetElevation = 1.dp,
+                sheetBackgroundColor = MaterialTheme.colors.background,
+                sheetContentColor = MaterialTheme.colors.onBackground,
+                scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
+            ) {
+                NavigationGraph(navController)
+                AddToCollectionScreen()
+                ShakeToDrinkScreen()
+            }
         }
     }
 
@@ -153,13 +168,14 @@ class MainActivity : ComponentActivity() {
             navigationNode(SearchNavigationCommand) {
                 SearchScreen()
             }
-            navigationNode(BartenderNavigationCommand) {
+            navigationNode(GeneratedDrinksNavigationCommand) {
                 ParameterizedDrinkListScreen(
-                    input = BartenderNavigationCommand.parseInput(it),
-                    floatingActionButton = {
-                        ShakeCocktailButton(Modifier.padding(bottom = 16.dp))
-                    }
+                    input = GeneratedDrinksNavigationCommand.parseInput(it),
+                    floatingActionButton = { ShakeCocktailButton(Modifier.padding(bottom = 16.dp)) }
                 )
+            }
+            navigationNode(BartenderNavigationCommand) {
+                BartenderScreen()
             }
         }
     }

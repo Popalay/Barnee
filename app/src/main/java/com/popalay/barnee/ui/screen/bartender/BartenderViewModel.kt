@@ -20,12 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.navigation
+package com.popalay.barnee.ui.screen.bartender
 
-import com.popalay.barnee.domain.navigation.BartenderDestination
-import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.domain.bartender.BartenderAction
+import com.popalay.barnee.domain.bartender.BartenderSideEffect
+import com.popalay.barnee.domain.bartender.BartenderState
+import com.popalay.barnee.domain.bartender.BartenderStateMachine
+import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
-object BartenderNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by BartenderDestination {
-    override val navigationType: NavigationCommand.NavigationType = NavigationCommand.NavigationType.BottomSheet
-}
+class BartenderViewModel(
+    stateMachine: BartenderStateMachine
+) : StateMachineWrapperViewModel<BartenderState, BartenderAction, BartenderSideEffect>(stateMachine)
