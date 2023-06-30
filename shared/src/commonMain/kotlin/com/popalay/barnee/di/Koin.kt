@@ -51,6 +51,7 @@ import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListSt
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
+import com.popalay.barnee.shared.BuildKonfig
 import com.popalay.barnee.util.EmptyLogger
 import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
@@ -96,7 +97,7 @@ val commonModule = module {
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
-    single<OpenAI> { OpenAI(token = "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") } // TODO: Move to config
+    single<OpenAI> { OpenAI(token = BuildKonfig.OPEN_AI_API_KEY) }
     single<Router> { RouterImpl(get()) }
     single<AiApi> { AiApi(get(), get(), get()) }
 

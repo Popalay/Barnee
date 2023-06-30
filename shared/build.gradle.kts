@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -27,6 +29,7 @@ plugins {
     kotlin("plugin.serialization") version libs.versions.kotlin
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
+    id("com.codingfeline.buildkonfig") version libs.versions.buildkonfig.gradle.plugin
 }
 
 // CocoaPods requires the podspec to have a version.
@@ -38,8 +41,6 @@ kotlin {
 
     iOSTarget("ios") {}
     android()
-
-    jvmToolchain(8)
 
     cocoapods {
         // Configure fields required by CocoaPods.
@@ -100,6 +101,30 @@ android {
 
     buildFeatures {
         buildConfig = true
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+buildkonfig {
+    packageName = "com.popalay.barnee.shared"
+
+    val openApiKeyName = "OPEN_AI_API_KEY"
+    val devOpenAiApiKey = System.getenv(openApiKeyName)
+        ?: gradleLocalProperties(rootDir).getProperty(openApiKeyName)
+        ?: error("No $openApiKeyName provided")
+
+    defaultConfigs {
+        buildConfigField(
+            type = FieldSpec.Type.STRING,
+            name = openApiKeyName,
+            value = devOpenAiApiKey,
+            const = true,
+            nullable = false
+        )
     }
 }
 
