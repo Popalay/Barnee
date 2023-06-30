@@ -25,6 +25,7 @@ package com.popalay.barnee.di
 import com.aallam.openai.client.OpenAI
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
+import com.popalay.barnee.data.message.MessagesProvider
 import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.CollectionRepository
@@ -33,6 +34,7 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.data.repository.ShareRepositoryImpl
+import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
 import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
@@ -100,6 +102,7 @@ val commonModule = module {
     single<OpenAI> { OpenAI(token = BuildKonfig.OPEN_AI_API_KEY) }
     single<Router> { RouterImpl(get()) }
     single<AiApi> { AiApi(get(), get(), get()) }
+    single { MessagesProvider() }
 
     single { GetCollectionUseCase(get(), get()) }
 
@@ -107,11 +110,11 @@ val commonModule = module {
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
-    factory { DrinkItemStateMachine(get(), get()) }
+    factory { DrinkItemStateMachine(get(), get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
-    factory { AddToCollectionStateMachine(get()) }
+    factory { (input: AddToCollectionInput) -> AddToCollectionStateMachine(input, get(), get()) }
     factory { BartenderStateMachine(get(), get()) }
 }
 

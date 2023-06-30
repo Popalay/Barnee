@@ -27,7 +27,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -62,7 +62,7 @@ sealed interface ParameterizedDrinkListAction : Action {
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, EmptySideEffect>(
+) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, NoSideEffect>(
     initialState = ParameterizedDrinkListState(input),
     initialAction = ParameterizedDrinkListAction.Initial,
     reducer = { state, _ ->

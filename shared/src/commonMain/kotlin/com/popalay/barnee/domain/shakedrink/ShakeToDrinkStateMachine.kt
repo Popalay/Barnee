@@ -26,7 +26,7 @@ import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -56,7 +56,7 @@ sealed interface ShakeToDrinkAction : Action {
 class ShakeToDrinkStateMachine(
     drinkRepository: DrinkRepository,
     shakeDetector: ShakeDetector
-) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, EmptySideEffect>(
+) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, NoSideEffect>(
     initialState = ShakeToDrinkState(),
     initialAction = ShakeToDrinkAction.Initial,
     reducer = { state, _ ->

@@ -28,12 +28,12 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
 import com.popalay.barnee.domain.Input
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.navigateBack
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -74,7 +74,7 @@ class CollectionStateMachine(
     shareRepository: ShareRepository,
     getCollectionUseCase: GetCollectionUseCase,
     router: Router
-) : StateMachine<CollectionState, CollectionAction, EmptySideEffect>(
+) : StateMachine<CollectionState, CollectionAction, NoSideEffect>(
     initialState = CollectionState(input),
     initialAction = CollectionAction.Initial,
     reducer = { state, _ ->
@@ -93,7 +93,7 @@ class CollectionStateMachine(
                 },
             filterIsInstance<CollectionAction.RemoveClicked>()
                 .map { collectionRepository.remove(state().name) }
-                .onEach { router.navigate(BackDestination) }
+                .onEach { router.navigateBack() }
                 .map { state() },
             filterIsInstance<CollectionAction.ShareClicked>()
                 .map { state().collection?.let { shareRepository.shareCollection(it) } }

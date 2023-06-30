@@ -43,3 +43,9 @@ data class Drink(
     internal val videos: List<Video> = emptyList(),
     @SerialName("nutritions") internal val nutrition: Nutrition = Nutrition(0)
 )
+
+data class DrinkMinimumData(
+    val identifier: String,
+    val name: String,
+    val displayImageUrl: ImageUrl,
+)

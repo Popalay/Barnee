@@ -26,6 +26,7 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.EmptyImageUrl
 import com.popalay.barnee.data.model.ExternalImageUrl
 import com.popalay.barnee.data.model.ImageUrl
@@ -62,7 +63,8 @@ val Drink.calories: String get() = nutrition.totalCalories.toString().let { "$it
 
 val Drink.collection: Collection? get() = userCollections.firstOrNull()
 
-fun Iterable<Collection>.filter(drink: Drink) = filter { drink.alias in it.aliases }
+fun Iterable<Collection>.filter(drink: DrinkMinimumData) = filter { drink.identifier in it.aliases }
+fun Iterable<Collection>.filter(drink: Drink) = filter { drink.identifier in it.aliases }
 
 val AggregationGroup.displayNames get() = values.keys.map { it.replace(' ', '-') to it.lowercase().replace('-', ' ') }
 
@@ -71,6 +73,12 @@ fun String.toImageUrl() = when {
     startsWith("http") || startsWith("https") -> ExternalImageUrl(this)
     else                                      -> InternalImageUrl(this)
 }
+
+fun Drink.toMinimumData() = DrinkMinimumData(
+    identifier = identifier,
+    name = displayName,
+    displayImageUrl = displayImageUrl
+)
 
 val Category.displayText get() = text.lowercase()
 

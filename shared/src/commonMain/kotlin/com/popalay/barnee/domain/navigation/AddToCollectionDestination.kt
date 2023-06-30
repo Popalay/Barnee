@@ -22,29 +22,30 @@
 
 package com.popalay.barnee.domain.navigation
 
-import com.popalay.barnee.domain.log.NavigationLogger
-import com.popalay.barnee.util.CFlow
-import com.popalay.barnee.util.wrap
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
+import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.ImageUrl
+import com.popalay.barnee.util.displayImageUrl
+import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.identifier
+import kotlin.jvm.JvmInline
 
-interface Router {
-    val destinationFlow: CFlow<Destination>
-    suspend fun navigate(destination: Destination)
-}
+@JvmInline
+value class AddToCollectionDestination private constructor(
+    override val destination: String
+) : Destination {
+    constructor(
+        identifier: String,
+        name: String,
+        image: ImageUrl
+    ) : this("add-to-collection/$identifier?$KEY_IMAGE=$image&$KEY_NAME=$name")
 
-suspend fun Router.navigateBack() {
-    navigate(BackDestination)
-}
+    constructor(drink: Drink) : this(drink.identifier, drink.displayName, drink.displayImageUrl)
 
-internal class RouterImpl(
-    private val navigationLogger: NavigationLogger
-) : Router {
-    private val _routeFlow = MutableSharedFlow<Destination>()
-    override val destinationFlow: CFlow<Destination> = _routeFlow.asSharedFlow().wrap()
+    companion object : RouteProvider {
+        private const val KEY_IDENTIFIER = "identifier"
+        const val KEY_NAME = "name"
+        const val KEY_IMAGE = "image"
 
-    override suspend fun navigate(destination: Destination) {
-        navigationLogger.log(this, destination)
-        _routeFlow.emit(destination)
+        override val route: String = "add-to-collection/{$KEY_IDENTIFIER}?$KEY_IMAGE={$KEY_IMAGE}&$KEY_NAME={$KEY_NAME}"
     }
 }

@@ -44,7 +44,7 @@ interface Input
 interface State
 interface Action
 interface SideEffect
-object EmptySideEffect : SideEffect
+object NoSideEffect : SideEffect
 
 open class StateMachine<S : State, A : Action, SE : SideEffect>(
     initialState: S,

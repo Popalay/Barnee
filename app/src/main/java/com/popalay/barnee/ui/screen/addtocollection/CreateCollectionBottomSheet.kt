@@ -53,16 +53,15 @@ import androidx.compose.ui.unit.dp
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.popalay.barnee.R
-import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
-import com.popalay.barnee.util.displayImageUrl
 
 @Composable
 fun CreateCollectionBottomSheet(
-    drink: Drink,
+    drink: DrinkMinimumData,
     collectionName: String,
     canBeSaved: Boolean,
     onSaveClicked: () -> Unit,

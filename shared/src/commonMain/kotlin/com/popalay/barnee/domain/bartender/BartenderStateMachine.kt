@@ -25,13 +25,13 @@ package com.popalay.barnee.domain.bartender
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
-import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.navigateBack
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
@@ -55,17 +55,13 @@ sealed interface BartenderAction : Action {
     data class OnPromptChanged(val prompt: String) : BartenderAction
     object OnGenerateDrinkClicked : BartenderAction
     object OnCloseClicked : BartenderAction
-    object Initial : BartenderAction
 }
-
-sealed interface BartenderSideEffect : SideEffect
 
 class BartenderStateMachine(
     drinkRepository: DrinkRepository,
     router: Router,
-) : StateMachine<BartenderState, BartenderAction, BartenderSideEffect>(
+) : StateMachine<BartenderState, BartenderAction, NoSideEffect>(
     initialState = BartenderState(),
-    initialAction = BartenderAction.Initial,
     reducer = { state, _ ->
         merge(
             filterIsInstance<BartenderAction.OnPromptChanged>()
@@ -77,10 +73,10 @@ class BartenderStateMachine(
                         .map { state().copy(isLoading = false, isError = false) }
                         .onStart { emit(state().copy(isLoading = true, isError = false)) }
                         .catch { emit(state().copy(isError = true, isLoading = false)) }
-                        .onCompletion { router.navigate(BackDestination) }
+                        .onCompletion { router.navigateBack() }
                 },
             filterIsInstance<BartenderAction.OnCloseClicked>()
-                .onEach { router.navigate(BackDestination) }
+                .onEach { router.navigateBack() }
                 .map { state() },
         )
     }

@@ -22,12 +22,12 @@
 
 package com.popalay.barnee.ui.screen.bartender
 
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.bartender.BartenderAction
-import com.popalay.barnee.domain.bartender.BartenderSideEffect
 import com.popalay.barnee.domain.bartender.BartenderState
 import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class BartenderViewModel(
     stateMachine: BartenderStateMachine
-) : StateMachineWrapperViewModel<BartenderState, BartenderAction, BartenderSideEffect>(stateMachine)
+) : StateMachineWrapperViewModel<BartenderState, BartenderAction, NoSideEffect>(stateMachine)

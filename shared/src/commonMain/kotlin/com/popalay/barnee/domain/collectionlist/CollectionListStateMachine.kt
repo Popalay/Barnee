@@ -25,7 +25,7 @@ package com.popalay.barnee.domain.collectionlist
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -51,7 +51,7 @@ sealed interface CollectionListAction : Action {
 class CollectionListStateMachine(
     collectionRepository: CollectionRepository,
     router: Router
-) : StateMachine<CollectionListState, CollectionListAction, EmptySideEffect>(
+) : StateMachine<CollectionListState, CollectionListAction, NoSideEffect>(
     initialState = CollectionListState(),
     initialAction = CollectionListAction.Initial,
     reducer = { state, _ ->

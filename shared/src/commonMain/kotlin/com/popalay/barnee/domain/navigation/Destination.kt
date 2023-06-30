@@ -22,6 +22,6 @@
 
 package com.popalay.barnee.domain.navigation
 
-sealed interface Destination {
+interface Destination {
     val destination: String
 }
