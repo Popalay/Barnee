@@ -60,7 +60,7 @@ sealed interface BartenderAction : Action {
 class BartenderStateMachine(
     drinkRepository: DrinkRepository,
     router: Router,
-) : StateMachine<BartenderState, BartenderAction, NoSideEffect>(
+) : StateMachine<BartenderState, NoSideEffect>(
     initialState = BartenderState(),
     reducer = { state, _ ->
         merge(

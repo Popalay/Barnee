@@ -50,7 +50,7 @@ fun CollectionListScreen() {
 @Composable
 fun CollectionListScreen(viewModel: CollectionListViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    CollectionListScreen(state, viewModel::processAction)
+    CollectionListScreen(state, viewModel::dispatchAction)
 }
 
 @Composable

@@ -7,7 +7,7 @@ import Foundation
 import shared
 import SwiftUI
 
-class StateMachineWrapperViewModel<S: shared.State, A: Action, SE: SideEffect, T: StateMachine<S, A, SE>>: ObservableObject {
+class StateMachineWrapperViewModel<S: shared.State, SE: SideEffect, T: StateMachine<S, A, SE>>: ObservableObject {
     private let stateMachine: T
     @Published var state: S
 
@@ -22,7 +22,7 @@ class StateMachineWrapperViewModel<S: shared.State, A: Action, SE: SideEffect, T
                 .assign(to: &$state)
     }
 
-    func processAction(action: A) {
-        stateMachine.process(action: action)
+    func dispatchAction(action: A) {
+        stateMachine.dispatch(action: action)
     }
 }

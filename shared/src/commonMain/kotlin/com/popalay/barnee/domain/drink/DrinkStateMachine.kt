@@ -28,6 +28,7 @@ import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
@@ -67,7 +68,6 @@ data class DrinkState(
 }
 
 sealed interface DrinkAction : Action {
-    object Initial : DrinkAction
     object TogglePlaying : DrinkAction
     object Retry : DrinkAction
     object MoreRecommendedDrinksClicked : DrinkAction
@@ -85,12 +85,11 @@ class DrinkStateMachine(
     drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
     router: Router
-) : StateMachine<DrinkState, DrinkAction, DrinkSideEffect>(
+) : StateMachine<DrinkState, DrinkSideEffect>(
     initialState = DrinkState(input),
-    initialAction = DrinkAction.Initial,
     reducer = { state, sideEffectConsumer ->
         merge(
-            filterIsInstance<DrinkAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { drinkRepository.fullDrink(state().identifier) }
                 .map { state().copy(drinkWithRelated = it) },

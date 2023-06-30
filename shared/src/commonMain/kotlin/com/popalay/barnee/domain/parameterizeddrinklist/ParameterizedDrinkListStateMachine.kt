@@ -26,9 +26,9 @@ import com.kuuurt.paging.multiplatform.PagingData
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
-import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.NoSideEffect
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Input
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import kotlinx.coroutines.flow.Flow
@@ -55,19 +55,14 @@ data class ParameterizedDrinkListState(
     constructor(input: ParameterizedDrinkListInput) : this(input.request, input.title, input.titleHighlighted, input.emptyStateMessage)
 }
 
-sealed interface ParameterizedDrinkListAction : Action {
-    object Initial : ParameterizedDrinkListAction
-}
-
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, NoSideEffect>(
+) : StateMachine<ParameterizedDrinkListState, NoSideEffect>(
     initialState = ParameterizedDrinkListState(input),
-    initialAction = ParameterizedDrinkListAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<ParameterizedDrinkListAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .map { drinkRepository.drinks(state().request) }
                 .map { state().copy(drinks = it) }

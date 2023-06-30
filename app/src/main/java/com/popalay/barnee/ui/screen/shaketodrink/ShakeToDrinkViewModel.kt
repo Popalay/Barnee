@@ -30,4 +30,4 @@ import com.popalay.barnee.ui.screen.StateMachineWrapperViewModel
 
 class ShakeToDrinkViewModel(
     stateMachine: ShakeToDrinkStateMachine
-) : StateMachineWrapperViewModel<ShakeToDrinkState, ShakeToDrinkAction, NoSideEffect>(stateMachine)
+) : StateMachineWrapperViewModel<ShakeToDrinkState, NoSideEffect>(stateMachine)

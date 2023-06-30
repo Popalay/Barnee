@@ -25,6 +25,7 @@ package com.popalay.barnee.domain.discovery
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
@@ -47,7 +48,6 @@ data class DiscoveryState(
 ) : State
 
 sealed interface DiscoveryAction : Action {
-    object Initial : DiscoveryAction
     object HeartClicked : DiscoveryAction
     object SearchClicked : DiscoveryAction
     object HouseBarClicked : DiscoveryAction
@@ -57,12 +57,11 @@ sealed interface DiscoveryAction : Action {
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
     router: Router
-) : StateMachine<DiscoveryState, DiscoveryAction, NoSideEffect>(
+) : StateMachine<DiscoveryState, NoSideEffect>(
     initialState = DiscoveryState(),
-    initialAction = DiscoveryAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<DiscoveryAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { drinkRepository.categories() }
                 .map { state().copy(categories = it) },

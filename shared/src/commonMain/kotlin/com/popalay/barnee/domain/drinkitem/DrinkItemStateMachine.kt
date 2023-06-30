@@ -53,7 +53,7 @@ class DrinkItemStateMachine(
     collectionRepository: CollectionRepository,
     messagesProvider: MessagesProvider,
     router: Router
-) : StateMachine<DrinkItemState, DrinkItemAction, NoSideEffect>(
+) : StateMachine<DrinkItemState, NoSideEffect>(
     initialState = DrinkItemState,
     reducer = { state, _ ->
         merge(

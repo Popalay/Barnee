@@ -166,7 +166,7 @@ fun DrinkScreen(input: DrinkInput) {
 @Composable
 fun DrinkScreen(viewModel: DrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DrinkScreen(state, viewModel.sideEffectFlow, viewModel::processAction, drinkItemViewModel::processAction)
+    DrinkScreen(state, viewModel.sideEffectFlow, viewModel::dispatchAction, drinkItemViewModel::dispatchAction)
 }
 
 @Composable

@@ -90,7 +90,7 @@ fun ShakeToDrinkScreen() {
 @Composable
 fun ShakeToDrinkScreen(viewModel: ShakeToDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    ShakeToDrinkScreen(state, viewModel::processAction, drinkItemViewModel::processAction)
+    ShakeToDrinkScreen(state, viewModel::dispatchAction, drinkItemViewModel::dispatchAction)
 }
 
 @Composable

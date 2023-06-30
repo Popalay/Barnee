@@ -59,7 +59,7 @@ fun BartenderScreen() {
 @Composable
 fun BartenderScreen(viewModel: BartenderViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    BartenderScreen(state, viewModel::processAction)
+    BartenderScreen(state, viewModel::dispatchAction)
 }
 
 @Composable

@@ -101,7 +101,7 @@ fun SearchScreen() {
 @Composable
 fun SearchScreen(viewModel: SearchViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    SearchScreen(state, viewModel.sideEffectFlow, viewModel::processAction)
+    SearchScreen(state, viewModel.sideEffectFlow, viewModel::dispatchAction)
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)

@@ -28,6 +28,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
@@ -62,7 +63,6 @@ data class CollectionState(
 }
 
 sealed interface CollectionAction : Action {
-    object Initial : CollectionAction
     object RemoveClicked : CollectionAction
     object ShareClicked : CollectionAction
     object SaveClicked : CollectionAction
@@ -74,12 +74,11 @@ class CollectionStateMachine(
     shareRepository: ShareRepository,
     getCollectionUseCase: GetCollectionUseCase,
     router: Router
-) : StateMachine<CollectionState, CollectionAction, NoSideEffect>(
+) : StateMachine<CollectionState, NoSideEffect>(
     initialState = CollectionState(input),
-    initialAction = CollectionAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<CollectionAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapLatest { getCollectionUseCase(GetCollectionUseCase.Input(state().name, state().aliases)) }
                 .map {

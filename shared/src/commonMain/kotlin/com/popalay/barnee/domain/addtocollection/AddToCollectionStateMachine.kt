@@ -67,7 +67,7 @@ class AddToCollectionStateMachine(
     input: AddToCollectionInput,
     collectionRepository: CollectionRepository,
     router: Router,
-) : StateMachine<AddToCollectionState, AddToCollectionAction, NoSideEffect>(
+) : StateMachine<AddToCollectionState, NoSideEffect>(
     initialState = AddToCollectionState(input.drink),
     reducer = { state, _ ->
         merge(

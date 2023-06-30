@@ -46,12 +46,13 @@ interface Action
 interface SideEffect
 object NoSideEffect : SideEffect
 
-open class StateMachine<S : State, A : Action, SE : SideEffect>(
+object InitialAction : Action
+
+open class StateMachine<S : State, SE : SideEffect>(
     initialState: S,
-    initialAction: A? = null,
     reducer: Reducer<S, SE>
 ) : KoinComponent {
-    private val actionFlow = MutableSharedFlow<A>()
+    private val actionFlow = MutableSharedFlow<Action>()
     private val sideEffectChannel = Channel<SE>()
     private val stateMachineScope = MainScope()
     private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
@@ -59,7 +60,7 @@ open class StateMachine<S : State, A : Action, SE : SideEffect>(
 
     val sideEffectFlow: CFlow<SE> = sideEffectChannel.receiveAsFlow().wrap()
     val stateFlow: CFlow<S> = actionFlow
-        .onStart { initialAction?.let { emit(it) } }
+        .onStart { emit(InitialAction) }
         .onEach { logger.log(this, it) }
         .reducer({ currentState }, {
             sideEffectChannel.send(it)
@@ -76,7 +77,7 @@ open class StateMachine<S : State, A : Action, SE : SideEffect>(
         stateMachineScope.coroutineContext.cancelChildren()
     }
 
-    fun process(action: A) {
+    fun dispatch(action: Action) {
         stateMachineScope.launch { actionFlow.emit(action) }
     }
 }

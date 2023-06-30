@@ -55,7 +55,7 @@ fun DiscoveryScreen() {
 @Composable
 private fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DiscoveryScreen(state, viewModel::processAction)
+    DiscoveryScreen(state, viewModel::dispatchAction)
 }
 
 @Composable

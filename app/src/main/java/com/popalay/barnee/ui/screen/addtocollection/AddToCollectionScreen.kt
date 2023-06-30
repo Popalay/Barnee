@@ -41,7 +41,7 @@ fun AddToCollectionScreen(input: AddToCollectionInput) {
 @Composable
 fun AddToCollectionScreen(viewModel: AddToCollectionViewModel) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    AddToCollectionScreen(state, viewModel::processAction)
+    AddToCollectionScreen(state, viewModel::dispatchAction)
 }
 
 @Composable

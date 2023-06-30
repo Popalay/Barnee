@@ -124,9 +124,9 @@ fun DrinkGrid(
                 item?.let {
                     DrinkListItem(
                         item,
-                        onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
-                        onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                        onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                        onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
+                        onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                        onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
                         modifier = Modifier.topShift(index = index, size = value.itemCount)
                     )
                 }
@@ -154,9 +154,9 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
+                    onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                    onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))

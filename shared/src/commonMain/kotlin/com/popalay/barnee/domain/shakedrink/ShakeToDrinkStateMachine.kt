@@ -26,6 +26,7 @@ import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
@@ -48,7 +49,6 @@ data class ShakeToDrinkState(
 ) : State
 
 sealed interface ShakeToDrinkAction : Action {
-    object Initial : ShakeToDrinkAction
     object DialogDismissed : ShakeToDrinkAction
     object Retry : ShakeToDrinkAction
 }
@@ -56,12 +56,11 @@ sealed interface ShakeToDrinkAction : Action {
 class ShakeToDrinkStateMachine(
     drinkRepository: DrinkRepository,
     shakeDetector: ShakeDetector
-) : StateMachine<ShakeToDrinkState, ShakeToDrinkAction, NoSideEffect>(
+) : StateMachine<ShakeToDrinkState, NoSideEffect>(
     initialState = ShakeToDrinkState(),
-    initialAction = ShakeToDrinkAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<ShakeToDrinkAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapMerge { detectShakes(shakeDetector) }
                 .flatMapToResult { drinkRepository.randomDrink() }
