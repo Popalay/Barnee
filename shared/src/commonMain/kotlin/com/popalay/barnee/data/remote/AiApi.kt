@@ -34,35 +34,52 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.util.Logger
 import kotlinx.serialization.json.Json
 
-@OptIn(BetaOpenAI::class)
 class AiApi(
     private val openAi: OpenAI,
     private val json: Json,
     private val logger: Logger
 ) {
 
+    @OptIn(BetaOpenAI::class)
     suspend fun getDrinkByPrompt(prompt: String): Drink {
-        val chatCompletionRequest = chatCompletionRequest {
-            model = ModelId("gpt-3.5-turbo-0613")
-            n = 1
-            temperature = 1.5
-            messages = listOf(
-                ChatMessage(
-                    role = ChatRole.System,
-                    content = "You are a helpful cocktails recipe assistant."
-                ),
-                ChatMessage(
-                    role = ChatRole.User,
-                    content = "Suggest a cocktail based on the following wishlist: $prompt. Be creative and imaginative! " +
-                            "The name of the cocktail should be unique and imaginative e.g. The Fluffy Unicorn, Stellar Swirl, Mystical Mingle."
-                )
-            )
-            functions {
-                function {
-                    name = "setRecipe"
-                    description = "Set the recipe for the cocktail"
-                    parameters = Parameters.fromJsonString(
-                        """
+        val response = openAi.chatCompletion(createChatCompletionRequest(prompt))
+        val result = response.choices[0].message?.functionCall?.arguments?.let {
+            json.decodeFromString(Drink.serializer(), it)
+        }
+
+        logger.debug("AiAPI", result.toString())
+
+        return result ?: error("Drink is null")
+    }
+}
+
+@OptIn(BetaOpenAI::class)
+private fun createChatCompletionRequest(prompt: String) = chatCompletionRequest {
+    model = ModelId("gpt-3.5-turbo-0613")
+    n = 1
+    temperature = 1.5
+    messages = listOf(
+        ChatMessage(
+            role = ChatRole.System,
+            content = "You are a helpful cocktails recipe assistant."
+        ),
+        ChatMessage(
+            role = ChatRole.User,
+            content = "Suggest a cocktail based on the following wishlist: $prompt. Be creative and imaginative! " +
+                    "The name of the cocktail should be unique and imaginative e.g. The Fluffy Unicorn, Stellar Swirl, Mystical Mingle."
+        )
+    )
+    functions {
+        function {
+            name = "setRecipe"
+            description = "Set the recipe for the cocktail"
+            parameters = Parameters.fromJsonString(responseScheme)
+        }
+    }
+    functionCall = FunctionMode.Named("setRecipe")
+}
+
+private val responseScheme = """
                             {
                               "type": "object",
                               "properties": {
@@ -138,19 +155,3 @@ class AiApi(
                               ]
                             }
                         """.trimIndent()
-                    )
-                }
-            }
-            functionCall = FunctionMode.Named("setRecipe")
-        }
-
-        val response = openAi.chatCompletion(chatCompletionRequest)
-        val result = response.choices[0].message?.functionCall?.arguments?.let {
-            json.decodeFromString(Drink.serializer(), it)
-        }
-
-        logger.debug("AiAPI", result.toString())
-
-        return result ?: error("Drink is null")
-    }
-}

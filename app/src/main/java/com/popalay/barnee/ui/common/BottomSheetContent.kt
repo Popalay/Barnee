@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.screen.addtocollection
+package com.popalay.barnee.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,9 +42,9 @@ import com.google.accompanist.insets.navigationBarsWithImePadding
 @Composable
 fun BottomSheetContent(
     title: @Composable () -> Unit,
-    action: @Composable () -> Unit,
-    body: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
+    body: @Composable ColumnScope.() -> Unit,
+    action: (@Composable () -> Unit)? = null,
     navigation: (@Composable () -> Unit)? = null
 ) {
     Column(modifier = modifier.padding(bottom = 24.dp)) {
@@ -78,7 +78,7 @@ fun BottomSheetContent(
                         .align(Alignment.CenterEnd)
                         .padding(end = 8.dp)
                 ) {
-                    action()
+                    action?.invoke()
                 }
             }
         }

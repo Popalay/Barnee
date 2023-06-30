@@ -54,6 +54,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.DrinkMinimumData
+import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl

@@ -22,7 +22,11 @@
 
 package com.popalay.barnee.ui.screen.bartender
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -37,6 +41,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -48,7 +53,9 @@ import com.popalay.barnee.R
 import com.popalay.barnee.domain.bartender.BartenderAction
 import com.popalay.barnee.domain.bartender.BartenderState
 import com.popalay.barnee.ui.common.BarneeTextField
-import com.popalay.barnee.ui.screen.addtocollection.BottomSheetContent
+import com.popalay.barnee.ui.common.BottomSheetContent
+import com.popalay.barnee.ui.screen.drinklist.DrinkListItem
+import com.popalay.barnee.util.displayName
 import org.koin.androidx.compose.getViewModel
 
 @Composable
@@ -67,79 +74,99 @@ fun BartenderScreen(
     state: BartenderState,
     onAction: (BartenderAction) -> Unit
 ) {
-    BartenderBottomSheet(
-        prompt = state.prompt,
-        isError = state.isError,
-        isLoading = state.isLoading,
-        canBeGenerated = state.isPromptValid,
-        onGenerateClicked = { onAction(BartenderAction.OnGenerateDrinkClicked) },
-        onBackClicked = { onAction(BartenderAction.OnCloseClicked) },
-        onPromptChanged = { onAction(BartenderAction.OnPromptChanged(it)) }
-    )
-}
-
-@Composable
-private fun BartenderBottomSheet(
-    prompt: String,
-    isError: Boolean,
-    isLoading: Boolean,
-    onBackClicked: () -> Unit,
-    onGenerateClicked: () -> Unit,
-    canBeGenerated: Boolean,
-    onPromptChanged: (String) -> Unit
-) {
-    val promptFocus = remember { FocusRequester() }
-    LaunchedEffect(Unit) {
-        promptFocus.requestFocus()
-    }
-
-    BottomSheetContent(
-        title = { Text(text = "Let's shake!") },
-        action = {
-            IconButton(
-                onClick = onGenerateClicked,
-                enabled = canBeGenerated && !isLoading
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        strokeWidth = 2.dp,
-                        modifier = Modifier.size(16.dp)
-                    )
-                } else {
-                    Icon(
-                        imageVector = if (isError) Icons.Default.Refresh else Icons.Default.Done,
-                        contentDescription = "Shake"
-                    )
+    Crossfade(targetState = state.generatedDrink, label = "bartender-content") { drink ->
+        if (drink != null) {
+            BottomSheetContent(
+                title = { Text(text = "Welcome ${drink.displayName}!") },
+                body = {
+                    Box(
+                        contentAlignment = Alignment.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        DrinkListItem(
+                            data = drink,
+                            onClick = { onAction(BartenderAction.OnDrinkClicked(drink)) },
+                            modifier = Modifier.fillMaxWidth(0.5F)
+                        )
+                    }
+                },
+                navigation = {
+                    IconButton(onClick = { onAction(BartenderAction.OnCloseClicked) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_cross),
+                            contentDescription = "Close"
+                        )
+                    }
                 }
-            }
-        },
-        body = {
-            BarneeTextField(
-                value = prompt,
-                onValueChange = onPromptChanged,
-                label = { Text(text = "Explain what you want") },
-                placeholder = { Text(text = "e.g. sour cocktail with gin and cherry") },
-                isError = isError,
-                singleLine = true,
-                textStyle = MaterialTheme.typography.body1,
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.Unspecified,
-                    focusedIndicatorColor = Color.Unspecified,
-                    unfocusedIndicatorColor = Color.Unspecified,
-                    disabledIndicatorColor = Color.Unspecified
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(promptFocus)
             )
-        },
-        navigation = {
-            IconButton(onClick = onBackClicked) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_cross),
-                    contentDescription = "Close"
-                )
+        } else {
+            val promptFocus = remember { FocusRequester() }
+            LaunchedEffect(Unit) {
+                promptFocus.requestFocus()
             }
+
+            BottomSheetContent(
+                title = { Text(text = "Let's shake!") },
+                action = {
+                    IconButton(
+                        onClick = { onAction(BartenderAction.OnGenerateDrinkClicked) },
+                        enabled = state.isPromptValid && !state.isLoading
+                    ) {
+                        if (state.isLoading) {
+                            CircularProgressIndicator(
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(16.dp)
+                            )
+                        } else {
+                            Icon(
+                                imageVector = if (state.isError) Icons.Default.Refresh else Icons.Default.Done,
+                                contentDescription = "Shake"
+                            )
+                        }
+                    }
+                },
+                body = {
+                    Column {
+
+                        BarneeTextField(
+                            value = state.prompt,
+                            onValueChange = { onAction(BartenderAction.OnPromptChanged(it)) },
+                            label = { Text(text = "Explain what you want") },
+                            placeholder = { Text(text = "e.g. sour cocktail with gin and cherry") },
+                            isError = state.isError,
+                            enabled = !state.isLoading,
+                            singleLine = true,
+                            textStyle = MaterialTheme.typography.body1,
+                            colors = TextFieldDefaults.textFieldColors(
+                                backgroundColor = Color.Unspecified,
+                                focusedIndicatorColor = Color.Unspecified,
+                                unfocusedIndicatorColor = Color.Unspecified,
+                                disabledIndicatorColor = Color.Unspecified,
+                                errorIndicatorColor = Color.Unspecified,
+                            ),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .focusRequester(promptFocus)
+                        )
+                        if (state.isError) {
+                            Text(
+                                text = state.error,
+                                color = MaterialTheme.colors.error,
+                                style = MaterialTheme.typography.caption,
+                                modifier = Modifier.padding(start = 16.dp)
+                            )
+                        }
+                    }
+                },
+                navigation = {
+                    IconButton(onClick = { onAction(BartenderAction.OnCloseClicked) }) {
+                        Icon(
+                            painter = painterResource(R.drawable.ic_cross),
+                            contentDescription = "Close"
+                        )
+                    }
+                }
+            )
         }
-    )
+    }
 }

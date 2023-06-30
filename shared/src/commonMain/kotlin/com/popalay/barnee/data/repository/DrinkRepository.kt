@@ -40,7 +40,6 @@ import com.popalay.barnee.data.repository.DrinksRequest.Generated
 import com.popalay.barnee.data.repository.DrinksRequest.Random
 import com.popalay.barnee.data.repository.DrinksRequest.RelatedTo
 import com.popalay.barnee.data.repository.DrinksRequest.Search
-import com.popalay.barnee.util.Logger
 import com.popalay.barnee.util.filter
 import com.popalay.barnee.util.identifier
 import com.popalay.barnee.util.toImageUrl
@@ -72,7 +71,6 @@ internal class DrinkRepositoryImpl(
     private val aiApi: AiApi,
     private val localStore: LocalStore,
     private val json: Json,
-    private val logger: Logger,
     private val collectionRepository: CollectionRepository
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =

@@ -167,7 +167,7 @@ fun DrinkHorizontalList(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun DrinkListItem(
+fun DrinkListItem(
     data: Drink,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},

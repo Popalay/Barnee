@@ -96,7 +96,7 @@ val commonModule = module {
             }
         }
     }
-    single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get(), get()) }
+    single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
     single<OpenAI> { OpenAI(token = BuildKonfig.OPEN_AI_API_KEY) }

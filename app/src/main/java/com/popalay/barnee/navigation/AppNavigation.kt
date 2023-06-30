@@ -50,34 +50,29 @@ fun <T : Input> NavGraphBuilder.navigationNode(
     command: NavigationCommand<T>,
     content: @Composable (NavBackStackEntry) -> Unit
 ) {
-    when(command.navigationType){
-        Dialog      -> {
-            dialog(
-                route = command.route,
-                deepLinks = command.deeplinks,
-                arguments = command.arguments,
-                content = content
-            )
+    when (command.navigationType) {
+        Dialog -> dialog(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = content
+        )
 
-        }
-        BottomSheet -> {
-            bottomSheet(
-                route = command.route,
-                deepLinks = command.deeplinks,
-                arguments = command.arguments,
-                content = {
-                    content(it)
-                }
-            )
-        }
-        Screen      -> {
-            composable(
-                route = command.route,
-                deepLinks = command.deeplinks,
-                arguments = command.arguments,
-                content = content
-            )
-        }
+        BottomSheet -> bottomSheet(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = {
+                content(it)
+            }
+        )
+
+        Screen -> composable(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = content
+        )
     }
 }
 
