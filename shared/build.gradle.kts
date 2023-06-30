@@ -110,7 +110,7 @@ android {
 }
 
 buildkonfig {
-    packageName = "com.popalay.barnee.shared"
+    packageName = android.namespace
 
     val openApiKeyName = "OPEN_AI_API_KEY"
     val devOpenAiApiKey = System.getenv(openApiKeyName)
