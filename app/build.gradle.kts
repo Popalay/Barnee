@@ -35,10 +35,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.core.splashscreen)
-    implementation(libs.exoplayer)
-    implementation(libs.youtubeExtractor) {
-        exclude("com.android.support", "support-annotations")
-    }
+    implementation(libs.youtubePlayer)
     implementation(libs.paging.compose)
     implementation(libs.coil.compose)
     implementation(libs.firebase.dynamicLinks)

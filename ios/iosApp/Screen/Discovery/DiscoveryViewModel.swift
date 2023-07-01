@@ -10,7 +10,7 @@ import Foundation
 import shared
 import SwiftUI
 
-class DiscoveryViewModel: StateMachineWrapperViewModel<DiscoveryState, DiscoveryAction, DiscoveryMutation, EmptySideEffect, DiscoveryStateMachine> {
+class DiscoveryViewModel: StateMachineWrapperViewModel<DiscoveryState, DiscoveryMutation, EmptySideEffect, DiscoveryStateMachine> {
     convenience init() {
         let sharedComponent = (UIApplication.shared.delegate as! AppDelegate).sharedComponent
         self.init(stateMachine: sharedComponent.provideDiscoveryStateMachine(), initialState: DiscoveryState(categories: Uninitialized()))

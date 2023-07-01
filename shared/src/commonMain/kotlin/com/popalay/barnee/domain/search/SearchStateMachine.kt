@@ -30,6 +30,7 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Fail
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
@@ -56,7 +57,6 @@ data class SearchState(
 ) : State
 
 sealed interface SearchAction : Action {
-    object Initial : SearchAction
     object Retry : SearchAction
     object ShowFiltersClicked : SearchAction
     object ClearSearchQuery : SearchAction
@@ -71,16 +71,15 @@ sealed interface SearchSideEffect : SideEffect {
 
 class SearchStateMachine(
     drinkRepository: DrinkRepository,
-) : StateMachine<SearchState, SearchAction, SearchSideEffect>(
+) : StateMachine<SearchState, SearchSideEffect>(
     initialState = SearchState(),
-    initialAction = SearchAction.Initial,
     reducer = { state, sideEffectConsumer ->
         merge(
-            filterIsInstance<SearchAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { drinkRepository.aggregation() }
                 .map { state().copy(aggregation = it) },
-            filterIsInstance<SearchAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .map { state().searchRequest(drinkRepository) }
                 .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },

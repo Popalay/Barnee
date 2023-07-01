@@ -46,6 +46,7 @@ object SimilarDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkList
         return ParameterizedDrinkListInput(
             request = DrinksRequest.RelatedTo(alias),
             title = "Cocktails like ",
+            emptyStateMessage = "No similar drinks found for \"$name\"",
             titleHighlighted = name
         )
     }

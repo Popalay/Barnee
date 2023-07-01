@@ -46,6 +46,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.data.model.Collection
+import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel

@@ -31,13 +31,12 @@ import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.NSUserDefaultsSettings
 import com.russhwolf.settings.coroutines.toFlowSettings
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import org.koin.dsl.module
 import platform.Foundation.NSUserDefaults
 
-@OptIn(ExperimentalSettingsApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalSettingsApi::class)
 actual val platformModule = module {
     single {
         val delegate = NSUserDefaults("Settings")

@@ -20,6 +20,8 @@
  * SOFTWARE.
  */
 
+import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
+import com.codingfeline.buildkonfig.compiler.FieldSpec
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
@@ -27,6 +29,7 @@ plugins {
     kotlin("plugin.serialization") version libs.versions.kotlin
     id("com.android.library")
     id("org.jetbrains.kotlin.native.cocoapods")
+    id("com.codingfeline.buildkonfig") version libs.versions.buildkonfig.gradle.plugin
 }
 
 // CocoaPods requires the podspec to have a version.
@@ -67,6 +70,7 @@ kotlin {
                 implementation(libs.koin.core)
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
+                implementation(libs.openai.client)
                 api(libs.multiplatformpaging)
             }
         }
@@ -98,4 +102,36 @@ android {
     buildFeatures {
         buildConfig = true
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+}
+
+buildkonfig {
+    packageName = android.namespace
+
+    val openApiKeyName = "OPEN_AI_API_KEY"
+    val openAiApiKey = System.getenv(openApiKeyName)
+        ?: gradleLocalProperties(rootDir).getProperty(openApiKeyName)
+        ?: error("No $openApiKeyName provided")
+
+    defaultConfigs {
+        buildConfigField(
+            type = FieldSpec.Type.STRING,
+            name = openApiKeyName,
+            value = openAiApiKey,
+            const = true,
+            nullable = false
+        )
+    }
+}
+
+// https://youtrack.jetbrains.com/issue/KT-55751
+configurations {
+    val myAttribute = Attribute.of("dummy.attribute", String::class.java)
+
+    named("podDebugFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
+    named("podReleaseFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
 }

@@ -26,6 +26,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.identifier
 import kotlin.jvm.JvmInline
 
 @JvmInline
@@ -33,18 +34,18 @@ value class DrinkDestination private constructor(
     override val destination: String
 ) : Destination {
     constructor(
-        alias: String,
+        identifier: String,
         name: String,
         image: ImageUrl
-    ) : this("drink/$alias?$KEY_IMAGE=$image&$KEY_NAME=$name")
+    ) : this("drink/$identifier?$KEY_IMAGE=$image&$KEY_NAME=$name")
 
-    constructor(drink: Drink) : this(drink.alias, drink.displayName, drink.displayImageUrl)
+    constructor(drink: Drink) : this(drink.identifier, drink.displayName, drink.displayImageUrl)
 
     companion object : RouteProvider {
-        const val KEY_ALIAS = "alias"
+        const val KEY_IDENTIFIER = "identifier"
         const val KEY_NAME = "name"
         const val KEY_IMAGE = "image"
 
-        override val route: String = "drink/{$KEY_ALIAS}?$KEY_IMAGE={$KEY_IMAGE}&$KEY_NAME={$KEY_NAME}"
+        override val route: String = "drink/{$KEY_IDENTIFIER}?$KEY_IMAGE={$KEY_IMAGE}&$KEY_NAME={$KEY_NAME}"
     }
 }

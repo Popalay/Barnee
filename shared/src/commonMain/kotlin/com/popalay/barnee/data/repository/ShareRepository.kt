@@ -30,6 +30,7 @@ import com.popalay.barnee.domain.navigation.CollectionDestination
 import com.popalay.barnee.domain.navigation.DrinkDestination
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.isGenerated
 
 interface ShareRepository {
     suspend fun shareDrink(drink: Drink)
@@ -46,7 +47,8 @@ internal class ShareRepositoryImpl(
             .mapIndexed { index, step -> "\t${index + 1}. ${step.text}" }
             .joinToString("\n")
         val text = "Check out how to make a ${drink.displayName.capitalizeFirstChar()}:\n$instruction"
-        val shortUrl = deeplinkFactory.build(DrinkDestination(drink).destination)
+        val shortUrl = drink.takeIf { !it.isGenerated }
+            ?.let { deeplinkFactory.build(DrinkDestination(drink).destination) }.orEmpty()
 
         sharer.openShareDialog(
             title = title,

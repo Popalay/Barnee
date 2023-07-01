@@ -22,8 +22,10 @@
 
 package com.popalay.barnee.navigation
 
-import com.popalay.barnee.domain.navigation.HouseBarDestination
+import com.popalay.barnee.domain.navigation.BartenderDestination
 import com.popalay.barnee.domain.navigation.RouteProvider
 
-object HouseBarNavigationCommand : NavigationCommand<Nothing>,
-    RouteProvider by HouseBarDestination
+object BartenderNavigationCommand : NavigationCommand<Nothing>,
+    RouteProvider by BartenderDestination {
+    override val navigationType: NavigationCommand.NavigationType = NavigationCommand.NavigationType.BottomSheet
+}

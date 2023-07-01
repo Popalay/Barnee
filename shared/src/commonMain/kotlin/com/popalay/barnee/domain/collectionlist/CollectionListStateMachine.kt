@@ -25,7 +25,8 @@ package com.popalay.barnee.domain.collectionlist
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.InitialAction
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
@@ -44,19 +45,17 @@ data class CollectionListState(
 ) : State
 
 sealed interface CollectionListAction : Action {
-    object Initial : CollectionListAction
     data class CollectionClicked(val collection: Collection) : CollectionListAction
 }
 
 class CollectionListStateMachine(
     collectionRepository: CollectionRepository,
     router: Router
-) : StateMachine<CollectionListState, CollectionListAction, EmptySideEffect>(
+) : StateMachine<CollectionListState, NoSideEffect>(
     initialState = CollectionListState(),
-    initialAction = CollectionListAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<CollectionListAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { collectionRepository.collections() }
                 .map { state().copy(collections = it) },

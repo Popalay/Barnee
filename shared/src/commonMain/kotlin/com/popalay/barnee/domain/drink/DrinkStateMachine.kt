@@ -28,6 +28,7 @@ import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.SideEffect
@@ -47,13 +48,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class DrinkInput(
-    val alias: String,
+    val identifier: String,
     val name: String,
     val image: ImageUrl
 ) : Input
 
 data class DrinkState(
-    val alias: String,
+    val identifier: String,
     val name: String,
     val image: ImageUrl,
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
@@ -63,11 +64,10 @@ data class DrinkState(
     val displayName = drinkWithRelated()?.drink?.displayName ?: name
     val displayImage = drinkWithRelated()?.drink?.displayImageUrl ?: image
 
-    constructor(input: DrinkInput) : this(input.alias, input.name, input.image)
+    constructor(input: DrinkInput) : this(input.identifier, input.name, input.image)
 }
 
 sealed interface DrinkAction : Action {
-    object Initial : DrinkAction
     object TogglePlaying : DrinkAction
     object Retry : DrinkAction
     object MoreRecommendedDrinksClicked : DrinkAction
@@ -85,23 +85,22 @@ class DrinkStateMachine(
     drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
     router: Router
-) : StateMachine<DrinkState, DrinkAction, DrinkSideEffect>(
+) : StateMachine<DrinkState, DrinkSideEffect>(
     initialState = DrinkState(input),
-    initialAction = DrinkAction.Initial,
     reducer = { state, sideEffectConsumer ->
         merge(
-            filterIsInstance<DrinkAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
-                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().identifier) }
                 .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.Retry>()
-                .flatMapToResult { drinkRepository.fullDrink(state().alias) }
+                .flatMapToResult { drinkRepository.fullDrink(state().identifier) }
                 .map { state().copy(drinkWithRelated = it) },
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
                 .map { state().copy(isPlaying = it) },
             filterIsInstance<DrinkAction.MoreRecommendedDrinksClicked>()
-                .onEach { router.navigate(SimilarDrinksDestination(state().alias, state().displayName)) }
+                .onEach { router.navigate(SimilarDrinksDestination(state().identifier, state().displayName)) }
                 .map { state() },
             filterIsInstance<DrinkAction.CategoryClicked>()
                 .onEach { router.navigate(TagDrinksDestination(it.category)) }

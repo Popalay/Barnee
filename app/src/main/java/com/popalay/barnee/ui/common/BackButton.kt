@@ -29,8 +29,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.popalay.barnee.R.drawable
-import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.navigateBack
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.get
 
@@ -40,7 +40,7 @@ fun BackButton(modifier: Modifier = Modifier) {
     val scope = rememberCoroutineScope()
 
     IconButton(
-        onClick = { scope.launch { router.navigate(BackDestination) } },
+        onClick = { scope.launch { router.navigateBack() } },
         modifier = modifier
     ) {
         Icon(

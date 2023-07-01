@@ -24,7 +24,7 @@ package com.popalay.barnee.data.repository
 
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Collection
-import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayImageUrl
@@ -33,8 +33,6 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -42,17 +40,15 @@ import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.SerializationException
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 interface CollectionRepository {
     fun collections(): Flow<Set<Collection>>
     fun collection(name: String): Flow<Collection>
-    fun collectionsUpdate(): Flow<Pair<Drink, Collection?>>
-    suspend fun removeFromAllCollectionsAndNotify(drink: Drink)
-    suspend fun addToCollectionAndNotify(collectionName: String = "", drink: Drink)
-    suspend fun removeFromCollectionAndNotify(collectionName: String = "", drink: Drink)
+    suspend fun removeFromAllCollections(drink: DrinkMinimumData)
+    suspend fun addToCollection(collectionName: String = Collection.DEFAULT_NAME, drink: DrinkMinimumData)
+    suspend fun removeFromCollection(collectionName: String = Collection.DEFAULT_NAME, drink: DrinkMinimumData)
     suspend fun remove(name: String)
     suspend fun saveOrMerge(name: String, aliases: Set<String>)
 }
@@ -62,8 +58,6 @@ internal class CollectionRepositoryImpl(
     private val api: Api,
     private val json: Json
 ) : CollectionRepository {
-    private val collectionsUpdateFlow = MutableSharedFlow<Pair<Drink, Collection?>>()
-
     init {
         @OptIn(DelicateCoroutinesApi::class)
         GlobalScope.launch {
@@ -71,45 +65,40 @@ internal class CollectionRepositoryImpl(
         }
     }
 
-    override suspend fun addToCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun addToCollection(collectionName: String, drink: DrinkMinimumData) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
         val targetCollection = (collections.firstOrNull { it.name == validCollectionName }
             ?: Collection(validCollectionName, emptySet(), emptySet())).let {
-            it.copy(aliases = it.aliases + drink.alias, cover = setOf(drink.displayImageUrl) + it.cover)
+            it.copy(aliases = it.aliases + drink.identifier, cover = setOf(drink.displayImageUrl) + it.cover)
         }
 
-        val newCollections = collections.toMutableSet().apply {
+        collections.toMutableSet().run {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
             toSet()
             saveCollections(this)
         }
-
-        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to targetCollection)
     }
 
-    override suspend fun removeFromCollectionAndNotify(collectionName: String, drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun removeFromCollection(collectionName: String, drink: DrinkMinimumData) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         val validCollectionName = collectionName.capitalizeFirstChar().ifBlank { Collection.DEFAULT_NAME }
         val targetCollection = collections.firstOrNull { it.name == validCollectionName }?.let {
-            it.copy(aliases = it.aliases - drink.alias, cover = it.cover - drink.displayImageUrl)
+            it.copy(aliases = it.aliases - drink.identifier, cover = it.cover - drink.displayImageUrl)
         } ?: return@withContext
 
-        val newCollections = collections.toMutableSet().apply {
+        collections.toMutableSet().run {
             removeAll { it.name == targetCollection.name }
             add(targetCollection)
             toSet()
             saveCollections(this)
         }
-
-        collectionsUpdateFlow.emit(drink.copy(userCollections = newCollections.filter(drink)) to null)
     }
 
-    override suspend fun removeFromAllCollectionsAndNotify(drink: Drink) = withContext(Dispatchers.Default) {
+    override suspend fun removeFromAllCollections(drink: DrinkMinimumData) = withContext(Dispatchers.Default) {
         val collections = removeFromCollections(drink)
         saveCollections(collections)
-        collectionsUpdateFlow.emit(drink.copy(userCollections = emptyList()) to null)
     }
 
     override suspend fun remove(name: String) = withContext(Dispatchers.Default) {
@@ -153,20 +142,18 @@ internal class CollectionRepositoryImpl(
     override fun collection(name: String): Flow<Collection> = collections()
         .mapNotNull { collection -> collection.firstOrNull { it.name == name } }
 
-    override fun collectionsUpdate(): Flow<Pair<Drink, Collection?>> = collectionsUpdateFlow.asSharedFlow()
-
     private suspend fun saveCollections(collections: Set<Collection>) {
         val serialized = json.encodeToString(collections)
         localStore.save(KEY_COLLECTION, serialized)
     }
 
-    private suspend fun removeFromCollections(drink: Drink): Set<Collection> {
+    private suspend fun removeFromCollections(drink: DrinkMinimumData): Set<Collection> {
         val collections = collections().first()
         val targetCollections = collections.filter(drink)
         val resultCollections = targetCollections
             .map {
                 it.copy(
-                    aliases = it.aliases - drink.alias,
+                    aliases = it.aliases - drink.identifier,
                     cover = it.cover - drink.displayImageUrl
                 )
             }

@@ -25,14 +25,15 @@ package com.popalay.barnee.domain.discovery
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.InitialAction
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
 import com.popalay.barnee.domain.navigation.CollectionsDestination
-import com.popalay.barnee.domain.navigation.HouseBarDestination
+import com.popalay.barnee.domain.navigation.GeneratedDrinksDestination
 import com.popalay.barnee.domain.navigation.QueryDrinksDestination
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.SearchDestination
@@ -47,7 +48,6 @@ data class DiscoveryState(
 ) : State
 
 sealed interface DiscoveryAction : Action {
-    object Initial : DiscoveryAction
     object HeartClicked : DiscoveryAction
     object SearchClicked : DiscoveryAction
     object HouseBarClicked : DiscoveryAction
@@ -57,12 +57,11 @@ sealed interface DiscoveryAction : Action {
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
     router: Router
-) : StateMachine<DiscoveryState, DiscoveryAction, EmptySideEffect>(
+) : StateMachine<DiscoveryState, NoSideEffect>(
     initialState = DiscoveryState(),
-    initialAction = DiscoveryAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<DiscoveryAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { drinkRepository.categories() }
                 .map { state().copy(categories = it) },
@@ -76,7 +75,7 @@ class DiscoveryStateMachine(
                 .onEach { router.navigate(SearchDestination) }
                 .map { state() },
             filterIsInstance<DiscoveryAction.HouseBarClicked>()
-                .onEach { router.navigate(HouseBarDestination) }
+                .onEach { router.navigate(GeneratedDrinksDestination) }
                 .map { state() },
         )
     }

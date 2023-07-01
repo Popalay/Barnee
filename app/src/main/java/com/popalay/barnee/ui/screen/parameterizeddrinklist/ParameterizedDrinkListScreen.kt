@@ -23,18 +23,27 @@
 package com.popalay.barnee.ui.screen.parameterizeddrinklist
 
 import android.content.res.Configuration
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.FabPosition
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
@@ -46,48 +55,75 @@ import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.getViewModel
 import org.koin.core.parameter.parametersOf
 
 @Composable
-fun ParameterizedDrinkListScreen(input: ParameterizedDrinkListInput) {
-    ParameterizedDrinkListScreen(getViewModel { parametersOf(input) })
+fun ParameterizedDrinkListScreen(
+    input: ParameterizedDrinkListInput,
+    floatingActionButton: (@Composable () -> Unit)? = null
+) {
+    ParameterizedDrinkListScreen(getViewModel { parametersOf(input) }, floatingActionButton)
 }
 
 @Composable
-fun ParameterizedDrinkListScreen(viewModel: ParameterizedDrinkListViewModel) {
+fun ParameterizedDrinkListScreen(
+    viewModel: ParameterizedDrinkListViewModel,
+    floatingActionButton: (@Composable () -> Unit)?
+) {
     val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    ParameterizedDrinkListScreen(state)
+    ParameterizedDrinkListScreen(state, floatingActionButton)
 }
 
 @Composable
-fun ParameterizedDrinkListScreen(state: ParameterizedDrinkListState) {
-    Column(modifier = Modifier.fillMaxSize()) {
-        val listState = rememberLazyListState()
-        val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
+fun ParameterizedDrinkListScreen(
+    state: ParameterizedDrinkListState,
+    floatingActionButton: (@Composable () -> Unit)?
+) {
+    val listState = rememberLazyListState()
+    val localDensity = LocalDensity.current
+    var fabHeight by remember { mutableStateOf(0.dp) }
 
-        ActionsAppBar(
-            title = buildAnnotatedString {
-                append(state.title)
-                withStyle(SpanStyle(color = MaterialTheme.colors.primary)) {
-                    append(state.titleHighlighted)
-                }
-            },
-            modifier = Modifier.liftOnScroll(listState),
-            leadingButtons = { BackButton() }
-        )
-        DrinkGrid(
-            drinks = lazyPagingItems,
-            listState = listState,
-            emptyMessage = "We don't have any drinks\nfor this category",
-            onRetry = { lazyPagingItems.retry() },
-            contentPadding = rememberInsetsPaddingValues(
-                insets = LocalWindowInsets.current.navigationBars,
-                additionalStart = 8.dp,
-                additionalEnd = 8.dp
+    val fab: @Composable () -> Unit = {
+        Box(
+            Modifier.onGloballyPositioned { coordinates ->
+                fabHeight = with(localDensity) { coordinates.size.height.toDp() }
+            }
+        ) { floatingActionButton?.invoke() }
+    }
+
+    Scaffold(
+        topBar = {
+            ActionsAppBar(
+                title = buildAnnotatedString {
+                    append(state.title)
+                    withStyle(SpanStyle(color = MaterialTheme.colors.primary)) {
+                        append(state.titleHighlighted)
+                    }
+                },
+                modifier = Modifier.liftOnScroll(listState),
+                leadingButtons = { BackButton() }
             )
-        )
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButton = fab,
+    ) { innerPadding ->
+        Column(Modifier.padding(innerPadding)) {
+            val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
+
+            DrinkGrid(
+                drinks = lazyPagingItems,
+                listState = listState,
+                emptyMessage = state.emptyStateMessage,
+                onRetry = { lazyPagingItems.retry() },
+                contentPadding = rememberInsetsPaddingValues(
+                    insets = LocalWindowInsets.current.navigationBars,
+                    additionalStart = 8.dp,
+                    additionalEnd = 8.dp,
+                    additionalBottom = fabHeight
+                ),
+            )
+        }
     }
 }
 
@@ -96,6 +132,6 @@ fun ParameterizedDrinkListScreen(state: ParameterizedDrinkListState) {
 @Composable
 fun ParameterizedDrinkListScreenPreview() {
     BarneeTheme {
-        ParameterizedDrinkListScreen(ParameterizedDrinkListState(DrinksRequest.ForQuery("query"), "Title", "Highlighted"))
+        ParameterizedDrinkListScreen(ParameterizedDrinkListState(DrinksRequest.ForQuery("query"), "Title", "Highlighted", "Empty"), {})
     }
 }

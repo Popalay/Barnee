@@ -25,8 +25,6 @@ package com.popalay.barnee.domain
 import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.util.CFlow
 import com.popalay.barnee.util.wrap
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.channels.Channel
@@ -46,15 +44,15 @@ interface Input
 interface State
 interface Action
 interface SideEffect
-object EmptySideEffect : SideEffect
+object NoSideEffect : SideEffect
 
-@OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
-open class StateMachine<S : State, A : Action, SE : SideEffect>(
+object InitialAction : Action
+
+open class StateMachine<S : State, SE : SideEffect>(
     initialState: S,
-    initialAction: A? = null,
     reducer: Reducer<S, SE>
 ) : KoinComponent {
-    private val actionFlow = MutableSharedFlow<A>()
+    private val actionFlow = MutableSharedFlow<Action>()
     private val sideEffectChannel = Channel<SE>()
     private val stateMachineScope = MainScope()
     private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
@@ -62,7 +60,7 @@ open class StateMachine<S : State, A : Action, SE : SideEffect>(
 
     val sideEffectFlow: CFlow<SE> = sideEffectChannel.receiveAsFlow().wrap()
     val stateFlow: CFlow<S> = actionFlow
-        .onStart { initialAction?.let { emit(it) } }
+        .onStart { emit(InitialAction) }
         .onEach { logger.log(this, it) }
         .reducer({ currentState }, {
             sideEffectChannel.send(it)
@@ -79,7 +77,7 @@ open class StateMachine<S : State, A : Action, SE : SideEffect>(
         stateMachineScope.coroutineContext.cancelChildren()
     }
 
-    fun process(action: A) {
+    fun dispatch(action: Action) {
         stateMachineScope.launch { actionFlow.emit(action) }
     }
 }

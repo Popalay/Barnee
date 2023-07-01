@@ -24,7 +24,6 @@ package com.popalay.barnee.domain
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.transformLatest
 
 sealed class Result<out T>(val complete: Boolean, val shouldLoad: Boolean, private val value: T?) {

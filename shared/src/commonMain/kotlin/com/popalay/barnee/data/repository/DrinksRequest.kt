@@ -34,4 +34,5 @@ sealed class DrinksRequest {
     ) : DrinksRequest()
 
     object Random : DrinksRequest()
+    object Generated : DrinksRequest()
 }

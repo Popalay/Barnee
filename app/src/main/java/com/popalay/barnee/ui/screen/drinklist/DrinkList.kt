@@ -79,9 +79,9 @@ import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.inCollections
+import com.popalay.barnee.util.isGenerated
 import org.koin.androidx.compose.getViewModel
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun DrinkGrid(
     drinks: LazyPagingItems<Drink>,
@@ -124,9 +124,9 @@ fun DrinkGrid(
                 item?.let {
                     DrinkListItem(
                         item,
-                        onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
-                        onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                        onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                        onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
+                        onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                        onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
                         modifier = Modifier.topShift(index = index, size = value.itemCount)
                     )
                 }
@@ -154,9 +154,9 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { viewModel.processAction(DrinkItemAction.DrinkClicked(item)) },
-                    onDoubleClick = { viewModel.processAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.processAction(ToggleFavorite(item)) },
+                    onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
+                    onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                    onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))
@@ -167,7 +167,7 @@ fun DrinkHorizontalList(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun DrinkListItem(
+fun DrinkListItem(
     data: Drink,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
@@ -209,18 +209,20 @@ private fun DrinkListItem(
                         .padding(end = 8.dp)
                 )
                 Text(
-                    text = data.displayRating,
+                    text = if (data.isGenerated) "AI ✨" else data.displayRating,
                     style = MaterialTheme.typography.h3,
                     color = MaterialTheme.colors.primary
                 )
             }
-            AnimatedHeartButton(
-                onToggle = onHeartClick,
-                isSelected = data.inCollections,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(4.dp)
-            )
+            if(!data.isGenerated) {
+                AnimatedHeartButton(
+                    onToggle = onHeartClick,
+                    isSelected = data.inCollections,
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(4.dp)
+                )
+            }
         }
     }
 }

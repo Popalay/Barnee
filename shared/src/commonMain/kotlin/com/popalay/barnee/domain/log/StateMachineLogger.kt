@@ -29,15 +29,15 @@ import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.util.Logger
 
 class StateMachineLogger(private val logger: Logger) {
-    fun <T : StateMachine<*, *, *>> log(tag: T, action: Action) {
+    fun <T : StateMachine<*, *>> log(tag: T, action: Action) {
         logger.info(tag::class.simpleName.orEmpty(), "action => $action")
     }
 
-    fun <T : StateMachine<*, *, *>> log(tag: T, state: State) {
+    fun <T : StateMachine<*, *>> log(tag: T, state: State) {
         logger.info(tag::class.simpleName.orEmpty(), "state => $state")
     }
 
-    fun <T : StateMachine<*, *, *>> log(tag: T, sideEffect: SideEffect) {
+    fun <T : StateMachine<*, *>> log(tag: T, sideEffect: SideEffect) {
         logger.info(tag::class.simpleName.orEmpty(), "side effect => $sideEffect")
     }
 }

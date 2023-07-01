@@ -22,8 +22,11 @@
 
 package com.popalay.barnee.di
 
+import com.aallam.openai.client.OpenAI
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
+import com.popalay.barnee.data.message.MessagesProvider
+import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.CollectionRepositoryImpl
@@ -31,7 +34,9 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.data.repository.ShareRepositoryImpl
+import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
+import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
@@ -48,6 +53,7 @@ import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListSt
 import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
+import com.popalay.barnee.shared.BuildKonfig
 import com.popalay.barnee.util.EmptyLogger
 import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
@@ -90,10 +96,13 @@ val commonModule = module {
             }
         }
     }
-    single<DrinkRepository> { DrinkRepositoryImpl(get(), get()) }
+    single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
+    single<OpenAI> { OpenAI(token = BuildKonfig.OPEN_AI_API_KEY) }
     single<Router> { RouterImpl(get()) }
+    single<AiApi> { AiApi(get(), get(), get()) }
+    single { MessagesProvider() }
 
     single { GetCollectionUseCase(get(), get()) }
 
@@ -101,11 +110,12 @@ val commonModule = module {
     factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
-    factory { DrinkItemStateMachine(get(), get()) }
+    factory { DrinkItemStateMachine(get(), get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
     factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
     factory { CollectionListStateMachine(get(), get()) }
-    factory { AddToCollectionStateMachine(get()) }
+    factory { (input: AddToCollectionInput) -> AddToCollectionStateMachine(input, get(), get()) }
+    factory { BartenderStateMachine(get(), get()) }
 }
 
 expect val platformModule: Module

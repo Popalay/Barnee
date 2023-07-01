@@ -28,6 +28,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Ingredient(
     @Serializable(with = SanitizeStringTransformer::class) val text: String,
-    @Serializable(with = SanitizeStringTransformer::class) val name: String,
     val nutrition: Int = 0
 )

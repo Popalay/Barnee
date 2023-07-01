@@ -22,55 +22,14 @@
 
 package com.popalay.barnee
 
-import android.content.res.Configuration
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
-import coil.Coil
-import coil.ImageLoader
-import coil.util.DebugLogger
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.firebase.dynamiclinks.ktx.dynamicLinks
-import com.google.firebase.ktx.Firebase
-import com.popalay.barnee.domain.navigation.BackDestination
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.navigation.CollectionNavigationCommand
-import com.popalay.barnee.navigation.CollectionsNavigationCommand
-import com.popalay.barnee.navigation.DiscoveryNavigationCommand
-import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.HouseBarNavigationCommand
-import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
-import com.popalay.barnee.navigation.SearchNavigationCommand
-import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
-import com.popalay.barnee.navigation.TagDrinksNavigationCommand
-import com.popalay.barnee.navigation.navigate
-import com.popalay.barnee.navigation.navigationNode
-import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
-import com.popalay.barnee.ui.screen.collection.CollectionScreen
-import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
-import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
-import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.housebar.HouseBarScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
-import com.popalay.barnee.ui.screen.search.SearchScreen
-import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.ImageUrlCoilMapper
-import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
-import com.popalay.barnee.util.isDebug
-import org.koin.androidx.compose.get
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,88 +39,9 @@ class MainActivity : ComponentActivity() {
         setContent {
             BarneeTheme {
                 Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
+                    ComposeApp(intent)
                 }
             }
-        }
-    }
-
-    @Composable
-    fun ComposeApp() {
-        ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-            val context = LocalContext.current
-            val navController = rememberNavController()
-            val imageLoader = remember {
-                ImageLoader.Builder(context)
-                    .logger(if (isDebug) DebugLogger() else null).components {
-                        add(ImageUrlCoilMapper())
-                    }
-                    .build()
-            }
-
-            LaunchedEffect(Unit) {
-                Firebase.dynamicLinks.getDynamicLink(intent).addOnSuccessListener { pendingDynamicLinkData ->
-                    pendingDynamicLinkData?.link?.let {
-                        navController.popBackStack(navController.graph.id, false)
-                        navController.navigate(it)
-                    }
-                }
-
-                Coil.setImageLoader(imageLoader)
-            }
-
-            NavigationGraph(navController)
-            AddToCollectionScreen()
-            ShakeToDrinkScreen()
-        }
-    }
-
-    @Composable
-    fun NavigationGraph(navController: NavHostController) {
-        val router: Router = get()
-
-        LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
-            if (destination == BackDestination) navController.navigateUp()
-            else navController.navigate(destination)
-        }
-
-        NavHost(navController, startDestination = DiscoveryNavigationCommand.route) {
-            navigationNode(DiscoveryNavigationCommand) {
-                DiscoveryScreen()
-            }
-            navigationNode(DrinkNavigationCommand) {
-                DrinkScreen(DrinkNavigationCommand.parseInput(it))
-            }
-            navigationNode(TagDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(TagDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(SimilarDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(SimilarDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(QueryDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(CollectionsNavigationCommand) {
-                CollectionListScreen()
-            }
-            navigationNode(CollectionNavigationCommand) {
-                CollectionScreen(CollectionNavigationCommand.parseInput(it))
-            }
-            navigationNode(SearchNavigationCommand) {
-                SearchScreen()
-            }
-            navigationNode(HouseBarNavigationCommand) {
-                HouseBarScreen()
-            }
-        }
-    }
-
-    @Preview("Light Theme", widthDp = 360, heightDp = 640)
-    @Preview("Dark Theme", widthDp = 360, heightDp = 640, uiMode = Configuration.UI_MODE_NIGHT_YES)
-    @Composable
-    fun ComposeAppPreview() {
-        BarneeTheme {
-            ComposeApp()
         }
     }
 }

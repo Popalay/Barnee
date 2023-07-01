@@ -23,6 +23,7 @@
 package com.popalay.barnee.di
 
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionViewModel
+import com.popalay.barnee.ui.screen.bartender.BartenderViewModel
 import com.popalay.barnee.ui.screen.collection.CollectionViewModel
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
 import com.popalay.barnee.ui.screen.discovery.DiscoveryViewModel
@@ -44,4 +45,5 @@ val uiModule = module {
     viewModel { CollectionViewModel(get { it }) }
     viewModel { CollectionListViewModel(get { it }) }
     viewModel { AddToCollectionViewModel(get { it }) }
+    viewModel { BartenderViewModel(get { it }) }
 }

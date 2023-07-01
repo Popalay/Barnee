@@ -22,7 +22,7 @@
 
 package com.popalay.barnee.domain.navigation
 
-object HouseBarDestination : Destination, RouteProvider {
-    override val destination = "house_bar"
-    override val route: String = "house_bar"
+object GeneratedDrinksDestination : Destination, RouteProvider {
+    override val destination = "generated-drinks"
+    override val route: String = "generated-drinks"
 }

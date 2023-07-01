@@ -33,6 +33,10 @@ interface Router {
     suspend fun navigate(destination: Destination)
 }
 
+suspend fun Router.navigateBack() {
+    navigate(BackDestination)
+}
+
 internal class RouterImpl(
     private val navigationLogger: NavigationLogger
 ) : Router {

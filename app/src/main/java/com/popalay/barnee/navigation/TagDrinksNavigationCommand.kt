@@ -43,6 +43,7 @@ object TagDrinksNavigationCommand : NavigationCommand<ParameterizedDrinkListInpu
         val tag = backStackEntry.arguments?.getString(KEY_TAG).orEmpty()
         return ParameterizedDrinkListInput(
             request = DrinksRequest.ForTags(setOf(tag)),
+            emptyStateMessage = "No drinks found for \"$tag\"",
             title = tag.capitalizeFirstChar()
         )
     }

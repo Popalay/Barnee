@@ -26,9 +26,9 @@ import com.kuuurt.paging.multiplatform.PagingData
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
-import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.EmptySideEffect
+import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Input
+import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import kotlinx.coroutines.flow.Flow
@@ -41,6 +41,7 @@ import kotlinx.coroutines.flow.take
 data class ParameterizedDrinkListInput(
     val request: DrinksRequest,
     val title: String,
+    val emptyStateMessage: String,
     val titleHighlighted: String = ""
 ) : Input
 
@@ -48,24 +49,20 @@ data class ParameterizedDrinkListState(
     val request: DrinksRequest,
     val title: String,
     val titleHighlighted: String,
+    val emptyStateMessage: String,
     val drinks: Flow<PagingData<Drink>> = emptyFlow()
 ) : State {
-    constructor(input: ParameterizedDrinkListInput) : this(input.request, input.title, input.titleHighlighted)
-}
-
-sealed interface ParameterizedDrinkListAction : Action {
-    object Initial : ParameterizedDrinkListAction
+    constructor(input: ParameterizedDrinkListInput) : this(input.request, input.title, input.titleHighlighted, input.emptyStateMessage)
 }
 
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
     drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, ParameterizedDrinkListAction, EmptySideEffect>(
+) : StateMachine<ParameterizedDrinkListState, NoSideEffect>(
     initialState = ParameterizedDrinkListState(input),
-    initialAction = ParameterizedDrinkListAction.Initial,
     reducer = { state, _ ->
         merge(
-            filterIsInstance<ParameterizedDrinkListAction.Initial>()
+            filterIsInstance<InitialAction>()
                 .take(1)
                 .map { drinkRepository.drinks(state().request) }
                 .map { state().copy(drinks = it) }

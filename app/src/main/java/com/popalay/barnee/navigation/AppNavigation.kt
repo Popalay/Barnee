@@ -29,9 +29,15 @@ import androidx.navigation.NavController
 import androidx.navigation.NavDeepLink
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
+import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
+import com.google.accompanist.navigation.material.bottomSheet
 import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.navigation.Destination
 import com.popalay.barnee.domain.navigation.RouteProvider
+import com.popalay.barnee.navigation.NavigationCommand.NavigationType.BottomSheet
+import com.popalay.barnee.navigation.NavigationCommand.NavigationType.Dialog
+import com.popalay.barnee.navigation.NavigationCommand.NavigationType.Screen
 
 const val DEEPLINK_PREFIX = "https://barnee.com/"
 
@@ -39,23 +45,48 @@ fun NavController.navigate(destination: Destination) {
     navigate(destination.destination)
 }
 
+@OptIn(ExperimentalMaterialNavigationApi::class)
 fun <T : Input> NavGraphBuilder.navigationNode(
     command: NavigationCommand<T>,
     content: @Composable (NavBackStackEntry) -> Unit
 ) {
-    composable(
-        route = command.route,
-        deepLinks = command.deeplinks,
-        arguments = command.arguments,
-        content = content
-    )
+    when (command.navigationType) {
+        Dialog -> dialog(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = content
+        )
+
+        BottomSheet -> bottomSheet(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = {
+                content(it)
+            }
+        )
+
+        Screen -> composable(
+            route = command.route,
+            deepLinks = command.deeplinks,
+            arguments = command.arguments,
+            content = content
+        )
+    }
 }
 
 interface NavigationCommand<T : Input> : RouteProvider {
     val arguments: List<NamedNavArgument> get() = emptyList()
     val deeplinks: List<NavDeepLink> get() = emptyList()
 
+    val navigationType: NavigationType get() = Screen
+
     fun parseInput(backStackEntry: NavBackStackEntry): T {
         throw UnsupportedOperationException("Input is not supported for ${this::class.simpleName}")
+    }
+
+    enum class NavigationType {
+        Dialog, BottomSheet, Screen
     }
 }

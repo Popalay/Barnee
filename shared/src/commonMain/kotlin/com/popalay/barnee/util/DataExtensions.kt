@@ -26,6 +26,7 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.EmptyImageUrl
 import com.popalay.barnee.data.model.ExternalImageUrl
 import com.popalay.barnee.data.model.ImageUrl
@@ -39,11 +40,15 @@ val Drink.displayImageUrl: ImageUrl
 
 val Drink.displayName: String get() = name.lowercase().removePrefix("absolut").trim()
 
-val Drink.videoUrl: String? get() = videos.firstOrNull()?.youtube?.let { "https://www.youtube.com/watch?v=$it" }
+val Drink.videoId: String? get() = videos.firstOrNull()?.youtube
 
 val Drink.displayRating: String get() = (rating / 10F).toIntIfInt().toString()
 
 val Drink.displayRatingWithMax: String get() = displayRating.let { "$it/10" }
+
+val Drink.isGenerated: Boolean get() = id.startsWith("generated_")
+
+val Drink.identifier: String get() = alias.ifBlank { id }
 
 val Drink.keywords: List<Category>
     get() = (categories + collections + occasions)
@@ -58,15 +63,22 @@ val Drink.calories: String get() = nutrition.totalCalories.toString().let { "$it
 
 val Drink.collection: Collection? get() = userCollections.firstOrNull()
 
-fun Iterable<Collection>.filter(drink: Drink) = filter { drink.alias in it.aliases }
+fun Iterable<Collection>.filter(drink: DrinkMinimumData) = filter { drink.identifier in it.aliases }
+fun Iterable<Collection>.filter(drink: Drink) = filter { drink.identifier in it.aliases }
 
 val AggregationGroup.displayNames get() = values.keys.map { it.replace(' ', '-') to it.lowercase().replace('-', ' ') }
 
 fun String.toImageUrl() = when {
-    isBlank() -> EmptyImageUrl
+    isBlank()                                 -> EmptyImageUrl
     startsWith("http") || startsWith("https") -> ExternalImageUrl(this)
-    else -> InternalImageUrl(this)
+    else                                      -> InternalImageUrl(this)
 }
+
+fun Drink.toMinimumData() = DrinkMinimumData(
+    identifier = identifier,
+    name = displayName,
+    displayImageUrl = displayImageUrl
+)
 
 val Category.displayText get() = text.lowercase()
 
