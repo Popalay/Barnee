@@ -113,7 +113,7 @@ buildkonfig {
     packageName = android.namespace
 
     val openApiKeyName = "OPEN_AI_API_KEY"
-    val devOpenAiApiKey = System.getenv(openApiKeyName)
+    val openAiApiKey = System.getenv(openApiKeyName)
         ?: gradleLocalProperties(rootDir).getProperty(openApiKeyName)
         ?: error("No $openApiKeyName provided")
 
@@ -121,7 +121,7 @@ buildkonfig {
         buildConfigField(
             type = FieldSpec.Type.STRING,
             name = openApiKeyName,
-            value = devOpenAiApiKey,
+            value = openAiApiKey,
             const = true,
             nullable = false
         )
