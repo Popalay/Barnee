@@ -22,6 +22,7 @@
 
 package com.popalay.barnee.di
 
+import com.aallam.openai.client.LoggingConfig
 import com.aallam.openai.client.OpenAI
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
@@ -70,6 +71,8 @@ import org.koin.core.context.startKoin
 import org.koin.core.module.Module
 import org.koin.dsl.KoinAppDeclaration
 import org.koin.dsl.module
+import com.aallam.openai.api.logging.LogLevel as OpenAiLogLevel
+import com.aallam.openai.api.logging.Logger as OpenAiLogger
 
 val commonModule = module {
     single { if (isDebug) RealLogger() else EmptyLogger }
@@ -99,7 +102,15 @@ val commonModule = module {
     single<DrinkRepository> { DrinkRepositoryImpl(get(), get(), get(), get(), get()) }
     single<CollectionRepository> { CollectionRepositoryImpl(get(), get(), get()) }
     single<ShareRepository> { ShareRepositoryImpl(get(), get()) }
-    single<OpenAI> { OpenAI(token = BuildKonfig.OPEN_AI_API_KEY) }
+    single<OpenAI> {
+        OpenAI(
+            token = BuildKonfig.OPEN_AI_API_KEY,
+            logging = LoggingConfig(
+                logLevel = OpenAiLogLevel.Body,
+                logger = if (isDebug) OpenAiLogger.Simple else OpenAiLogger.Empty
+            )
+        )
+    }
     single<Router> { RouterImpl(get()) }
     single<AiApi> { AiApi(get(), get(), get()) }
     single { MessagesProvider() }

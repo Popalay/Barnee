@@ -71,6 +71,8 @@ kotlin {
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
                 implementation(libs.openai.client)
+                implementation(libs.uri)
+                implementation(libs.uuid)
                 api(libs.multiplatformpaging)
             }
         }

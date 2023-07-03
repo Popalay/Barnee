@@ -34,6 +34,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -331,7 +332,7 @@ private fun DrinkAppBar(
             .fillMaxWidth()
             .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DEFAULT_ASPECT_RATIO))
     ) {
-        Crossfade(state.isPlaying) { isPlaying ->
+        Crossfade(state.isPlaying, label = "player-content") { isPlaying ->
             if (isPlaying) {
                 YouTubePlayer(
                     videoId = drink?.videoId.orEmpty(),
@@ -581,7 +582,13 @@ private fun Story(
     val textLength by animateIntAsState(if (isTextCollapsed) 100 else story.length)
     val arrowRotation by animateIntAsState(if (isTextCollapsed) 270 else 90)
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.clickable(
+            onClick = { isTextCollapsed = !isTextCollapsed },
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        )
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "Story",
@@ -611,7 +618,7 @@ private fun Story(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = story.take(textLength) + if (isTextCollapsed) "..." else "",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.body2,
         )
     }
 }
