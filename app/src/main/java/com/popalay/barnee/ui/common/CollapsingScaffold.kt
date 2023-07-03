@@ -103,7 +103,6 @@ class CollapsingScaffoldState(
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
 
     companion object {
-        @Suppress("FunctionName")
         fun Saver(scaffoldState: ScaffoldState): Saver<CollapsingScaffoldState, *> = listSaver(
             save = { listOf(it.minHeightPx, it.maxHeightPx, it.currentValue.ordinal) },
             restore = { list ->
