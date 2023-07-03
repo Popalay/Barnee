@@ -91,14 +91,15 @@ private fun createChatCompletionRequest(prompt: String) = chatCompletionRequest 
                     "and provide a prompt that visualises it. Use the 2 prompts below as an example of construct:\n" +
                     "IMAGE_TYPE: Food photography | GENRE: Gourmet | EMOTION: Delightful | SCENE: An exquisitely designed dessert, " +
                     "featuring a chocolate sphere filled with a velvety mousse and adorned with gold leaf, elegantly placed on a white porcelain " +
-                    "plate | ACTORS: None | LOCATION TYPE: Studio | CAMERA MODEL: Canon EOS 5D Mark IV | CAMERA LENSE: 100mm f/2.8 Macro | SPECIAL EFFECTS: Soft lighting " +
-                    "| TAGS: gourmet dessert, chocolate sphere, gold leaf, artistic presentation | TIME_OF_DAY: Studio lighting | INTERACTION: None | --ar 4:3\n" +
-                    "IMAGE_TYPE: Food photography | GENRE: Pastry | EMOTION: Whimsical | SCENE: A colorful and artistic macaron tower, decorated " +
-                    "with delicate sugar flowers and butterflies, set against a dreamy pastel background | ACTORS: None | LOCATION TYPE: Studio " +
-                    "| CAMERA MODEL: Nikon D850 | CAMERA LENSE: 60mm f/2.8 Macro | SPECIAL EFFECTS: Dreamy bokeh | TAGS: macaron tower, sugar flowers, " +
-                    "butterflies, pastel background, whimsical | TIME_OF_DAY: Studio lighting | INTERACTION: None | --ar 1:1.\n" +
-                    "Be creative and imaginative! The name of the cocktail should be unique and imaginative e.g. The Fluffy Unicorn, Stellar Swirl, Mystical Mingle.\n" +
-                    "The cocktail image should be made with dark background and should be in 9:16 aspect ratio."
+                    "plate | ACTORS: None | LOCATION TYPE: Studio | CAMERA MODEL: Canon EOS 5D Mark IV | CAMERA LENSE: 100mm f/2.8 Macro " +
+                    "| SPECIAL EFFECTS: Soft lighting | TAGS: gourmet dessert, chocolate sphere, gold leaf, artistic presentation " +
+                    "| TIME_OF_DAY: Studio lighting | INTERACTION: None | --ar 4:3\nIMAGE_TYPE: Food photography | GENRE: Pastry " +
+                    "| EMOTION: Whimsical | SCENE: A colorful and artistic macaron tower, decorated with delicate sugar flowers and butterflies, " +
+                    "set against a dreamy pastel background | ACTORS: None | LOCATION TYPE: Studio | CAMERA MODEL: Nikon D850 " +
+                    "| CAMERA LENSE: 60mm f/2.8 Macro | SPECIAL EFFECTS: Dreamy bokeh | TAGS: macaron tower, sugar flowers, butterflies, " +
+                    "pastel background, whimsical | TIME_OF_DAY: Studio lighting | INTERACTION: None | --ar 1:1.\n" +
+                    "Be creative and imaginative! The name of the cocktail should be unique and imaginative e.g. The Fluffy Unicorn, " +
+                    "Stellar Swirl, Mystical Mingle.\n The cocktail image should be made with dark background and should be in 9:16 aspect ratio."
         )
     )
     functions {
