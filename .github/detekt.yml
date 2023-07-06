@@ -93,19 +93,19 @@ complexity:
   active: true
   CognitiveComplexMethod:
     active: false
-    threshold: 15
+    allowedComplexity: 15
   ComplexCondition:
     active: true
     threshold: 4
   ComplexInterface:
     active: false
-    threshold: 10
+    allowedDefinitions: 10
     includeStaticDeclarations: false
     includePrivateDeclarations: false
     ignoreOverloaded: false
   CyclomaticComplexMethod:
     active: true
-    threshold: 14
+    allowedComplexity: 14
     ignoreSingleWhenExpression: false
     ignoreSimpleWhenEntries: false
     ignoreNestingFunctions: false
@@ -124,30 +124,30 @@ complexity:
     ignoredLabels: [ ]
   LargeClass:
     active: true
-    threshold: 600
+    allowedLines: 600
   LongMethod:
     active: true
-    threshold: 100
+    allowedLines: 60
   LongParameterList:
     active: true
-    functionThreshold: 7
+    functionThreshold: 6
     constructorThreshold: 7
-    ignoreDefaultParameters: true
+    ignoreDefaultParameters: false
     ignoreDataClasses: true
     ignoreAnnotatedParameter: [ ]
   MethodOverloading:
     active: false
-    threshold: 6
+    allowedOverloads: 6
   NamedArguments:
     active: false
-    threshold: 3
+    allowedArguments: 3
     ignoreArgumentsMatchingNames: false
   NestedBlockDepth:
     active: true
-    threshold: 4
+    allowedDepth: 4
   NestedScopeFunctions:
     active: false
-    threshold: 1
+    allowedDepth: 1
     functions:
       - 'kotlin.apply'
       - 'kotlin.run'
@@ -164,7 +164,7 @@ complexity:
     excludeStringsWithLessThan5Characters: true
     ignoreStringsRegex: '$^'
   TooManyFunctions:
-    active: false
+    active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
     thresholdInFiles: 11
     thresholdInClasses: 11
@@ -321,17 +321,16 @@ naming:
   ForbiddenClassName:
     active: false
     forbiddenName: [ ]
-  FunctionMaxLength:
-    active: true
-    maximumFunctionNameLength: 40
-  FunctionMinLength:
-    active: true
+  FunctionNameMaxLength:
+    active: false
+    maximumFunctionNameLength: 30
+  FunctionNameMinLength:
+    active: false
     minimumFunctionNameLength: 3
   FunctionNaming:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
     functionPattern: '[a-z][a-zA-Z0-9]*'
-    ignoreAnnotated: [ 'Composable' ]
     excludeClassPattern: '$^'
   FunctionParameterNaming:
     active: true
@@ -364,11 +363,11 @@ naming:
     packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'
   TopLevelPropertyNaming:
     active: true
-    constantPattern: '[A-Z][A-Za-z0-9]*'
+    constantPattern: '[A-Z][_A-Z0-9]*'
     propertyPattern: '[A-Za-z][_A-Za-z0-9]*'
     privatePropertyPattern: '_?[A-Za-z][_A-Za-z0-9]*'
   VariableMaxLength:
-    active: true
+    active: false
     maximumVariableNameLength: 64
   VariableMinLength:
     active: false
@@ -384,7 +383,7 @@ performance:
   ArrayPrimitive:
     active: true
   CouldBeSequence:
-    active: true
+    active: false
     threshold: 3
   ForEachOnRange:
     active: true
@@ -393,7 +392,7 @@ performance:
     active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
   UnnecessaryPartOfBinaryExpression:
-    active: true
+    active: false
   UnnecessaryTemporaryInstantiation:
     active: true
 
@@ -403,12 +402,15 @@ potential-bugs:
     active: true
     forbiddenTypePatterns:
       - 'kotlin.String'
+  CastNullableToNonNullableType:
+    active: false
+    ignorePlatformTypes: true
   CastToNullableType:
     active: false
   Deprecation:
     active: false
   DontDowncastCollectionTypes:
-    active: true
+    active: false
   DoubleMutabilityForCollection:
     active: true
     mutableTypes:
@@ -428,7 +430,7 @@ potential-bugs:
   EqualsWithHashCodeExist:
     active: true
   ExitOutsideMain:
-    active: true
+    active: false
   ExplicitGarbageCollectionCall:
     active: true
   HasPlatformType:
@@ -467,18 +469,18 @@ potential-bugs:
   MapGetWithNotNullAssertionOperator:
     active: true
   MissingPackageDeclaration:
-    active: true
+    active: false
     excludes: [ '**/*.kts' ]
   NullCheckOnMutableProperty:
     active: false
   NullableToStringCall:
-    active: true
+    active: false
   PropertyUsedBeforeDeclaration:
-    active: true
+    active: false
   UnconditionalJumpStatementInLoop:
-    active: true
+    active: false
   UnnecessaryNotNullCheck:
-    active: true
+    active: false
   UnnecessaryNotNullOperator:
     active: true
   UnnecessarySafeCall:
@@ -512,7 +514,7 @@ style:
     singleLine: 'necessary'
     multiLine: 'consistent'
   CanBeNonNullable:
-    active: true
+    active: false
   CascadingCallWrapping:
     active: false
     includeElvis: true
@@ -526,12 +528,12 @@ style:
       - 'to'
     allowOperators: false
   DataClassShouldBeImmutable:
-    active: true
+    active: false
   DestructuringDeclarationWithTooManyEntries:
     active: true
     maxDestructuringEntries: 3
   DoubleNegativeLambda:
-    active: true
+    active: false
     negativeFunctions:
       - reason: 'Use `takeIf` instead.'
         value: 'takeUnless'
@@ -552,7 +554,7 @@ style:
     active: false
     includeLineWrapping: false
   ForbiddenAnnotation:
-    active: true
+    active: false
     annotations:
       - reason: 'it is a java annotation. Use `Suppress` instead.'
         value: 'java.lang.SuppressWarnings'
@@ -605,7 +607,7 @@ style:
     active: true
     maxJumpCount: 1
   MagicNumber:
-    active: false
+    active: true
     excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts' ]
     ignoreNumbers:
       - '-1'
@@ -613,7 +615,7 @@ style:
       - '1'
       - '2'
     ignoreHashCodeFunction: true
-    ignorePropertyDeclaration: true
+    ignorePropertyDeclaration: false
     ignoreLocalVariableDeclaration: false
     ignoreConstantDeclaration: true
     ignoreCompanionObjectPropertyDeclaration: true
@@ -625,15 +627,17 @@ style:
   MandatoryBracesLoops:
     active: false
   MaxChainedCallsOnSameLine:
-    active: true
+    active: false
     maxChainedCalls: 5
   MaxLineLength:
     active: true
-    maxLineLength: 150
+    maxLineLength: 120
     excludePackageStatements: true
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+  MayBeConstant:
+    active: true
   ModifierOrder:
     active: true
   MultilineLambdaItParameter:
@@ -682,6 +686,8 @@ style:
     active: true
   SerialVersionUIDInSerializableClass:
     active: true
+  SpacingAfterPackageDeclaration:
+    active: false
   StringShouldBeRawString:
     active: false
     maxEscapedCharacterCount: 2
@@ -691,7 +697,7 @@ style:
     max: 2
     excludeGuardClauses: false
   TrailingWhitespace:
-    active: true
+    active: false
   TrimMultilineRawString:
     active: false
     trimmingMethods:
@@ -704,7 +710,7 @@ style:
   UnnecessaryAbstractClass:
     active: true
   UnnecessaryAnnotationUseSiteTarget:
-    active: true
+    active: false
   UnnecessaryApply:
     active: true
   UnnecessaryBackticks:
@@ -716,16 +722,16 @@ style:
   UnnecessaryInheritance:
     active: true
   UnnecessaryInnerClass:
-    active: true
+    active: false
   UnnecessaryLet:
-    active: true
+    active: false
   UnnecessaryParentheses:
-    active: true
-    allowForUnclearPrecedence: true
+    active: false
+    allowForUnclearPrecedence: false
   UntilInsteadOfRangeTo:
-    active: true
+    active: false
   UnusedImports:
-    active: true
+    active: false
   UnusedParameter:
     active: true
     allowedNames: 'ignored|expected'
@@ -733,7 +739,6 @@ style:
     active: true
   UnusedPrivateMember:
     active: true
-    ignoreAnnotated: ['Preview']
     allowedNames: ''
   UnusedPrivateProperty:
     active: true
@@ -747,12 +752,12 @@ style:
   UseCheckOrError:
     active: true
   UseDataClass:
-    active: true
+    active: false
     allowVars: false
   UseEmptyCounterpart:
     active: false
   UseIfEmptyOrIfBlank:
-    active: true
+    active: false
   UseIfInsteadOfWhen:
     active: false
     ignoreWhenContainingVariableDeclaration: false
@@ -767,7 +772,7 @@ style:
   UseRequireNotNull:
     active: true
   UseSumOfInsteadOfFlatMapSize:
-    active: true
+    active: false
   UselessCallOnNotNull:
     active: true
   UtilityClassWithPublicConstructor:
