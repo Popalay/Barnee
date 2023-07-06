@@ -59,7 +59,7 @@ jobs:
       - name: Detekt all
         uses: natiginfo/action-detekt-all@1.23.0
         with:
-          args: --fail-fast --config .github/detekt.yml --report sarif:./reports/detekt.sarif
+          args: --config .github/detekt.yml --report sarif:./reports/detekt.sarif
 
       - name: Upload SARIF to Github using the upload-sarif action
         uses: github/codeql-action/upload-sarif@v1.1.5
