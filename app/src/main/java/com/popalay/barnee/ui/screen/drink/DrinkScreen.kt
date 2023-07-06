@@ -123,6 +123,7 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.navigation.CollectionDestination
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.ui.common.ActionsAppBar
+import com.popalay.barnee.ui.common.ActionsAppBarHeight
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
@@ -179,7 +180,7 @@ fun DrinkScreen(
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
     val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
-    val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
+    val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + LocalWindowInsets.current.statusBars.top }
     val activity = findActivity()
     val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
     val listState = rememberLazyListState()
