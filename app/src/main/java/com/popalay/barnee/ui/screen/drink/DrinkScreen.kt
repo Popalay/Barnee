@@ -135,7 +135,7 @@ import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.theme.DefaultAspectRatio
+import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
@@ -179,7 +179,7 @@ fun DrinkScreen(
     onItemAction: (DrinkItemAction) -> Unit
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
-    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DefaultAspectRatio).toPx() }
+    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
     val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + LocalWindowInsets.current.statusBars.top }
     val activity = findActivity()
     val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -331,7 +331,7 @@ private fun DrinkAppBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DefaultAspectRatio))
+            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DEFAULT_ASPECT_RATIO))
     ) {
         Crossfade(state.isPlaying, label = "player-content") { isPlaying ->
             if (isPlaying) {
@@ -369,6 +369,21 @@ private fun DrinkAppBar(
         ConstraintLayout {
             val (actionBar, title, nutrition) = createRefs()
             val (collection, bottomSection, playButton) = createRefs()
+            DrinkActionBar(
+                title = state.displayName,
+                titleAlpha = 1 - contentAlpha,
+                isActionsVisible = drink != null,
+                isScreenKeptOn = state.isScreenKeptOn,
+                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
+                onShareClicked = { onAction(DrinkAction.ShareClicked) },
+                modifier = Modifier
+                    .constrainAs(actionBar) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .offset { -offset }
+            )
             CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
                 Text(
                     text = state.displayName,
@@ -437,21 +452,6 @@ private fun DrinkAppBar(
                     PlayButton(onClick = { onAction(DrinkAction.TogglePlaying) })
                 }
             }
-            DrinkActionBar(
-                title = state.displayName,
-                titleAlpha = 1 - contentAlpha,
-                isActionsVisible = drink != null,
-                isScreenKeptOn = state.isScreenKeptOn,
-                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
-                onShareClicked = { onAction(DrinkAction.ShareClicked) },
-                modifier = Modifier
-                    .constrainAs(actionBar) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .offset { -offset }
-            )
         }
     }
 }
