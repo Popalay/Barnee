@@ -46,7 +46,7 @@ object AddToCollectionNavigationCommand : NavigationCommand<AddToCollectionInput
     )
 
     override val deeplinks: List<NavDeepLink> = listOf(
-        navDeepLink { uriPattern = "${DEEPLINK_PREFIX}$route" }
+        navDeepLink { uriPattern = "${DeeplinkPrefix}$route" }
     )
 
     override val navigationType: NavigationCommand.NavigationType = NavigationCommand.NavigationType.BottomSheet
