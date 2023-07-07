@@ -135,7 +135,7 @@ import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
@@ -179,7 +179,7 @@ fun DrinkScreen(
     onItemAction: (DrinkItemAction) -> Unit
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
-    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
+    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DefaultAspectRatio).toPx() }
     val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + LocalWindowInsets.current.statusBars.top }
     val activity = findActivity()
     val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
@@ -331,7 +331,7 @@ private fun DrinkAppBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DEFAULT_ASPECT_RATIO))
+            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DefaultAspectRatio))
     ) {
         Crossfade(state.isPlaying, label = "player-content") { isPlaying ->
             if (isPlaying) {
