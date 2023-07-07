@@ -53,7 +53,7 @@ import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
+import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultItemShift
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
@@ -63,7 +63,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
@@ -100,7 +100,7 @@ fun CategoryGrid(
         ) {
             itemsInGridIndexed(
                 items = value,
-                columns = DEFAULT_COLUMNS,
+                columns = DefaultColumns,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
@@ -124,7 +124,7 @@ private fun CategoryListItem(
     Card(
         elevation = 4.dp,
         shape = MediumSquircleShape,
-        modifier = modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
+        modifier = modifier.aspectRatio(DefaultAspectRatio)
     ) {
         BoxWithConstraints(modifier = Modifier.clickable(onClick = onClick)) {
             Image(

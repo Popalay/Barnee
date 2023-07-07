@@ -26,7 +26,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 
-const val DEFAULT_ASPECT_RATIO = 0.8F
+const val DefaultAspectRatio = 0.8F
 
 private val DarkColorPalette = darkColors(
     primary = Yellow,

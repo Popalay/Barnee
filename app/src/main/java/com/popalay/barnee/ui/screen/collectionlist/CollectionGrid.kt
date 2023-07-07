@@ -53,7 +53,7 @@ import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
+import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
@@ -63,7 +63,7 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.topShift
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
@@ -101,7 +101,7 @@ fun CollectionGrid(
         ) {
             itemsInGridIndexed(
                 items = value.toList(),
-                columns = DEFAULT_COLUMNS,
+                columns = DefaultColumns,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
@@ -126,7 +126,7 @@ fun CollectionItem(
         Card(
             elevation = 4.dp,
             shape = MediumSquircleShape,
-            modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO),
+            modifier = Modifier.aspectRatio(DefaultAspectRatio),
         ) {
             CollectionCover(
                 images = data.cover,

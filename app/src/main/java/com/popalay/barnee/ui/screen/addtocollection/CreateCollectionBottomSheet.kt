@@ -55,7 +55,7 @@ import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.ui.common.BottomSheetContent
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
@@ -97,7 +97,7 @@ fun CreateCollectionBottomSheet(
                     shape = MediumSquircleShape,
                     modifier = Modifier
                         .height(96.dp)
-                        .aspectRatio(DEFAULT_ASPECT_RATIO)
+                        .aspectRatio(DefaultAspectRatio)
                 ) {
                     BoxWithConstraints {
                         Image(

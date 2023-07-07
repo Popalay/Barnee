@@ -50,7 +50,7 @@ import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import org.koin.androidx.compose.getViewModel
 
@@ -99,7 +99,7 @@ private fun BottomSheetCollectionItem(
         Card(
             elevation = 4.dp,
             shape = MediumSquircleShape,
-            modifier = Modifier.aspectRatio(DEFAULT_ASPECT_RATIO),
+            modifier = Modifier.aspectRatio(DefaultAspectRatio),
         ) {
             CollectionCover(
                 images = data.cover,

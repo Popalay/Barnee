@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 
-const val DEFAULT_COLUMNS = 2
+const val DefaultColumns = 2
 val DefaultItemShift = 24.dp
 val DefaultHorizontalItemPadding = 24.dp
 val DefaultVerticalItemPadding = 0.dp
