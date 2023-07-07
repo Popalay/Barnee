@@ -369,21 +369,6 @@ private fun DrinkAppBar(
         ConstraintLayout {
             val (actionBar, title, nutrition) = createRefs()
             val (collection, bottomSection, playButton) = createRefs()
-            DrinkActionBar(
-                title = state.displayName,
-                titleAlpha = 1 - contentAlpha,
-                isActionsVisible = drink != null,
-                isScreenKeptOn = state.isScreenKeptOn,
-                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
-                onShareClicked = { onAction(DrinkAction.ShareClicked) },
-                modifier = Modifier
-                    .constrainAs(actionBar) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .offset { -offset }
-            )
             CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
                 Text(
                     text = state.displayName,
@@ -452,6 +437,21 @@ private fun DrinkAppBar(
                     PlayButton(onClick = { onAction(DrinkAction.TogglePlaying) })
                 }
             }
+            DrinkActionBar(
+                title = state.displayName,
+                titleAlpha = 1 - contentAlpha,
+                isActionsVisible = drink != null,
+                isScreenKeptOn = state.isScreenKeptOn,
+                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
+                onShareClicked = { onAction(DrinkAction.ShareClicked) },
+                modifier = Modifier
+                    .constrainAs(actionBar) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .offset { -offset }
+            )
         }
     }
 }
