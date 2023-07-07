@@ -93,7 +93,7 @@ complexity:
   active: true
   CognitiveComplexMethod:
     active: false
-    allowedComplexity: 15
+    threshold: 15
   ComplexCondition:
     active: true
     threshold: 4
@@ -402,9 +402,6 @@ potential-bugs:
     active: true
     forbiddenTypePatterns:
       - 'kotlin.String'
-  CastNullableToNonNullableType:
-    active: true
-    ignorePlatformTypes: true
   CastToNullableType:
     active: false
   Deprecation:
@@ -636,8 +633,6 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
-  MayBeConstant:
-    active: true
   ModifierOrder:
     active: true
   MultilineLambdaItParameter:
@@ -685,8 +680,6 @@ style:
   SafeCast:
     active: true
   SerialVersionUIDInSerializableClass:
-    active: true
-  SpacingAfterPackageDeclaration:
     active: true
   StringShouldBeRawString:
     active: false
