@@ -44,12 +44,14 @@ fun AnimatedHeartButton(
     onToggle: () -> Unit,
     isSelected: Boolean,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     iconSize: Dp = 24.dp
 ) {
     val transitionData = updateTransitionData(iconSize, isSelected)
 
     IconButton(
         onClick = onToggle,
+        enabled = enabled,
         modifier = modifier
     ) {
         Image(
