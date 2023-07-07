@@ -34,6 +34,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -122,6 +123,7 @@ import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.navigation.CollectionDestination
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.ui.common.ActionsAppBar
+import com.popalay.barnee.ui.common.ActionsAppBarHeight
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
@@ -133,7 +135,7 @@ import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
 import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
@@ -177,8 +179,8 @@ fun DrinkScreen(
     onItemAction: (DrinkItemAction) -> Unit
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
-    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DEFAULT_ASPECT_RATIO).toPx() }
-    val collapsedToolbarHeightPx = with(LocalDensity.current) { 88.dp.toPx() + LocalWindowInsets.current.statusBars.bottom }
+    val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DefaultAspectRatio).toPx() }
+    val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + LocalWindowInsets.current.statusBars.top }
     val activity = findActivity()
     val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
     val listState = rememberLazyListState()
@@ -329,9 +331,9 @@ private fun DrinkAppBar(
         ),
         modifier = modifier
             .fillMaxWidth()
-            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DEFAULT_ASPECT_RATIO))
+            .then(if (isLandscape) Modifier.fillMaxHeight() else Modifier.aspectRatio(DefaultAspectRatio))
     ) {
-        Crossfade(state.isPlaying) { isPlaying ->
+        Crossfade(state.isPlaying, label = "player-content") { isPlaying ->
             if (isPlaying) {
                 YouTubePlayer(
                     videoId = drink?.videoId.orEmpty(),
@@ -367,21 +369,6 @@ private fun DrinkAppBar(
         ConstraintLayout {
             val (actionBar, title, nutrition) = createRefs()
             val (collection, bottomSection, playButton) = createRefs()
-            DrinkActionBar(
-                title = state.displayName,
-                titleAlpha = 1 - contentAlpha,
-                isActionsVisible = drink != null,
-                isScreenKeptOn = state.isScreenKeptOn,
-                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
-                onShareClicked = { onAction(DrinkAction.ShareClicked) },
-                modifier = Modifier
-                    .constrainAs(actionBar) {
-                        top.linkTo(parent.top)
-                        start.linkTo(parent.start)
-                        end.linkTo(parent.end)
-                    }
-                    .offset { -offset }
-            )
             CompositionLocalProvider(LocalContentAlpha provides contentAlpha) {
                 Text(
                     text = state.displayName,
@@ -450,6 +437,21 @@ private fun DrinkAppBar(
                     PlayButton(onClick = { onAction(DrinkAction.TogglePlaying) })
                 }
             }
+            DrinkActionBar(
+                title = state.displayName,
+                titleAlpha = 1 - contentAlpha,
+                isActionsVisible = drink != null,
+                isScreenKeptOn = state.isScreenKeptOn,
+                onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
+                onShareClicked = { onAction(DrinkAction.ShareClicked) },
+                modifier = Modifier
+                    .constrainAs(actionBar) {
+                        top.linkTo(parent.top)
+                        start.linkTo(parent.start)
+                        end.linkTo(parent.end)
+                    }
+                    .offset { -offset }
+            )
         }
     }
 }
@@ -581,7 +583,13 @@ private fun Story(
     val textLength by animateIntAsState(if (isTextCollapsed) 100 else story.length)
     val arrowRotation by animateIntAsState(if (isTextCollapsed) 270 else 90)
 
-    Column(modifier = modifier) {
+    Column(
+        modifier = modifier.clickable(
+            onClick = { isTextCollapsed = !isTextCollapsed },
+            interactionSource = remember { MutableInteractionSource() },
+            indication = null
+        )
+    ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Text(
                 text = "Story",
@@ -611,7 +619,7 @@ private fun Story(
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = story.take(textLength) + if (isTextCollapsed) "..." else "",
-            style = MaterialTheme.typography.body2
+            style = MaterialTheme.typography.body2,
         )
     }
 }

@@ -59,7 +59,7 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.ui.common.AnimatedHeartButton
-import com.popalay.barnee.ui.common.DEFAULT_COLUMNS
+import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
 import com.popalay.barnee.ui.common.EmptyStateView
@@ -71,7 +71,7 @@ import com.popalay.barnee.ui.common.itemsInGridIndexed
 import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.common.topShift
-import com.popalay.barnee.ui.theme.DEFAULT_ASPECT_RATIO
+import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.toIntSize
@@ -116,7 +116,7 @@ fun DrinkGrid(
         ) {
             itemsInGridIndexed(
                 lazyPagingItems = value,
-                columns = DEFAULT_COLUMNS,
+                columns = DefaultColumns,
                 contentPadding = fullContentPadding,
                 horizontalItemPadding = DefaultHorizontalItemPadding,
                 verticalItemPadding = DefaultVerticalItemPadding,
@@ -177,7 +177,7 @@ fun DrinkListItem(
     Card(
         elevation = 4.dp,
         shape = MediumSquircleShape,
-        modifier = modifier.aspectRatio(DEFAULT_ASPECT_RATIO)
+        modifier = modifier.aspectRatio(DefaultAspectRatio)
     ) {
         BoxWithConstraints(modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)) {
             Image(

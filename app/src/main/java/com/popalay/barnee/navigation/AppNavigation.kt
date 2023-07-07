@@ -39,7 +39,7 @@ import com.popalay.barnee.navigation.NavigationCommand.NavigationType.BottomShee
 import com.popalay.barnee.navigation.NavigationCommand.NavigationType.Dialog
 import com.popalay.barnee.navigation.NavigationCommand.NavigationType.Screen
 
-const val DEEPLINK_PREFIX = "https://barnee.com/"
+const val DeeplinkPrefix = "https://barnee.com/"
 
 fun NavController.navigate(destination: Destination) {
     navigate(destination.destination)

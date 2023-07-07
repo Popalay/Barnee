@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.LocalTextStyle
@@ -81,8 +82,8 @@ fun ActionsAppBar(
         modifier = modifier
             .fillMaxWidth()
             .statusBarsPadding()
-            .padding(8.dp)
-            .padding(start = if (leadingButtons != null) 0.dp else 16.dp)
+            .height(64.dp)
+            .padding(start = if (leadingButtons != null) 8.dp else 24.dp, end = 8.dp)
     ) {
         CompositionLocalProvider(LocalContentColor provides MaterialTheme.colors.onBackground) {
             leadingButtons?.invoke(this)
@@ -101,3 +102,5 @@ fun ActionsAppBar(
         }
     }
 }
+
+val ActionsAppBarHeight = 64.dp

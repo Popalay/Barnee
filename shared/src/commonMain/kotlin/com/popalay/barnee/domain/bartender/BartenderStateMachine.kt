@@ -38,7 +38,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.take
 
 data class BartenderState(
     val generatedDrink: Drink? = null,
@@ -69,7 +68,6 @@ class BartenderStateMachine(
             filterIsInstance<BartenderAction.OnGenerateDrinkClicked>()
                 .flatMapLatest {
                     drinkRepository.drinkForPrompt(state().prompt)
-                        .take(1)
                         .map { state().copy(generatedDrink = it, isLoading = false, error = "") }
                         .onStart { emit(state().copy(isLoading = true, error = "")) }
                 }

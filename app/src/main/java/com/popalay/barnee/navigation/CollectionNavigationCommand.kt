@@ -42,7 +42,7 @@ object CollectionNavigationCommand : NavigationCommand<CollectionInput>,
     )
 
     override val deeplinks: List<NavDeepLink> = listOf(
-        navDeepLink { uriPattern = "${DEEPLINK_PREFIX}$route" }
+        navDeepLink { uriPattern = "${DeeplinkPrefix}$route" }
     )
 
     override fun parseInput(backStackEntry: NavBackStackEntry): CollectionInput {

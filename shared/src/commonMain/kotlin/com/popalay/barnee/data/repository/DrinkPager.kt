@@ -34,11 +34,11 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.plus
 
-private const val DEFAULT_PAGE_SIZE = 60
+private const val DefaultPageSize = 60
 
 private val DefaultPagingConfig = PagingConfig(
-    pageSize = DEFAULT_PAGE_SIZE,
-    initialLoadSize = DEFAULT_PAGE_SIZE * 2
+    pageSize = DefaultPageSize,
+    initialLoadSize = DefaultPageSize * 2
 )
 
 internal data class PageRequest(

@@ -20,31 +20,13 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.theme
+package com.popalay.barnee.data.model
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.runtime.Composable
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
-const val DefaultAspectRatio = 0.8F
-
-private val DarkColorPalette = darkColors(
-    primary = Yellow,
-    primaryVariant = DarkYellow,
-    secondary = Green,
-    surface = DarkGrey,
-    background = DarkGrey,
-    onPrimary = DarkGrey,
-    onSurface = White,
-    onBackground = White
+@Serializable
+data class AiGenerationResponse(
+    val drink: Drink,
+    @SerialName("image_prompt") val imagePrompt: String,
 )
-
-@Composable
-fun BarneeTheme(content: @Composable () -> Unit) {
-    MaterialTheme(
-        colors = DarkColorPalette,
-        typography = Typography,
-        shapes = Shapes,
-        content = content
-    )
-}
