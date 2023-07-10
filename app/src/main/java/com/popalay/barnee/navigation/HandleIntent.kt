@@ -22,11 +22,11 @@
 
 package com.popalay.barnee.navigation
 
-import android.content.Context
 import android.content.Intent
 import androidx.activity.ComponentActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
 import com.eygraber.uri.Url
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
@@ -37,7 +37,8 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 
 @Composable
-internal fun HandleIntent(context: Context) {
+internal fun HandleIntent() {
+    val context = LocalContext.current
     val deeplinkManager = koinInject<DeeplinkManager>()
     LaunchedEffect(Unit) {
         callbackFlow {

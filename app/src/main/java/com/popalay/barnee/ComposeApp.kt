@@ -32,7 +32,6 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -42,9 +41,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
-import coil.Coil
-import coil.ImageLoader
-import coil.util.DebugLogger
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.popalay.barnee.data.message.Message
@@ -58,9 +54,7 @@ import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.ImageUrlCoilMapper
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
-import com.popalay.barnee.util.isDebug
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -69,19 +63,6 @@ import org.koin.compose.koinInject
 @Composable
 internal fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-        val context = LocalContext.current
-        val imageLoader = remember {
-            ImageLoader.Builder(context)
-                .logger(if (isDebug) DebugLogger() else null).components {
-                    add(ImageUrlCoilMapper())
-                }
-                .build()
-        }
-
-        LaunchedEffect(Unit) {
-            Coil.setImageLoader(imageLoader)
-        }
-
         val snackbarHostState = remember { SnackbarHostState() }
         Box(modifier = Modifier.fillMaxSize()) {
             BottomSheetNavigator(
@@ -92,7 +73,7 @@ internal fun ComposeApp() {
             ) { bottomSheetNavigator ->
                 Navigator(DiscoveryScreen()) { navigator ->
                     MessagesHost(snackbarHostState)
-                    HandleIntent(context)
+                    HandleIntent()
                     NavigationHost(navigator, bottomSheetNavigator)
                     SlideTransition(navigator)
                     ShakeToDrinkScreen().Content()

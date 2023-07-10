@@ -22,7 +22,20 @@
 
 package com.popalay.barnee.di
 
+import coil.Coil
+import coil.ImageLoader
+import coil.util.DebugLogger
+import com.popalay.barnee.ui.util.ImageUrlCoilMapper
+import com.popalay.barnee.util.isDebug
 import org.koin.dsl.module
 
 val uiModule = module {
+    single<ImageLoader> {
+        ImageLoader.Builder(get())
+            .logger(if (isDebug) DebugLogger() else null).components {
+                add(ImageUrlCoilMapper())
+            }
+            .build()
+            .also(Coil::setImageLoader)
+    }
 }
