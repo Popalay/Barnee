@@ -24,34 +24,24 @@ package com.popalay.barnee.domain.collectionlist
 
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.repository.CollectionRepository
-import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
-import com.popalay.barnee.domain.navigation.CollectionDestination
-import com.popalay.barnee.domain.navigation.Router
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class CollectionListState(
     val collections: Result<Set<Collection>> = Uninitialized()
 ) : State
 
-sealed interface CollectionListAction : Action {
-    data class CollectionClicked(val collection: Collection) : CollectionListAction
-}
-
 class CollectionListStateMachine(
     collectionRepository: CollectionRepository,
-    router: Router
-) : StateMachine<CollectionListState, NoSideEffect>(
+) : StateMachine<CollectionListState>(
     initialState = CollectionListState(),
     reducer = { state, _ ->
         merge(
@@ -59,9 +49,6 @@ class CollectionListStateMachine(
                 .take(1)
                 .flatMapToResult { collectionRepository.collections() }
                 .map { state().copy(collections = it) },
-            filterIsInstance<CollectionListAction.CollectionClicked>()
-                .onEach { router.navigate(CollectionDestination(it.collection)) }
-                .map { state() }
         )
     }
 )

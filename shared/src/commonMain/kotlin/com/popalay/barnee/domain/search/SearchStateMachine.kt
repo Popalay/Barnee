@@ -32,7 +32,6 @@ import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Fail
 import com.popalay.barnee.domain.InitialAction
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
@@ -45,35 +44,34 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class SearchState(
     val searchQuery: String = "",
+    val showFilters: Boolean = false,
     val drinks: Flow<PagingData<Drink>> = emptyFlow(),
     val aggregation: Result<Aggregation> = Uninitialized(),
     val selectedFilters: Set<Pair<String, AggregationGroup>> = emptySet(),
     val appliedFilters: Set<Pair<String, AggregationGroup>> = emptySet(),
-) : State
+) : State {
+    val hasNewFilters = appliedFilters != selectedFilters
+}
 
 sealed interface SearchAction : Action {
     object Retry : SearchAction
     object ShowFiltersClicked : SearchAction
     object ClearSearchQuery : SearchAction
     object FiltersDismissed : SearchAction
+    object FiltersApplied : SearchAction
     data class QueryChanged(val query: String) : SearchAction
     data class FilterClicked(val value: Pair<String, AggregationGroup>) : SearchAction
 }
 
-sealed interface SearchSideEffect : SideEffect {
-    object ShowFilters : SearchSideEffect
-}
-
 class SearchStateMachine(
     drinkRepository: DrinkRepository,
-) : StateMachine<SearchState, SearchSideEffect>(
+) : StateMachine<SearchState>(
     initialState = SearchState(),
-    reducer = { state, sideEffectConsumer ->
+    reducer = { state, _ ->
         merge(
             filterIsInstance<InitialAction>()
                 .take(1)
@@ -105,12 +103,10 @@ class SearchStateMachine(
                     )
                 },
             filterIsInstance<SearchAction.ShowFiltersClicked>()
-                .onEach { sideEffectConsumer(SearchSideEffect.ShowFilters) }
-                .map { state() },
-            filterIsInstance<SearchAction.FiltersDismissed>()
-                .filter { state().let { it.appliedFilters != it.selectedFilters } }
-                .map { state().searchRequest(drinkRepository) }
-                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
+                .map { state().copy(showFilters = true) },
+            filter { it is SearchAction.FiltersApplied || it is SearchAction.FiltersDismissed }
+                .map { with(state()) { if (hasNewFilters) searchRequest(drinkRepository) else drinks } }
+                .map { state().copy(drinks = it, showFilters = false, appliedFilters = state().selectedFilters) },
             filterIsInstance<SearchAction.ClearSearchQuery>()
                 .map { state().copy(searchQuery = "") },
             filterIsInstance<SearchAction.ClearSearchQuery>()

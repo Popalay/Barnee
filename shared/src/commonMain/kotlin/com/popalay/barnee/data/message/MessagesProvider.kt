@@ -22,22 +22,31 @@
 
 package com.popalay.barnee.data.message
 
-import com.popalay.barnee.domain.navigation.Destination
+import com.popalay.barnee.domain.navigation.TypedScreenProvider
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 sealed interface Message {
 
-    data class Toast(
-        val conctent: String,
+    data class SnackBar(
+        val content: String,
         val action: Action? = null,
     ) : Message {
 
         data class Action(
             val text: String,
-            val destination: Destination,
+            val destination: TypedScreenProvider,
         )
+    }
+
+    data class Toast(
+        val content: String,
+        val duration: Duration,
+    ) : Message {
+        enum class Duration {
+            Short, Long
+        }
     }
 }
 

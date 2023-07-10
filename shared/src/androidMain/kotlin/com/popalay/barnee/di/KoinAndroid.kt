@@ -27,6 +27,7 @@ package com.popalay.barnee.di
 import android.content.Context
 import android.hardware.SensorManager
 import androidx.datastore.preferences.preferencesDataStore
+import com.popalay.barnee.data.device.KeepScreenOnSetter
 import com.popalay.barnee.data.device.ShakeDetector
 import com.popalay.barnee.data.device.Sharer
 import com.popalay.barnee.data.device.SharerImpl
@@ -34,8 +35,8 @@ import com.popalay.barnee.data.remote.DeeplinkFactory
 import com.popalay.barnee.data.remote.DeeplinkFactoryImpl
 import com.russhwolf.settings.ExperimentalSettingsApi
 import com.russhwolf.settings.ExperimentalSettingsImplementation
-import com.russhwolf.settings.datastore.DataStoreSettings
 import com.russhwolf.settings.coroutines.FlowSettings
+import com.russhwolf.settings.datastore.DataStoreSettings
 import org.koin.dsl.module
 
 private val Context.dataStore by preferencesDataStore("Settings")
@@ -46,4 +47,5 @@ actual val platformModule = module {
     single { ShakeDetector(get<Context>().getSystemService(SensorManager::class.java)) }
     single<DeeplinkFactory> { DeeplinkFactoryImpl() }
     single<Sharer> { SharerImpl(get()) }
+    single { KeepScreenOnSetter(get()) }
 }

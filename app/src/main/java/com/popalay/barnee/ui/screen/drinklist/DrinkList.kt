@@ -56,8 +56,10 @@ import androidx.paging.compose.LazyPagingItems
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.domain.drinkitem.DrinkItemAction
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
+import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -80,7 +82,8 @@ import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
 import com.popalay.barnee.util.inCollections
 import com.popalay.barnee.util.isGenerated
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.toMinimumData
+import org.koin.compose.koinInject
 
 @Composable
 fun DrinkGrid(
@@ -91,7 +94,7 @@ fun DrinkGrid(
     listState: LazyListState = rememberLazyListState(),
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val viewModel: DrinkItemViewModel = getViewModel()
+    val stateMachine: DrinkItemStateMachine = koinInject()
 
     StateLayout(
         value = drinks,
@@ -124,9 +127,9 @@ fun DrinkGrid(
                 item?.let {
                     DrinkListItem(
                         item,
-                        onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
-                        onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
-                        onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                        onClick = { stateMachine.dispatch(NavigateToAction(AppScreens.Drink(item.toMinimumData()))) },
+                        onDoubleClick = { stateMachine.dispatch(ToggleFavorite(item)) },
+                        onHeartClick = { stateMachine.dispatch(ToggleFavorite(item)) },
                         modifier = Modifier.topShift(index = index, size = value.itemCount)
                     )
                 }
@@ -144,7 +147,7 @@ fun DrinkHorizontalList(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(0.dp)
 ) {
-    val viewModel: DrinkItemViewModel = getViewModel()
+    val stateMachine: DrinkItemStateMachine = koinInject()
 
     BoxWithConstraints {
         LazyRow(
@@ -154,9 +157,9 @@ fun DrinkHorizontalList(
             itemsIndexed(data) { index, item ->
                 DrinkListItem(
                     item,
-                    onClick = { viewModel.dispatchAction(DrinkItemAction.DrinkClicked(item)) },
-                    onDoubleClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
-                    onHeartClick = { viewModel.dispatchAction(ToggleFavorite(item)) },
+                    onClick = { stateMachine.dispatch(NavigateToAction(AppScreens.Drink(item.toMinimumData()))) },
+                    onDoubleClick = { stateMachine.dispatch(ToggleFavorite(item)) },
+                    onHeartClick = { stateMachine.dispatch(ToggleFavorite(item)) },
                     modifier = Modifier.width(maxWidth / 3)
                 )
                 if (index != data.lastIndex) Spacer(modifier = Modifier.width(24.dp))
@@ -214,7 +217,7 @@ fun DrinkListItem(
                     color = MaterialTheme.colors.primary
                 )
             }
-            if(!data.isGenerated) {
+            if (!data.isGenerated) {
                 AnimatedHeartButton(
                     onToggle = onHeartClick,
                     isSelected = data.inCollections,

@@ -42,30 +42,38 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.collection.CollectionAction
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionState
+import com.popalay.barnee.domain.collection.CollectionStateMachine
+import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.asStateFlow
 import org.koin.core.parameter.parametersOf
 
-@Composable
-fun CollectionScreen(input: CollectionInput) {
-    CollectionScreen(getViewModel { parametersOf(input) })
+data class CollectionScreen(override val input: CollectionInput) : ScreenWithInputAsKey<CollectionInput> {
+
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<CollectionStateMachine>(parameters = { parametersOf(input) })
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        CollectionScreen(state, stateMachine::dispatch)
+    }
 }
 
 @Composable
-fun CollectionScreen(viewModel: CollectionViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    CollectionScreen(state, viewModel::dispatchAction)
-}
-
-@Composable
-fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Unit) {
+private fun CollectionScreen(
+    state: CollectionState,
+    onAction: (Action) -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         val lazyPagingItems = state.drinks.collectAsLazyPagingItems()
@@ -73,7 +81,7 @@ fun CollectionScreen(state: CollectionState, onAction: (CollectionAction) -> Uni
         ActionsAppBar(
             title = state.name,
             modifier = Modifier.liftOnScroll(listState),
-            leadingButtons = { BackButton() },
+            leadingButtons = { BackButton(onClick = { onAction(NavigateBackAction) }) },
             trailingButtons = {
                 AnimatedVisibility(state.isShareButtonVisible) {
                     IconButton(onClick = { onAction(CollectionAction.ShareClicked) }) {

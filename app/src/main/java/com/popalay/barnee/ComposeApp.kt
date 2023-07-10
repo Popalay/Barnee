@@ -24,9 +24,10 @@ package com.popalay.barnee
 
 import android.content.Intent
 import android.content.res.Configuration
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -40,46 +41,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.rememberNavController
+import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import coil.Coil
 import coil.ImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
-import com.google.accompanist.navigation.material.ModalBottomSheetLayout
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import com.google.firebase.dynamiclinks.ktx.dynamicLinks
 import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.data.message.Message
 import com.popalay.barnee.data.message.MessagesProvider
-import com.popalay.barnee.domain.navigation.BackDestination
 import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.navigation.AddToCollectionNavigationCommand
-import com.popalay.barnee.navigation.BartenderNavigationCommand
-import com.popalay.barnee.navigation.CollectionNavigationCommand
-import com.popalay.barnee.navigation.CollectionsNavigationCommand
-import com.popalay.barnee.navigation.DiscoveryNavigationCommand
-import com.popalay.barnee.navigation.DrinkNavigationCommand
-import com.popalay.barnee.navigation.GeneratedDrinksNavigationCommand
-import com.popalay.barnee.navigation.QueryDrinksNavigationCommand
-import com.popalay.barnee.navigation.SearchNavigationCommand
-import com.popalay.barnee.navigation.SimilarDrinksNavigationCommand
-import com.popalay.barnee.navigation.TagDrinksNavigationCommand
-import com.popalay.barnee.navigation.navigate
-import com.popalay.barnee.navigation.navigationNode
+import com.popalay.barnee.domain.navigation.StackChange
+import com.popalay.barnee.navigation.NavigationHost
+import com.popalay.barnee.navigation.SlideTransition
 import com.popalay.barnee.ui.common.PrimarySnackbar
-import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
-import com.popalay.barnee.ui.screen.bartender.BartenderScreen
-import com.popalay.barnee.ui.screen.bartender.ShakeCocktailButton
-import com.popalay.barnee.ui.screen.collection.CollectionScreen
-import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
-import com.popalay.barnee.ui.screen.drink.DrinkScreen
-import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
-import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.ImageUrlCoilMapper
@@ -89,13 +67,11 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialNavigationApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun ComposeApp(intent: Intent) {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
         val context = LocalContext.current
-        val bottomSheetNavigator = rememberBottomSheetNavigator()
-        val navController = rememberNavController(bottomSheetNavigator)
         val imageLoader = remember {
             ImageLoader.Builder(context)
                 .logger(if (isDebug) DebugLogger() else null).components {
@@ -107,114 +83,70 @@ internal fun ComposeApp(intent: Intent) {
         LaunchedEffect(Unit) {
             Firebase.dynamicLinks.getDynamicLink(intent).addOnSuccessListener { pendingDynamicLinkData ->
                 pendingDynamicLinkData?.link?.let {
-                    navController.popBackStack(navController.graph.id, false)
-                    navController.navigate(it)
+// TODO                    navController.popBackStack(navController.graph.id, false)
+//                    navController.navigate(it)
                 }
             }
 
             Coil.setImageLoader(imageLoader)
         }
 
-        ModalBottomSheetLayout(
-            bottomSheetNavigator = bottomSheetNavigator,
-            sheetElevation = 1.dp,
-            sheetBackgroundColor = MaterialTheme.colors.background,
-            sheetContentColor = MaterialTheme.colors.onBackground,
-            scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
-        ) {
-            NavigationGraph(navController)
-            ShakeToDrinkScreen()
+        val snackbarHostState = remember { SnackbarHostState() }
+        Box(modifier = Modifier.fillMaxSize()) {
+            BottomSheetNavigator(
+                sheetElevation = 1.dp,
+                sheetBackgroundColor = MaterialTheme.colors.background,
+                sheetContentColor = MaterialTheme.colors.onBackground,
+                scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
+            ) { bottomSheetNavigator ->
+                Navigator(DiscoveryScreen()) { navigator ->
+                    MessagesHost(snackbarHostState)
+                    SlideTransition(navigator) { screen ->
+                        NavigationHost(navigator, bottomSheetNavigator)
+                        screen.Content()
+                        ShakeToDrinkScreen().Content()
+                    }
+                }
+            }
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { PrimarySnackbar(it) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+            )
         }
     }
 }
 
 @Composable
-private fun NavigationGraph(navController: NavHostController) {
-    MessagesContainer {
-        val router: Router = koinInject()
-
-        LifecycleAwareLaunchedEffect(router.destinationFlow) { destination ->
-            if (destination == BackDestination) navController.navigateUp()
-            else navController.navigate(destination)
-        }
-
-        NavHost(navController, startDestination = DiscoveryNavigationCommand.route) {
-            navigationNode(DiscoveryNavigationCommand) {
-                DiscoveryScreen()
-            }
-            navigationNode(DrinkNavigationCommand) {
-                DrinkScreen(DrinkNavigationCommand.parseInput(it))
-            }
-            navigationNode(TagDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(TagDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(SimilarDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(SimilarDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(QueryDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(QueryDrinksNavigationCommand.parseInput(it))
-            }
-            navigationNode(CollectionsNavigationCommand) {
-                CollectionListScreen()
-            }
-            navigationNode(CollectionNavigationCommand) {
-                CollectionScreen(CollectionNavigationCommand.parseInput(it))
-            }
-            navigationNode(SearchNavigationCommand) {
-                SearchScreen()
-            }
-            navigationNode(GeneratedDrinksNavigationCommand) {
-                ParameterizedDrinkListScreen(
-                    input = GeneratedDrinksNavigationCommand.parseInput(it),
-                    floatingActionButton = { ShakeCocktailButton(Modifier.padding(bottom = 16.dp)) }
-                )
-            }
-            navigationNode(BartenderNavigationCommand) {
-                BartenderScreen()
-            }
-
-            navigationNode(AddToCollectionNavigationCommand) {
-                AddToCollectionScreen(input = AddToCollectionNavigationCommand.parseInput(it))
-            }
-        }
-    }
-}
-
-@Composable
-private fun MessagesContainer(
-    content: @Composable () -> Unit
-) {
+private fun MessagesHost(snackbarHostState: SnackbarHostState, ) {
+    val context = LocalContext.current
     val messagesFlow = koinInject<MessagesProvider>().messageFlow
-    val router = koinInject<Router>()
-    val snackbarHostState = remember { SnackbarHostState() }
     val snackbarScope = rememberCoroutineScope()
+    val router = koinInject<Router>()
 
     LifecycleAwareLaunchedEffect(messagesFlow) { message ->
         when (message) {
-            is Message.Toast -> {
+            is Message.SnackBar -> {
                 snackbarScope.coroutineContext.cancelChildren()
                 snackbarScope.launch {
-                    snackbarHostState.showSnackbar(message.conctent, actionLabel = message.action?.text).let { result ->
+                    snackbarHostState.showSnackbar(message.content, actionLabel = message.action?.text).let { result ->
                         if (result == SnackbarResult.ActionPerformed) {
-                            message.action?.destination?.let { router.navigate(it) }
+                            message.action?.destination?.let { router.updateStack(StackChange.Push(it)) }
                         }
                     }
                 }
             }
 
-            else             -> {}
+            is Message.Toast    -> {
+                val duration = when (message.duration) {
+                    Message.Toast.Duration.Short -> Toast.LENGTH_SHORT
+                    Message.Toast.Duration.Long  -> Toast.LENGTH_LONG
+                }
+                Toast.makeText(context, message.content, duration).show()
+            }
         }
-    }
-
-    Box(modifier = Modifier.fillMaxSize()) {
-        content()
-        SnackbarHost(
-            hostState = snackbarHostState,
-            snackbar = { PrimarySnackbar(it) },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-        )
     }
 }
 

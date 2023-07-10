@@ -8,17 +8,16 @@ google-services-gradlePlugin = "4.3.15"
 dependencyUpdatesPlugin = "0.47.0"
 buildkonfig-gradle-plugin = "0.13.3"
 
-androidx-compose-bom = "2023.01.00"
+androidx-compose-bom = "2023.06.01"
 androidx-compose-compiler = "1.4.3"
 androidx-activity = "1.7.2"
-androidx-navigation = "2.6.0"
 androidx-lifecycle = "2.6.1"
 androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-core-splashscreen = "1.0.1"
 androidx-constraintlayout-compose = "1.1.0-alpha10"
 
-accompanist = "0.28.0"
+accompanist = "0.30.1"
 ktor = "2.3.1"
 junit = "4.13.2"
 androidx-test = "1.1.5"
@@ -35,6 +34,7 @@ uri = "0.0.12"
 uuid = "0.7.1"
 youtubePlayer = "12.0.0"
 openai = "3.3.0"
+voyager = "1.0.0-rc06"
 
 [libraries]
 #Core
@@ -49,8 +49,8 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
+androidx-compose-animation = { module = "androidx.compose.animation:animation" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidx-navigation" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
@@ -63,7 +63,6 @@ androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "andro
 #Accompanist
 accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
-accompanist-navigation = { module = "com.google.accompanist:accompanist-navigation-material", version.ref = "accompanist" }
 
 #Ktor
 ktor-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
@@ -88,6 +87,12 @@ multiplatformsettings-noarg = { module = "com.russhwolf:multiplatform-settings-n
 multiplatformsettings-coroutines = { module = "com.russhwolf:multiplatform-settings-coroutines", version.ref = "multiplatformsettings" }
 multiplatformsettings-datastore = { module = "com.russhwolf:multiplatform-settings-datastore", version.ref = "multiplatformsettings" }
 
+#Voyager
+voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
+voyager-bottomSheetNavigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
+voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
+
 #Others
 firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.ref = "firebase-dynamicLinks" }
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
@@ -95,13 +100,13 @@ multiplatformpaging = { module = "io.github.kuuuurt:multiplatform-paging", versi
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-uri = { module = "com.eygraber:uri-kmp", version.ref = "uri" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 youtubePlayer = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtubePlayer" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai"}
 
 [bundles]
-androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime"]
+androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime", "androidx-compose-animation"]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
-accompanist = ["accompanist-insets", "accompanist-flowlayout", "accompanist-navigation"]
+accompanist = ["accompanist-insets", "accompanist-flowlayout"]
 koin = ["koin-android", "koin-core", "koin-compose"]
+vojager = ["voyager-navigator", "voyager-bottomSheetNavigator", "voyager-transitions", "voyager-koin"]

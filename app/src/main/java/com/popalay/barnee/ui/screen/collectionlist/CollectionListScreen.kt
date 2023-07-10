@@ -27,48 +27,62 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.screen.Screen
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
-import com.popalay.barnee.domain.collectionlist.CollectionListAction
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.collectionlist.CollectionListState
+import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.NavigateToAction
+import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenWith
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.asStateFlow
 
-@Composable
-fun CollectionListScreen() {
-    CollectionListScreen(getViewModel())
+class CollectionListScreen : Screen {
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<CollectionListStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        CollectionListScreen(state, stateMachine::dispatch)
+    }
 }
 
 @Composable
-fun CollectionListScreen(viewModel: CollectionListViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    CollectionListScreen(state, viewModel::dispatchAction)
-}
+private fun CollectionListScreen(state: CollectionListState, onAction: (Action) -> Unit) {
+    LaunchedEffect(state.collections) {
+        if (state.collections()?.size == 1) {
+            onAction(ReplaceCurrentScreenWith(AppScreens.SingleCollection()))
+        }
+    }
+    if (state.collections()?.size == 1) return
 
-@Composable
-fun CollectionListScreen(state: CollectionListState, onAction: (CollectionListAction) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
 
         ActionsAppBar(
             title = "Collections",
             modifier = Modifier.liftOnScroll(listState),
-            leadingButtons = { BackButton() }
+            leadingButtons = { BackButton(onClick = { onAction(NavigateBackAction) }) }
         )
         CollectionGrid(
             collections = state.collections,
             listState = listState,
             emptyMessage = "You don't have any collections yet\nstart adding them by clicking the ♥ button",
             onRetry = { },
-            onItemClick = { onAction(CollectionListAction.CollectionClicked(it)) },
+            onItemClick = { onAction(NavigateToAction(AppScreens.SingleCollection(it))) },
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,
                 additionalStart = 8.dp,

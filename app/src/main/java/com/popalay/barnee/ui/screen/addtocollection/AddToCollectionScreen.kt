@@ -23,35 +23,50 @@
 package com.popalay.barnee.ui.screen.addtocollection
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.popalay.barnee.data.model.DrinkMinimumData
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.addtocollection.AddToCollectionAction
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState
-import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionState
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
+import com.popalay.barnee.domain.collectionlist.CollectionListState
+import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
+import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
+import com.popalay.barnee.util.asStateFlow
 import org.koin.core.parameter.parametersOf
 
-@Composable
-fun AddToCollectionScreen(input: AddToCollectionInput) {
-    AddToCollectionScreen(getViewModel { parametersOf(input) })
+data class AddToCollectionScreen(override val input: DrinkMinimumData) : ScreenWithInputAsKey<DrinkMinimumData> {
+
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<AddToCollectionStateMachine>(parameters = { parametersOf(input) })
+        val collectionListStateMachine = injectStateMachine<CollectionListStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+        val collectionListState by collectionListStateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        AddToCollectionScreen(state, collectionListState, stateMachine::dispatch)
+    }
 }
 
 @Composable
-fun AddToCollectionScreen(viewModel: AddToCollectionViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    AddToCollectionScreen(state, viewModel::dispatchAction)
-}
-
-@Composable
-fun AddToCollectionScreen(
+private fun AddToCollectionScreen(
     state: AddToCollectionState,
-    onAction: (AddToCollectionAction) -> Unit
+    collectionListState: CollectionListState,
+    onAction: (Action) -> Unit
 ) {
+    Spacer(Modifier.height(1.dp))
     Crossfade(state.dialogState, label = "add-to-collection-dialog") { dialogState ->
         when (dialogState) {
             is AddToCollectionDialogState.ChooseCollection -> ChooseCollectionBottomSheet(
+                state = collectionListState,
                 onCollectionClicked = { onAction(AddToCollectionAction.CollectionClicked(it)) },
                 onCreateNewClicked = { onAction(AddToCollectionAction.CreateCollectionClicked) }
             )

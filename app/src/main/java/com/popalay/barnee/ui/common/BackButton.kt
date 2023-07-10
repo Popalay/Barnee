@@ -22,29 +22,26 @@
 
 package com.popalay.barnee.ui.common
 
+import androidx.annotation.DrawableRes
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.popalay.barnee.R.drawable
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.navigateBack
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.get
 
 @Composable
-fun BackButton(modifier: Modifier = Modifier) {
-    val router: Router = get()
-    val scope = rememberCoroutineScope()
-
+fun BackButton(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    @DrawableRes iconRes: Int = drawable.ic_arrow_back
+) {
     IconButton(
-        onClick = { scope.launch { router.navigateBack() } },
+        onClick = onClick,
         modifier = modifier
     ) {
         Icon(
-            painter = painterResource(drawable.ic_arrow_back),
+            painter = painterResource(iconRes),
             contentDescription = "Back",
         )
     }

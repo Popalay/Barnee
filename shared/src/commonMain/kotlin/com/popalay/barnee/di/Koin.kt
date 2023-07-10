@@ -27,6 +27,7 @@ import com.aallam.openai.client.OpenAI
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.local.LocalStoreImpl
 import com.popalay.barnee.data.message.MessagesProvider
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
 import com.popalay.barnee.data.repository.CollectionRepository
@@ -35,14 +36,12 @@ import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinkRepositoryImpl
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.data.repository.ShareRepositoryImpl
-import com.popalay.barnee.domain.addtocollection.AddToCollectionInput
 import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
 import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
-import com.popalay.barnee.domain.drink.DrinkInput
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.log.NavigationLogger
@@ -77,7 +76,6 @@ import com.aallam.openai.api.logging.Logger as OpenAiLogger
 val commonModule = module {
     single { if (isDebug) RealLogger() else EmptyLogger }
     single { StateMachineLogger(get()) }
-    single { NavigationLogger(get()) }
 
     single { Api(get()) }
     single<LocalStore> { LocalStoreImpl(get()) }
@@ -111,22 +109,23 @@ val commonModule = module {
             )
         )
     }
-    single<Router> { RouterImpl(get()) }
     single<AiApi> { AiApi(get(), get(), get()) }
     single { MessagesProvider() }
+    single { NavigationLogger(get()) }
+    single<Router> { RouterImpl(get()) }
 
     single { GetCollectionUseCase(get(), get()) }
 
-    factory { DiscoveryStateMachine(get(), get()) }
-    factory { (input: DrinkInput) -> DrinkStateMachine(input, get(), get(), get()) }
+    factory { DiscoveryStateMachine(get()) }
+    factory { (input: DrinkMinimumData) -> DrinkStateMachine(input, get(), get(), get(), get()) }
     factory { SearchStateMachine(get()) }
     factory { (input: ParameterizedDrinkListInput) -> ParameterizedDrinkListStateMachine(input, get()) }
-    factory { DrinkItemStateMachine(get(), get(), get()) }
+    factory { DrinkItemStateMachine(get(), get()) }
     factory { ShakeToDrinkStateMachine(get(), get()) }
-    factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get(), get()) }
-    factory { CollectionListStateMachine(get(), get()) }
-    factory { (input: AddToCollectionInput) -> AddToCollectionStateMachine(input, get(), get()) }
-    factory { BartenderStateMachine(get(), get()) }
+    factory { (input: CollectionInput) -> CollectionStateMachine(input, get(), get(), get()) }
+    factory { CollectionListStateMachine(get()) }
+    factory { (input: DrinkMinimumData) -> AddToCollectionStateMachine(input, get()) }
+    factory { BartenderStateMachine(get()) }
 }
 
 expect val platformModule: Module

@@ -27,12 +27,9 @@ import com.popalay.barnee.data.message.MessagesProvider
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.NoSideEffect
-import com.popalay.barnee.domain.State
+import com.popalay.barnee.domain.NoState
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.navigation.AddToCollectionDestination
-import com.popalay.barnee.domain.navigation.DrinkDestination
-import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.inCollections
@@ -40,21 +37,16 @@ import com.popalay.barnee.util.toMinimumData
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
-
-object DrinkItemState : State
 
 sealed interface DrinkItemAction : Action {
     data class ToggleFavorite(val drink: Drink) : DrinkItemAction
-    data class DrinkClicked(val drink: Drink) : DrinkItemAction
 }
 
 class DrinkItemStateMachine(
     collectionRepository: CollectionRepository,
     messagesProvider: MessagesProvider,
-    router: Router
-) : StateMachine<DrinkItemState, NoSideEffect>(
-    initialState = DrinkItemState,
+) : StateMachine<NoState>(
+    initialState = NoState,
     reducer = { state, _ ->
         merge(
             filterIsInstance<DrinkItemAction.ToggleFavorite>()
@@ -64,20 +56,17 @@ class DrinkItemStateMachine(
                     } else {
                         collectionRepository.addToCollection(drink = it.drink.toMinimumData())
                         messagesProvider.dispatch(
-                            Message.Toast(
-                                conctent = "${it.drink.displayName.capitalizeFirstChar()} was added to favorites",
-                                action = Message.Toast.Action(
+                            Message.SnackBar(
+                                content = "${it.drink.displayName.capitalizeFirstChar()} was added to favorites",
+                                action = Message.SnackBar.Action(
                                     text = "Change",
-                                    destination = AddToCollectionDestination(it.drink),
+                                    destination = AppScreens.AddToCollection(it.drink.toMinimumData()),
                                 )
                             )
                         )
                     }
                 }
                 .map { state() },
-            filterIsInstance<DrinkItemAction.DrinkClicked>()
-                .onEach { router.navigate(DrinkDestination(it.drink)) }
-                .map { state() }
         )
     }
 )

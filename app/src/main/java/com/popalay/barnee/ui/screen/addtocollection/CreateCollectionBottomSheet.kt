@@ -33,7 +33,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
@@ -54,6 +53,7 @@ import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.DrinkMinimumData
+import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
@@ -111,7 +111,7 @@ fun CreateCollectionBottomSheet(
                         )
                     }
                 }
-                TextField(
+                BarneeTextField(
                     value = collectionName,
                     onValueChange = onCollectionNameChanged,
                     singleLine = true,
