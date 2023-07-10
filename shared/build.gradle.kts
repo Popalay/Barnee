@@ -71,8 +71,9 @@ kotlin {
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
                 implementation(libs.openai.client)
-                implementation(libs.uuid)
                 implementation(libs.bundles.vojager)
+                implementation(libs.uuid)
+                api(libs.uri)
                 api(libs.multiplatformpaging)
             }
         }
@@ -106,8 +107,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }
 

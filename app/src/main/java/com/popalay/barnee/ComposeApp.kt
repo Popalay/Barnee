@@ -22,7 +22,6 @@
 
 package com.popalay.barnee
 
-import android.content.Intent
 import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.foundation.layout.Box
@@ -48,12 +47,11 @@ import coil.ImageLoader
 import coil.util.DebugLogger
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
-import com.google.firebase.dynamiclinks.ktx.dynamicLinks
-import com.google.firebase.ktx.Firebase
 import com.popalay.barnee.data.message.Message
 import com.popalay.barnee.data.message.MessagesProvider
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
+import com.popalay.barnee.navigation.HandleIntent
 import com.popalay.barnee.navigation.NavigationHost
 import com.popalay.barnee.navigation.SlideTransition
 import com.popalay.barnee.ui.common.PrimarySnackbar
@@ -69,7 +67,7 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal fun ComposeApp(intent: Intent) {
+internal fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
         val context = LocalContext.current
         val imageLoader = remember {
@@ -81,13 +79,6 @@ internal fun ComposeApp(intent: Intent) {
         }
 
         LaunchedEffect(Unit) {
-            Firebase.dynamicLinks.getDynamicLink(intent).addOnSuccessListener { pendingDynamicLinkData ->
-                pendingDynamicLinkData?.link?.let {
-// TODO                    navController.popBackStack(navController.graph.id, false)
-//                    navController.navigate(it)
-                }
-            }
-
             Coil.setImageLoader(imageLoader)
         }
 
@@ -101,11 +92,10 @@ internal fun ComposeApp(intent: Intent) {
             ) { bottomSheetNavigator ->
                 Navigator(DiscoveryScreen()) { navigator ->
                     MessagesHost(snackbarHostState)
-                    SlideTransition(navigator) { screen ->
-                        NavigationHost(navigator, bottomSheetNavigator)
-                        screen.Content()
-                        ShakeToDrinkScreen().Content()
-                    }
+                    HandleIntent(context)
+                    NavigationHost(navigator, bottomSheetNavigator)
+                    SlideTransition(navigator)
+                    ShakeToDrinkScreen().Content()
                 }
             }
             SnackbarHost(
@@ -120,7 +110,7 @@ internal fun ComposeApp(intent: Intent) {
 }
 
 @Composable
-private fun MessagesHost(snackbarHostState: SnackbarHostState, ) {
+private fun MessagesHost(snackbarHostState: SnackbarHostState) {
     val context = LocalContext.current
     val messagesFlow = koinInject<MessagesProvider>().messageFlow
     val snackbarScope = rememberCoroutineScope()
@@ -155,6 +145,6 @@ private fun MessagesHost(snackbarHostState: SnackbarHostState, ) {
 @Composable
 fun ComposeAppPreview() {
     BarneeTheme {
-        ComposeApp(Intent())
+        ComposeApp()
     }
 }

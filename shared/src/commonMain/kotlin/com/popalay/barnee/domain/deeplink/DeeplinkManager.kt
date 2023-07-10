@@ -20,29 +20,28 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.domain.deeplink
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.navigation.registerScreens
-import com.popalay.barnee.ui.theme.BarneeTheme
+import com.eygraber.uri.Url
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.StackChange
+import com.popalay.barnee.util.Logger
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        registerScreens()
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
+class DeeplinkManager(
+    private val router: Router,
+    private val deeplinkHandlers: Set<DeeplinkHandler>,
+    private val logger: Logger,
+) {
+
+    @OptIn(DelicateCoroutinesApi::class)
+    fun handle(deeplink: Url) {
+        logger.debug("DeeplinkHandler", "Deeplink received: $deeplink")
+        deeplinkHandlers.firstOrNull { it.supports(deeplink) }?.createDestination(deeplink)?.let { destinations ->
+            GlobalScope.launch {
+                router.updateStack(StackChange.ReplaceAll(destinations))
             }
         }
     }

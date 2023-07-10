@@ -29,8 +29,16 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
 sealed interface StackChange {
-    data class Push(val destination: TypedScreenProvider) : StackChange
+    data class Push(val destinations: List<TypedScreenProvider>) : StackChange {
+        constructor(destination: TypedScreenProvider) : this(listOf(destination))
+    }
+
     data class Replace(val destination: TypedScreenProvider) : StackChange
+
+    data class ReplaceAll(val destinations: List<TypedScreenProvider>) : StackChange {
+        constructor(destination: TypedScreenProvider) : this(listOf(destination))
+    }
+
     object Pop : StackChange
 }
 

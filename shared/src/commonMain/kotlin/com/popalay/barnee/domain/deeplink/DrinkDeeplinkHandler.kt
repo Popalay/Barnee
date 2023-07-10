@@ -20,30 +20,29 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.domain.deeplink
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.navigation.registerScreens
-import com.popalay.barnee.ui.theme.BarneeTheme
+import com.eygraber.uri.Url
+import com.popalay.barnee.data.model.DrinkMinimumData
+import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.TypedScreenProvider
+import com.popalay.barnee.util.toImageUrl
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        registerScreens()
-        setContent {
-            BarneeTheme {
-                Surface(color = MaterialTheme.colors.background) {
-                    ComposeApp()
-                }
-            }
-        }
+class DrinkDeeplinkHandler : DeeplinkHandler {
+    override fun supports(deeplink: Url): Boolean =
+        deeplink.path?.startsWith("/drink/") == true
+
+    override fun createDestination(deeplink: Url): List<TypedScreenProvider>? {
+        val drink = DrinkMinimumData(
+            identifier = deeplink.pathSegments.lastOrNull() ?: return null,
+            name = deeplink.getQueryParameter("name") ?: return null,
+            displayImageUrl = deeplink.getQueryParameter("image")?.toImageUrl() ?: return null,
+        )
+        return listOf(AppScreens.Discovery, AppScreens.Drink(drink))
+    }
+
+    companion object {
+        fun createDeeplink(drink: DrinkMinimumData): String =
+            "drink/${drink.identifier}?name=${drink.identifier}&image=${drink.displayImageUrl}"
     }
 }

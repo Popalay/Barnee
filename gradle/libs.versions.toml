@@ -100,6 +100,7 @@ multiplatformpaging = { module = "io.github.kuuuurt:multiplatform-paging", versi
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
+uri = { module = "com.eygraber:uri-kmp", version.ref = "uri" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 youtubePlayer = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtubePlayer" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai"}

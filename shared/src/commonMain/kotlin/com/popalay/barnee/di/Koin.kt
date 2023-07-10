@@ -46,6 +46,10 @@ import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.log.NavigationLogger
 import com.popalay.barnee.domain.log.StateMachineLogger
+import com.popalay.barnee.domain.deeplink.CollectionDeeplinkHandler
+import com.popalay.barnee.domain.deeplink.DeeplinkHandler
+import com.popalay.barnee.domain.deeplink.DeeplinkManager
+import com.popalay.barnee.domain.deeplink.DrinkDeeplinkHandler
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.RouterImpl
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
@@ -113,6 +117,8 @@ val commonModule = module {
     single { MessagesProvider() }
     single { NavigationLogger(get()) }
     single<Router> { RouterImpl(get()) }
+    single<Set<DeeplinkHandler>> { setOf(DrinkDeeplinkHandler(), CollectionDeeplinkHandler()) }
+    single { DeeplinkManager(get(), get(), get()) }
 
     single { GetCollectionUseCase(get(), get()) }
 
