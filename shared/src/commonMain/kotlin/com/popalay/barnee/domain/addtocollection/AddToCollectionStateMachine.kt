@@ -26,11 +26,11 @@ import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.ChooseCollection
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.CreateCollection
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -82,6 +82,7 @@ class AddToCollectionStateMachine(
                 .map { state() },
             filterIsInstance<AddToCollectionAction.CollectionClicked>()
                 .map { collectionRepository.addToCollection(it.collection.name, state().drink) }
+                .onEach { dispatcher(NavigateBackAction) }
                 .map { state() },
             filterIsInstance<AddToCollectionAction.NewCollectionNameChanged>()
                 .map {

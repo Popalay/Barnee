@@ -63,8 +63,8 @@ import org.koin.compose.koinInject
 @Composable
 internal fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-        val snackbarHostState = remember { SnackbarHostState() }
         Box(modifier = Modifier.fillMaxSize()) {
+            val snackbarHostState = remember { SnackbarHostState() }
             BottomSheetNavigator(
                 sheetElevation = 1.dp,
                 sheetBackgroundColor = MaterialTheme.colors.background,
