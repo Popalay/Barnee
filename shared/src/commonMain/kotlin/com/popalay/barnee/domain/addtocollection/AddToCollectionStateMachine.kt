@@ -26,22 +26,15 @@ import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.ChooseCollection
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState.CreateCollection
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.navigateBack
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-
-data class AddToCollectionInput(
-    val drink: DrinkMinimumData
-) : Input
 
 data class AddToCollectionState(
     val drink: DrinkMinimumData,
@@ -64,12 +57,11 @@ sealed interface AddToCollectionAction : Action {
 }
 
 class AddToCollectionStateMachine(
-    input: AddToCollectionInput,
+    drink: DrinkMinimumData,
     collectionRepository: CollectionRepository,
-    router: Router,
-) : StateMachine<AddToCollectionState, NoSideEffect>(
-    initialState = AddToCollectionState(input.drink),
-    reducer = { state, _ ->
+) : StateMachine<AddToCollectionState>(
+    initialState = AddToCollectionState(drink),
+    reducer = { state, dispatcher ->
         merge(
             merge(
                 filterIsInstance<AddToCollectionAction.CreateCollectionClicked>()
@@ -86,11 +78,11 @@ class AddToCollectionStateMachine(
                 },
             filterIsInstance<AddToCollectionAction.SaveCollectionClicked>()
                 .map { collectionRepository.addToCollection(state().newCollectionName, state().drink) }
-                .onEach { router.navigateBack() }
+                .onEach { dispatcher(NavigateBackAction) }
                 .map { state() },
             filterIsInstance<AddToCollectionAction.CollectionClicked>()
                 .map { collectionRepository.addToCollection(it.collection.name, state().drink) }
-                .onEach { router.navigateBack() }
+                .onEach { dispatcher(NavigateBackAction) }
                 .map { state() },
             filterIsInstance<AddToCollectionAction.NewCollectionNameChanged>()
                 .map {

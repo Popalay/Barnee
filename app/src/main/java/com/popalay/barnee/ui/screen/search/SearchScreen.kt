@@ -30,8 +30,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -57,6 +59,7 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -69,15 +72,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import cafe.adriel.voyager.core.screen.Screen
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.navigationBarsHeight
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.search.SearchAction
-import com.popalay.barnee.domain.search.SearchSideEffect
 import com.popalay.barnee.domain.search.SearchState
+import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.BarneeTextField
@@ -88,38 +95,34 @@ import com.popalay.barnee.ui.common.drawBadge
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
+import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.displayNames
-import kotlinx.coroutines.flow.Flow
-import org.koin.androidx.compose.getViewModel
 
-@Composable
-fun SearchScreen() {
-    SearchScreen(getViewModel())
-}
+class SearchScreen : Screen {
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<SearchStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
 
-@Composable
-fun SearchScreen(viewModel: SearchViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    SearchScreen(state, viewModel.sideEffectFlow, viewModel::dispatchAction)
+        SearchScreen(state, stateMachine::dispatch)
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalComposeUiApi::class)
 @Composable
-fun SearchScreen(
+private fun SearchScreen(
     state: SearchState,
-    sideEffectFlow: Flow<SearchSideEffect>,
-    onAction: (SearchAction) -> Unit
+    onAction: (Action) -> Unit
 ) {
     val bottomSheetState = rememberModalBottomSheetState(initialValue = Hidden)
     val keyboardController = LocalSoftwareKeyboardController.current
 
-    LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
-        when (sideEffect) {
-            SearchSideEffect.ShowFilters -> {
-                keyboardController?.hide()
-                bottomSheetState.show()
-            }
+    LaunchedEffect(state.showFilters) { ->
+        if (state.showFilters) {
+            keyboardController?.hide()
+            bottomSheetState.show()
+        } else {
+            bottomSheetState.hide()
         }
     }
 
@@ -145,6 +148,7 @@ fun SearchScreen(
                 Filters(
                     aggregation = aggregation,
                     selected = state.selectedFilters,
+                    onApplyClick = { onAction(SearchAction.FiltersApplied) },
                     onFilterClicked = { onAction(SearchAction.FilterClicked(it)) }
                 )
             }
@@ -157,6 +161,7 @@ fun SearchScreen(
 
                 SearchAppBar(
                     onFilterClick = { onAction(SearchAction.ShowFiltersClicked) },
+                    onBackClick = { onAction(NavigateBackAction) },
                     isFiltersApplied = state.selectedFilters.isNotEmpty(),
                     modifier = Modifier.liftOnScroll(listState)
                 )
@@ -241,6 +246,7 @@ private fun SearchTextField(
 @Composable
 private fun SearchAppBar(
     onFilterClick: () -> Unit,
+    onBackClick: () -> Unit,
     isFiltersApplied: Boolean,
     modifier: Modifier = Modifier,
 ) {
@@ -248,7 +254,7 @@ private fun SearchAppBar(
     ActionsAppBar(
         title = "Search",
         modifier = modifier,
-        leadingButtons = { BackButton() },
+        leadingButtons = { BackButton(onClick = onBackClick) },
         trailingButtons = {
             IconButton(onClick = onFilterClick) {
                 Icon(
@@ -265,11 +271,33 @@ private fun SearchAppBar(
 private fun Filters(
     aggregation: Aggregation,
     selected: Set<Pair<String, AggregationGroup>>,
+    onApplyClick: () -> Unit,
     onFilterClicked: (Pair<String, AggregationGroup>) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
+                .padding(start = 16.dp)
+        ) {
+            Text(
+                text = "Apply all your wishes",
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.primary
+            )
+            IconButton(onClick = onApplyClick) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_done),
+                    tint = MaterialTheme.colors.primary,
+                    contentDescription = "Your bartender",
+                )
+            }
+
+        }
         val groups = listOf(
             "Color" to aggregation.colored,
             "Taste" to aggregation.tasting,

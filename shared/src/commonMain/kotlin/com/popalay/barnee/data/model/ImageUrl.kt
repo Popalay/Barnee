@@ -22,7 +22,6 @@
 
 package com.popalay.barnee.data.model
 
-import com.eygraber.uri.UriCodec
 import com.popalay.barnee.data.transformer.StringAsImageUrlTransformer
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
@@ -40,7 +39,7 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
     override fun scaledUrl(size: Pair<Int, Int>): String =
         "${URL_PREFIX}c_scale,w_${size.first}/$rawUrl"
 
-    override fun toString(): String = UriCodec.encode(rawUrl)
+    override fun toString(): String = rawUrl
 
     companion object {
         private const val URL_PREFIX = "https://res.cloudinary.com/barnee/image/upload/"
@@ -48,16 +47,14 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
 }
 
 @JvmInline
-value class ExternalImageUrl(private val encodedUrl: String) : ImageUrl {
-
-    override val url: String get() = UriCodec.decodeOrNull(encodedUrl) ?: encodedUrl
+value class ExternalImageUrl(override val url: String) : ImageUrl {
 
     override fun scaledUrl(size: Pair<Int, Int>): String {
         val separator = if (url.contains('?')) "&" else "?"
         return "$url${separator}imwidth=${size.first}"
     }
 
-    override fun toString(): String = UriCodec.encode(url)
+    override fun toString(): String = url
 }
 
 object EmptyImageUrl : ImageUrl {

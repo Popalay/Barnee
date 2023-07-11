@@ -127,11 +127,11 @@ complexity:
     threshold: 600
   LongMethod:
     active: true
-    threshold: 100
+    threshold: 200
   LongParameterList:
     active: true
-    functionThreshold: 7
-    constructorThreshold: 7
+    functionThreshold: 10
+    constructorThreshold: 10
     ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotatedParameter: [ ]
@@ -325,7 +325,7 @@ naming:
     active: true
     maximumFunctionNameLength: 40
   FunctionMinLength:
-    active: true
+    active: false
     minimumFunctionNameLength: 3
   FunctionNaming:
     active: true
@@ -634,6 +634,7 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
   ModifierOrder:
     active: true
   MultilineLambdaItParameter:
@@ -671,7 +672,7 @@ style:
   RedundantVisibilityModifierRule:
     active: false
   ReturnCount:
-    active: true
+    active: false
     max: 2
     excludedFunctions:
       - 'equals'

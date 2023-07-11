@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -47,32 +49,40 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.screen.Screen
 import com.popalay.barnee.R
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.bartender.BartenderAction
 import com.popalay.barnee.domain.bartender.BartenderState
+import com.popalay.barnee.domain.bartender.BartenderStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenAction
 import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.screen.drinklist.DrinkListItem
+import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.displayName
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.toMinimumData
 
-@Composable
-fun BartenderScreen() {
-    BartenderScreen(getViewModel())
+class BartenderScreen : Screen {
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<BartenderStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        BartenderScreen(state, stateMachine::dispatch)
+    }
 }
 
 @Composable
-fun BartenderScreen(viewModel: BartenderViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    BartenderScreen(state, viewModel::dispatchAction)
-}
-
-@Composable
-fun BartenderScreen(
+private fun BartenderScreen(
     state: BartenderState,
-    onAction: (BartenderAction) -> Unit
+    onAction: (Action) -> Unit
 ) {
     Crossfade(targetState = state.generatedDrink, label = "bartender-content") { drink ->
         if (drink != null) {
@@ -85,13 +95,13 @@ fun BartenderScreen(
                     ) {
                         DrinkListItem(
                             data = drink,
-                            onClick = { onAction(BartenderAction.OnDrinkClicked(drink)) },
+                            onClick = { onAction(ReplaceCurrentScreenAction(AppScreens.Drink(drink.toMinimumData()))) },
                             modifier = Modifier.fillMaxWidth(0.5F)
                         )
                     }
                 },
                 navigation = {
-                    IconButton(onClick = { onAction(BartenderAction.OnCloseClicked) }) {
+                    IconButton(onClick = { onAction(NavigateBackAction) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_cross),
                             contentDescription = "Close"
@@ -127,7 +137,6 @@ fun BartenderScreen(
                 },
                 body = {
                     Column {
-
                         BarneeTextField(
                             value = state.prompt,
                             onValueChange = { onAction(BartenderAction.OnPromptChanged(it)) },
@@ -144,6 +153,16 @@ fun BartenderScreen(
                                 disabledIndicatorColor = Color.Unspecified,
                                 errorIndicatorColor = Color.Unspecified,
                             ),
+                            keyboardOptions = KeyboardOptions(
+                                imeAction = if (state.isPromptValid) ImeAction.Done else ImeAction.None
+                            ),
+                            keyboardActions = KeyboardActions(
+                                onDone = {
+                                    if (state.isPromptValid) {
+                                        onAction(BartenderAction.OnGenerateDrinkClicked)
+                                    }
+                                }
+                            ),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .focusRequester(promptFocus)
@@ -159,7 +178,7 @@ fun BartenderScreen(
                     }
                 },
                 navigation = {
-                    IconButton(onClick = { onAction(BartenderAction.OnCloseClicked) }) {
+                    IconButton(onClick = { onAction(NavigateBackAction) }) {
                         Icon(
                             painter = painterResource(R.drawable.ic_cross),
                             contentDescription = "Close"

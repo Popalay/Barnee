@@ -24,7 +24,6 @@ package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
 import android.view.WindowManager
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateIntAsState
@@ -77,7 +76,6 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -110,18 +108,24 @@ import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
-import com.popalay.barnee.domain.drink.DrinkInput
-import com.popalay.barnee.domain.drink.DrinkSideEffect
 import com.popalay.barnee.domain.drink.DrinkState
+import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
-import com.popalay.barnee.domain.navigation.CollectionDestination
-import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
+import com.popalay.barnee.domain.navigation.ScreenWithTransition
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.ActionsAppBarHeight
 import com.popalay.barnee.ui.common.AnimatedHeartButton
@@ -133,15 +137,14 @@ import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
 import com.popalay.barnee.ui.screen.drinklist.DrinkHorizontalList
-import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
-import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.findActivity
 import com.popalay.barnee.ui.util.toIntSize
+import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
 import com.popalay.barnee.util.displayRatingWithMax
@@ -152,30 +155,28 @@ import com.popalay.barnee.util.isGenerated
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoId
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.getViewModel
-import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-@Composable
-fun DrinkScreen(input: DrinkInput) {
-    DrinkScreen(getViewModel { parametersOf(input) }, getViewModel())
+data class DrinkScreen(override val input: DrinkMinimumData) : ScreenWithInputAsKey<DrinkMinimumData> {
+
+    override val transition: ScreenWithTransition.Transition = ScreenWithTransition.Transition.SlideVertical
+
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<DrinkStateMachine>(parameters = { parametersOf(input) })
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+        val drinkItemStateMachine = injectStateMachine<DrinkItemStateMachine>()
+
+        DrinkScreen(state, stateMachine::dispatch, drinkItemStateMachine::dispatch)
+    }
 }
 
 @Composable
-fun DrinkScreen(viewModel: DrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DrinkScreen(state, viewModel.sideEffectFlow, viewModel::dispatchAction, drinkItemViewModel::dispatchAction)
-}
-
-@Composable
-fun DrinkScreen(
+private fun DrinkScreen(
     state: DrinkState,
-    sideEffectFlow: Flow<DrinkSideEffect>,
-    onAction: (DrinkAction) -> Unit,
+    onAction: (Action) -> Unit,
     onItemAction: (DrinkItemAction) -> Unit
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
@@ -188,20 +189,6 @@ fun DrinkScreen(
         minHeight = collapsedToolbarHeightPx,
         maxHeight = toolbarHeightPx
     )
-
-    LifecycleAwareLaunchedEffect(sideEffectFlow) { sideEffect ->
-        when (sideEffect) {
-            is DrinkSideEffect.KeepScreenOn -> activity?.let {
-                if (sideEffect.keep) {
-                    it.window?.addFlags(keepScreenOnFlag)
-                    Toast.makeText(it, "The screen will remain on on this screen", Toast.LENGTH_LONG).show()
-                } else {
-                    it.window?.clearFlags(keepScreenOnFlag)
-                    Toast.makeText(it, "The screen will turn off as usual", Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-    }
 
     DisposableEffect(Unit) {
         onDispose {
@@ -228,14 +215,14 @@ fun DrinkScreen(
             listState = listState,
             contentPadding = contentPadding,
             onRetryClicked = { onAction(DrinkAction.Retry) },
-            onCategoryClicked = { onAction(DrinkAction.CategoryClicked(it)) },
-            onMoreRecommendedDrinksClicked = { onAction(DrinkAction.MoreRecommendedDrinksClicked) }
+            onCategoryClicked = { onAction(NavigateToAction(AppScreens.DrinksByTag(it.text))) },
+            onMoreRecommendedDrinksClicked = { onAction(NavigateToAction(AppScreens.SimilarDrinksTo(state.drinkMinimumData))) }
         )
     }
 }
 
 @Composable
-fun DrinkScreenBody(
+private fun DrinkScreenBody(
     drinkWithRelated: Result<FullDrinkResponse>,
     listState: LazyListState,
     onRetryClicked: () -> Unit,
@@ -307,7 +294,7 @@ fun DrinkScreenBody(
 @Composable
 private fun DrinkAppBar(
     state: DrinkState,
-    onAction: (DrinkAction) -> Unit,
+    onAction: (Action) -> Unit,
     onDrinkAction: (DrinkItemAction) -> Unit,
     scrollFraction: Float,
     offset: IntOffset,
@@ -391,6 +378,7 @@ private fun DrinkAppBar(
                 )
                 CollectionBanner(
                     collection = state.drinkWithRelated()?.drink?.collection,
+                    onCollectionClick = { onAction(NavigateToAction(AppScreens.SingleCollection(it))) },
                     modifier = Modifier.constrainAs(collection) {
                         start.linkTo(nutrition.end, 24.dp)
                         centerVerticallyTo(nutrition)
@@ -442,6 +430,7 @@ private fun DrinkAppBar(
                 titleAlpha = 1 - contentAlpha,
                 isActionsVisible = drink != null,
                 isScreenKeptOn = state.isScreenKeptOn,
+                onBackCLick = { onAction(NavigateBackAction) },
                 onKeepScreenOnClicked = { onAction(DrinkAction.KeepScreenOnClicked) },
                 onShareClicked = { onAction(DrinkAction.ShareClicked) },
                 modifier = Modifier
@@ -464,6 +453,7 @@ private fun DrinkActionBar(
     isScreenKeptOn: Boolean,
     onKeepScreenOnClicked: () -> Unit,
     onShareClicked: () -> Unit,
+    onBackCLick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     ActionsAppBar(
@@ -475,7 +465,7 @@ private fun DrinkActionBar(
                 overflow = TextOverflow.Ellipsis
             )
         },
-        leadingButtons = { BackButton() },
+        leadingButtons = { BackButton(onClick = onBackCLick, iconRes = R.drawable.ic_cross) },
         trailingButtons = {
             AnimatedVisibility(isActionsVisible) {
                 Row {
@@ -501,11 +491,9 @@ private fun DrinkActionBar(
 @Composable
 fun CollectionBanner(
     collection: Collection?,
+    onCollectionClick: (Collection) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val router: Router = koinInject()
-    val scope = rememberCoroutineScope()
-
     AnimatedVisibility(
         visible = collection?.isDefault == false,
         enter = fadeIn(),
@@ -517,7 +505,7 @@ fun CollectionBanner(
             color = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.medium),
             modifier = Modifier
                 .clip(CircleShape)
-                .clickable { scope.launch { router.navigate(CollectionDestination(requireNotNull(collection))) } }
+                .clickable { onCollectionClick(requireNotNull(collection)) }
         ) {
             Text(
                 text = collection?.name.orEmpty(),
@@ -737,6 +725,6 @@ private fun RecommendedDrinks(
 @Composable
 fun DrinkScreenPreview() {
     BarneeTheme {
-        DrinkScreen(DrinkInput("alias", "name", "sample.png".toImageUrl()))
+        DrinkScreen(DrinkMinimumData("alias", "name", "sample.png".toImageUrl()))
     }
 }

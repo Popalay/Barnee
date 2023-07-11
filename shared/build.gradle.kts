@@ -66,15 +66,20 @@ kotlin {
                 implementation(libs.ktor.contentNegotiation)
                 implementation(libs.ktor.json)
                 implementation(libs.logback.classic)
-                implementation(libs.kotlinx.coroutines.core)
                 implementation(libs.koin.core)
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
                 implementation(libs.openai.client)
-                implementation(libs.uri)
+                implementation(libs.bundles.vojager)
                 implementation(libs.uuid)
+                implementation(libs.bundles.kotlinx)
+                api(libs.uri)
                 api(libs.multiplatformpaging)
             }
+        }
+
+        sourceSets["commonTest"].dependencies {
+            implementation(kotlin("test"))
         }
 
         sourceSets["androidMain"].dependencies {
@@ -106,27 +111,25 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_19
+        targetCompatibility = JavaVersion.VERSION_19
     }
 }
 
 buildkonfig {
     packageName = android.namespace
 
-    val openApiKeyName = "OPEN_AI_API_KEY"
-    val openAiApiKey = System.getenv(openApiKeyName)
-        ?: gradleLocalProperties(rootDir).getProperty(openApiKeyName)
-        ?: error("No $openApiKeyName provided")
-
     defaultConfigs {
-        buildConfigField(
-            type = FieldSpec.Type.STRING,
-            name = openApiKeyName,
-            value = openAiApiKey,
-            const = true,
-            nullable = false
-        )
+        val secrets = listOf(getSecret("OPEN_AI_API_KEY"), getSecret("CLOUDINARY_API_SECRET"))
+        secrets.forEach { (secretName, secretValue) ->
+            buildConfigField(
+                type = FieldSpec.Type.STRING,
+                name = secretName,
+                value = secretValue,
+                const = true,
+                nullable = false
+            )
+        }
     }
 }
 
@@ -136,4 +139,11 @@ configurations {
 
     named("podDebugFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
     named("podReleaseFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
+}
+
+fun getSecret(name: String): Pair<String, String> {
+    val secret = System.getenv(name)
+        ?: gradleLocalProperties(rootDir).getProperty(name)
+        ?: error("No $name provided")
+    return name to secret
 }

@@ -22,72 +22,56 @@
 
 package com.popalay.barnee.domain.drink
 
-import com.popalay.barnee.data.model.Category
+import com.popalay.barnee.data.device.KeepScreenOnSetter
+import com.popalay.barnee.data.message.Message
+import com.popalay.barnee.data.message.MessagesProvider
+import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.FullDrinkResponse
-import com.popalay.barnee.data.model.ImageUrl
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.Result
-import com.popalay.barnee.domain.SideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.SimilarDrinksDestination
-import com.popalay.barnee.domain.navigation.TagDrinksDestination
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
+import com.popalay.barnee.util.identifier
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
-data class DrinkInput(
-    val identifier: String,
-    val name: String,
-    val image: ImageUrl
-) : Input
-
 data class DrinkState(
-    val identifier: String,
-    val name: String,
-    val image: ImageUrl,
+    val drinkMinimumData: DrinkMinimumData,
     val drinkWithRelated: Result<FullDrinkResponse> = Uninitialized(),
     val isScreenKeptOn: Boolean = false,
     val isPlaying: Boolean = false
 ) : State {
-    val displayName = drinkWithRelated()?.drink?.displayName ?: name
-    val displayImage = drinkWithRelated()?.drink?.displayImageUrl ?: image
-
-    constructor(input: DrinkInput) : this(input.identifier, input.name, input.image)
+    val identifier = drinkWithRelated()?.drink?.identifier ?: drinkMinimumData.identifier
+    val displayName = drinkWithRelated()?.drink?.displayName ?: drinkMinimumData.name
+    val displayImage = drinkWithRelated()?.drink?.displayImageUrl ?: drinkMinimumData.displayImageUrl
 }
 
 sealed interface DrinkAction : Action {
     object TogglePlaying : DrinkAction
     object Retry : DrinkAction
-    object MoreRecommendedDrinksClicked : DrinkAction
     object ShareClicked : DrinkAction
     object KeepScreenOnClicked : DrinkAction
-    data class CategoryClicked(val category: Category) : DrinkAction
-}
-
-sealed interface DrinkSideEffect : SideEffect {
-    data class KeepScreenOn(val keep: Boolean) : DrinkSideEffect
 }
 
 class DrinkStateMachine(
-    input: DrinkInput,
+    drinkMinimumData: DrinkMinimumData,
     drinkRepository: DrinkRepository,
     shareRepository: ShareRepository,
-    router: Router
-) : StateMachine<DrinkState, DrinkSideEffect>(
-    initialState = DrinkState(input),
-    reducer = { state, sideEffectConsumer ->
+    messagesProvider: MessagesProvider,
+    private val keepScreenOnSetter: KeepScreenOnSetter,
+) : StateMachine<DrinkState>(
+    initialState = DrinkState(drinkMinimumData),
+    reducer = { state, _ ->
         merge(
             filterIsInstance<InitialAction>()
                 .take(1)
@@ -99,19 +83,26 @@ class DrinkStateMachine(
             filterIsInstance<DrinkAction.TogglePlaying>()
                 .map { !state().isPlaying }
                 .map { state().copy(isPlaying = it) },
-            filterIsInstance<DrinkAction.MoreRecommendedDrinksClicked>()
-                .onEach { router.navigate(SimilarDrinksDestination(state().identifier, state().displayName)) }
-                .map { state() },
-            filterIsInstance<DrinkAction.CategoryClicked>()
-                .onEach { router.navigate(TagDrinksDestination(it.category)) }
-                .map { state() },
             filterIsInstance<DrinkAction.ShareClicked>()
                 .onEach { shareRepository.shareDrink(requireNotNull(state().drinkWithRelated()?.drink)) }
                 .map { state() },
             filterIsInstance<DrinkAction.KeepScreenOnClicked>()
                 .map { !state().isScreenKeptOn }
-                .onEach { sideEffectConsumer(DrinkSideEffect.KeepScreenOn(it)) }
-                .map { state().copy(isScreenKeptOn = it) }
+                .onEach { keepScreenOn ->
+                    val toast = if (keepScreenOn) {
+                        keepScreenOnSetter.on()
+                        Message.Toast("The screen will remain on on this screen", Message.Toast.Duration.Long)
+                    } else {
+                        keepScreenOnSetter.off()
+                        Message.Toast("The screen will turn off as usual", Message.Toast.Duration.Long)
+                    }
+                    messagesProvider.dispatch(toast)
+                }
+                .map { state().copy(isScreenKeptOn = it) },
         )
     }
-)
+) {
+    override fun onDispose() {
+        keepScreenOnSetter.off()
+    }
+}

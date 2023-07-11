@@ -24,40 +24,24 @@ package com.popalay.barnee.domain.discovery
 
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.repository.DrinkRepository
-import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import com.popalay.barnee.domain.Uninitialized
 import com.popalay.barnee.domain.flatMapToResult
-import com.popalay.barnee.domain.navigation.CollectionsDestination
-import com.popalay.barnee.domain.navigation.GeneratedDrinksDestination
-import com.popalay.barnee.domain.navigation.QueryDrinksDestination
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.SearchDestination
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
 data class DiscoveryState(
     val categories: Result<List<Category>> = Uninitialized()
 ) : State
 
-sealed interface DiscoveryAction : Action {
-    object HeartClicked : DiscoveryAction
-    object SearchClicked : DiscoveryAction
-    object HouseBarClicked : DiscoveryAction
-    data class CategoryClicked(val category: Category) : DiscoveryAction
-}
-
 class DiscoveryStateMachine(
     drinkRepository: DrinkRepository,
-    router: Router
-) : StateMachine<DiscoveryState, NoSideEffect>(
+) : StateMachine<DiscoveryState>(
     initialState = DiscoveryState(),
     reducer = { state, _ ->
         merge(
@@ -65,18 +49,6 @@ class DiscoveryStateMachine(
                 .take(1)
                 .flatMapToResult { drinkRepository.categories() }
                 .map { state().copy(categories = it) },
-            filterIsInstance<DiscoveryAction.HeartClicked>()
-                .onEach { router.navigate(CollectionsDestination) }
-                .map { state() },
-            filterIsInstance<DiscoveryAction.CategoryClicked>()
-                .onEach { router.navigate(QueryDrinksDestination(it.category.alias, it.category.text)) }
-                .map { state() },
-            filterIsInstance<DiscoveryAction.SearchClicked>()
-                .onEach { router.navigate(SearchDestination) }
-                .map { state() },
-            filterIsInstance<DiscoveryAction.HouseBarClicked>()
-                .onEach { router.navigate(GeneratedDrinksDestination) }
-                .map { state() },
         )
     }
 )

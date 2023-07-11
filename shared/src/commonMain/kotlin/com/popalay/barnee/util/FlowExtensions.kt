@@ -26,6 +26,10 @@ import io.ktor.utils.io.core.Closeable
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.plus
@@ -48,3 +52,13 @@ class CFlow<T>(private val origin: Flow<T>) : Flow<T> by origin {
 
     fun unwrap() = origin
 }
+
+fun <T> CFlow<T>.asStateFlow(): StateFlow<T> = unwrap() as StateFlow<T>
+
+fun <T> concat(vararg flows: Flow<T>) = flow {
+    for (flow in flows) {
+        emitAll(flow)
+    }
+}
+
+fun <T> Flow<T>.ignoreElements() = filter { false }

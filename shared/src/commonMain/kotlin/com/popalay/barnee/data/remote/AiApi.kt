@@ -42,6 +42,7 @@ import kotlinx.serialization.json.Json
 
 class AiApi(
     private val openAi: OpenAI,
+    private val cloudinaryApi: CloudinaryApi,
     private val json: Json,
     private val logger: Logger
 ) {
@@ -57,13 +58,14 @@ class AiApi(
 
         val drink = result?.drink ?: error("Drink is null")
 
-        val imageUrl = openAi.imageURL(creteImageCreationRequest(result.imagePrompt)).firstOrNull()?.url?.toImageUrl()
+        val imageUrl = openAi.imageURL(creteImageCreationRequest(result.imagePrompt)).firstOrNull()?.url ?: error("Image is null")
+        val cloudinaryImageUrl = cloudinaryApi.uploadImage(imageUrl).toImageUrl()
 
-        logger.debug("AiAPI", "Image url: $imageUrl")
+        logger.debug("AiAPI", "Image url: $cloudinaryImageUrl")
 
         return drink.copy(
             id = "generated_${uuid4()}",
-            images = listOfNotNull(imageUrl?.let(::Image))
+            images = listOfNotNull(cloudinaryImageUrl.let(::Image))
         )
     }
 }

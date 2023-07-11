@@ -36,42 +36,46 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.screen.Screen
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
-import com.popalay.barnee.domain.discovery.DiscoveryAction
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.discovery.DiscoveryState
+import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.asStateFlow
 
-@Composable
-fun DiscoveryScreen() {
-    DiscoveryScreen(getViewModel())
+class DiscoveryScreen : Screen {
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<DiscoveryStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        DiscoveryScreen(state, stateMachine::dispatch)
+    }
 }
 
 @Composable
-private fun DiscoveryScreen(viewModel: DiscoveryViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    DiscoveryScreen(state, viewModel::dispatchAction)
-}
-
-@Composable
-private fun DiscoveryScreen(state: DiscoveryState, onAction: (DiscoveryAction) -> Unit) {
+private fun DiscoveryScreen(state: DiscoveryState, onAction: (Action) -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         val listState = rememberLazyListState()
         DiscoveryAppBar(
-            onHeartClick = { onAction(DiscoveryAction.HeartClicked) },
-            onSearchClick = { onAction(DiscoveryAction.SearchClicked) },
-            onBartenderClick = { onAction(DiscoveryAction.HouseBarClicked) },
+            onHeartClick = { onAction(NavigateToAction(AppScreens.Collections)) },
+            onSearchClick = { onAction(NavigateToAction(AppScreens.Search)) },
+            onBartenderClick = { onAction(NavigateToAction(AppScreens.GeneratedDrinks)) },
             modifier = Modifier.liftOnScroll(listState)
         )
         CategoryGrid(
             categories = state.categories,
             emptyMessage = "We currently have no drinks",
-            onItemClick = { onAction(DiscoveryAction.CategoryClicked(it)) },
+            onItemClick = { onAction(NavigateToAction(AppScreens.SingleCategory(it))) },
             listState = listState,
             contentPadding = rememberInsetsPaddingValues(
                 insets = LocalWindowInsets.current.navigationBars,

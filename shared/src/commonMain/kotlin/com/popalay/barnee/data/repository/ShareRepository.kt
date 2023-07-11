@@ -26,11 +26,12 @@ import com.popalay.barnee.data.device.Sharer
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.remote.DeeplinkFactory
-import com.popalay.barnee.domain.navigation.CollectionDestination
-import com.popalay.barnee.domain.navigation.DrinkDestination
+import com.popalay.barnee.domain.deeplink.CollectionDeeplinkHandler
+import com.popalay.barnee.domain.deeplink.DrinkDeeplinkHandler
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.isGenerated
+import com.popalay.barnee.util.toMinimumData
 
 interface ShareRepository {
     suspend fun shareDrink(drink: Drink)
@@ -48,7 +49,7 @@ internal class ShareRepositoryImpl(
             .joinToString("\n")
         val text = "Check out how to make a ${drink.displayName.capitalizeFirstChar()}:\n$instruction"
         val shortUrl = drink.takeIf { !it.isGenerated }
-            ?.let { deeplinkFactory.build(DrinkDestination(drink).destination) }.orEmpty()
+            ?.let { deeplinkFactory.build(DrinkDeeplinkHandler.createDeeplink(drink.toMinimumData())) }.orEmpty()
 
         sharer.openShareDialog(
             title = title,
@@ -62,7 +63,7 @@ internal class ShareRepositoryImpl(
         val drinks = collection.aliases
             .joinToString("\n") { "• ${it.replace('-', ' ').capitalizeFirstChar()}" }
         val text = "Check out my collection - ${collection.name.capitalizeFirstChar()}:\n$drinks"
-        val shortUrl = deeplinkFactory.build(CollectionDestination(collection).destination)
+        val shortUrl = deeplinkFactory.build(CollectionDeeplinkHandler.createDeeplink(collection))
 
         sharer.openShareDialog(
             title = title,

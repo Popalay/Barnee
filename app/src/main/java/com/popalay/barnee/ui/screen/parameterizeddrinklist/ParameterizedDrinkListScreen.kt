@@ -45,40 +45,45 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListState
+import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.asStateFlow
 import org.koin.core.parameter.parametersOf
 
-@Composable
-fun ParameterizedDrinkListScreen(
-    input: ParameterizedDrinkListInput,
-    floatingActionButton: (@Composable () -> Unit)? = null
-) {
-    ParameterizedDrinkListScreen(getViewModel { parametersOf(input) }, floatingActionButton)
+data class ParameterizedDrinkListScreen(
+    private val input: ParameterizedDrinkListInput
+) : Screen {
+
+    override val key: ScreenKey = input.request.toString()
+
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<ParameterizedDrinkListStateMachine>(parameters = { parametersOf(input) })
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+
+        ParameterizedDrinkListScreen(state, stateMachine::dispatch)
+    }
 }
 
 @Composable
-fun ParameterizedDrinkListScreen(
-    viewModel: ParameterizedDrinkListViewModel,
-    floatingActionButton: (@Composable () -> Unit)?
-) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    ParameterizedDrinkListScreen(state, floatingActionButton)
-}
-
-@Composable
-fun ParameterizedDrinkListScreen(
+internal fun ParameterizedDrinkListScreen(
     state: ParameterizedDrinkListState,
-    floatingActionButton: (@Composable () -> Unit)?
+    onAction: (Action) -> Unit,
+    floatingActionButton: (@Composable () -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
     val localDensity = LocalDensity.current
@@ -102,7 +107,7 @@ fun ParameterizedDrinkListScreen(
                     }
                 },
                 modifier = Modifier.liftOnScroll(listState),
-                leadingButtons = { BackButton() }
+                leadingButtons = { BackButton(onClick = { onAction(NavigateBackAction) })}
             )
         },
         floatingActionButtonPosition = FabPosition.Center,

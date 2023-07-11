@@ -56,48 +56,55 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import cafe.adriel.voyager.core.screen.Screen
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
+import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.di.injectStateMachine
+import com.popalay.barnee.domain.Action
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
+import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
+import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
+import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
 import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.drink.CollectionBanner
-import com.popalay.barnee.ui.screen.drinklist.DrinkItemViewModel
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
 import com.popalay.barnee.ui.util.applyForImageUrl
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.ui.util.toIntSize
+import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.inCollections
-import org.koin.androidx.compose.getViewModel
+import com.popalay.barnee.util.toMinimumData
 
-@Composable
-fun ShakeToDrinkScreen() {
-    ShakeToDrinkScreen(getViewModel(), getViewModel())
+class ShakeToDrinkScreen : Screen {
+    @Composable
+    override fun Content() {
+        val stateMachine = injectStateMachine<ShakeToDrinkStateMachine>()
+        val drinkItemStateMachine = injectStateMachine<DrinkItemStateMachine>()
+        val state by stateMachine.stateFlow.asStateFlow().collectAsStateWithLifecycle()
+        ShakeToDrinkScreen(state, stateMachine::dispatch, drinkItemStateMachine::dispatch)
+    }
 }
 
 @Composable
-fun ShakeToDrinkScreen(viewModel: ShakeToDrinkViewModel, drinkItemViewModel: DrinkItemViewModel) {
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-    ShakeToDrinkScreen(state, viewModel::dispatchAction, drinkItemViewModel::dispatchAction)
-}
-
-@Composable
-fun ShakeToDrinkScreen(
+private fun ShakeToDrinkScreen(
     state: ShakeToDrinkState,
-    onAction: (ShakeToDrinkAction) -> Unit,
-    onItemAction: (DrinkItemAction) -> Unit
+    onAction: (Action) -> Unit,
+    onItemAction: (Action) -> Unit
 ) {
     if (state.shouldShow) {
         val hapticFeedback = LocalHapticFeedback.current
@@ -138,8 +145,9 @@ fun ShakeToDrinkScreen(
                             data = value,
                             onClick = {
                                 onAction(ShakeToDrinkAction.DialogDismissed)
-                                onItemAction(DrinkItemAction.DrinkClicked(value))
+                                onAction(NavigateToAction(AppScreens.Drink(value.toMinimumData())))
                             },
+                            onCollectionClick = { onAction(NavigateToAction(AppScreens.SingleCollection(it))) },
                             onHeartClick = { onItemAction(DrinkItemAction.ToggleFavorite(value)) }
                         )
                     }
@@ -154,6 +162,7 @@ private fun RandomDrink(
     data: Drink,
     onClick: () -> Unit,
     onHeartClick: () -> Unit,
+    onCollectionClick: (Collection) -> Unit,
     modifier: Modifier = Modifier
 ) {
     BoxWithConstraints(modifier = modifier.clickable(onClick = onClick)) {
@@ -189,7 +198,10 @@ private fun RandomDrink(
                     style = MaterialTheme.typography.h3,
                 )
                 Spacer(modifier = Modifier.width(24.dp))
-                CollectionBanner(data.collection)
+                CollectionBanner(
+                    collection = data.collection,
+                    onCollectionClick = onCollectionClick,
+                )
             }
             Spacer(
                 modifier = Modifier

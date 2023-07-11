@@ -29,12 +29,9 @@ import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.NoSideEffect
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.navigateBack
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -48,7 +45,7 @@ import kotlinx.coroutines.flow.take
 data class CollectionInput(
     val name: String,
     val aliases: Set<String>
-) : Input
+)
 
 data class CollectionState(
     val name: String,
@@ -73,10 +70,9 @@ class CollectionStateMachine(
     collectionRepository: CollectionRepository,
     shareRepository: ShareRepository,
     getCollectionUseCase: GetCollectionUseCase,
-    router: Router
-) : StateMachine<CollectionState, NoSideEffect>(
+) : StateMachine<CollectionState>(
     initialState = CollectionState(input),
-    reducer = { state, _ ->
+    reducer = { state, dispatcher ->
         merge(
             filterIsInstance<InitialAction>()
                 .take(1)
@@ -92,13 +88,14 @@ class CollectionStateMachine(
                 },
             filterIsInstance<CollectionAction.RemoveClicked>()
                 .map { collectionRepository.remove(state().name) }
-                .onEach { router.navigateBack() }
+                .onEach { dispatcher(NavigateBackAction) }
                 .map { state() },
             filterIsInstance<CollectionAction.ShareClicked>()
                 .map { state().collection?.let { shareRepository.shareCollection(it) } }
                 .map { state() },
             filterIsInstance<CollectionAction.SaveClicked>()
                 .map { collectionRepository.saveOrMerge(state().name, state().aliases) }
+                .onEach { dispatcher(NavigateBackAction) }
                 .map { state() }
         )
     }

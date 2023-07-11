@@ -25,18 +25,13 @@ package com.popalay.barnee.domain.bartender
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.domain.navigation.DrinkDestination
-import com.popalay.barnee.domain.navigation.Router
-import com.popalay.barnee.domain.navigation.navigateBack
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 
 data class BartenderState(
@@ -51,33 +46,24 @@ data class BartenderState(
 
 sealed interface BartenderAction : Action {
     data class OnPromptChanged(val prompt: String) : BartenderAction
-    data class OnDrinkClicked(val drink: Drink) : BartenderAction
     object OnGenerateDrinkClicked : BartenderAction
-    object OnCloseClicked : BartenderAction
 }
 
 class BartenderStateMachine(
     drinkRepository: DrinkRepository,
-    router: Router,
-) : StateMachine<BartenderState, NoSideEffect>(
+) : StateMachine<BartenderState>(
     initialState = BartenderState(),
     reducer = { state, _ ->
         merge(
             filterIsInstance<BartenderAction.OnPromptChanged>()
-                .map { state().copy(prompt = it.prompt, error = "") },
+                .map { state().copy(prompt = it.prompt.trimStart(), error = "") },
             filterIsInstance<BartenderAction.OnGenerateDrinkClicked>()
                 .flatMapLatest {
                     drinkRepository.drinkForPrompt(state().prompt)
                         .map { state().copy(generatedDrink = it, isLoading = false, error = "") }
                         .onStart { emit(state().copy(isLoading = true, error = "")) }
+                        .catch { emit(state().copy(error = "Something went wrong. Please try again.", isLoading = false)) }
                 }
-                .catch { emit(state().copy(error = it.message ?: "Something went wrong. Please try again.", isLoading = false)) },
-            filterIsInstance<BartenderAction.OnDrinkClicked>()
-                .onEach { router.navigate(DrinkDestination(it.drink)) }
-                .map { state() },
-            filterIsInstance<BartenderAction.OnCloseClicked>()
-                .onEach { router.navigateBack() }
-                .map { state() },
         )
     }
 )

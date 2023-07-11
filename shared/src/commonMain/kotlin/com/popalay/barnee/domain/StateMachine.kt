@@ -22,66 +22,62 @@
 
 package com.popalay.barnee.domain
 
+import cafe.adriel.voyager.core.model.ScreenModel
+import cafe.adriel.voyager.core.model.coroutineScope
 import com.popalay.barnee.domain.log.StateMachineLogger
+import com.popalay.barnee.domain.navigation.Router
+import com.popalay.barnee.domain.navigation.navigationSideEffect
 import com.popalay.barnee.util.CFlow
 import com.popalay.barnee.util.wrap
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.cancelChildren
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
-interface Input
 interface State
+object NoState : State
 interface Action
-interface SideEffect
-object NoSideEffect : SideEffect
 
 object InitialAction : Action
 
-open class StateMachine<S : State, SE : SideEffect>(
+abstract class StateMachine<S : State>(
     initialState: S,
-    reducer: Reducer<S, SE>
-) : KoinComponent {
-    private val actionFlow = MutableSharedFlow<Action>()
-    private val sideEffectChannel = Channel<SE>()
-    private val stateMachineScope = MainScope()
+    reducer: Reducer<S>,
+) : KoinComponent, ScreenModel {
+    private val sharedActionFlow = MutableSharedFlow<Action>()
     private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
     private val logger by inject<StateMachineLogger>()
+    private val router by inject<Router>()
 
-    val sideEffectFlow: CFlow<SE> = sideEffectChannel.receiveAsFlow().wrap()
-    val stateFlow: CFlow<S> = actionFlow
+    val stateFlow: CFlow<S> = sharedActionFlow
         .onStart { emit(InitialAction) }
         .onEach { logger.log(this, it) }
-        .reducer({ currentState }, {
-            sideEffectChannel.send(it)
-            logger.log(this, it)
-        })
+        .let {
+            merge(
+                it.reducer({ currentState }, ::dispatch),
+                it.navigationSideEffect({ currentState }, router)
+            )
+        }
         .onEach { logger.log(this, it) }
         .stateIn(
-            stateMachineScope,
+            coroutineScope,
             SharingStarted.Eagerly,
             initialState
-        ).wrap()
-
-    open fun clear() {
-        stateMachineScope.coroutineContext.cancelChildren()
-    }
+        )
+        .wrap()
 
     fun dispatch(action: Action) {
-        stateMachineScope.launch { actionFlow.emit(action) }
+        coroutineScope.launch { sharedActionFlow.emit(action) }
     }
 }
 
 typealias StateProvider<State> = () -> State
-typealias SideEffectConsumer<SideEffect> = suspend (SideEffect) -> Unit
-typealias Reducer<State, SideEffect> = Flow<Action>.(StateProvider<State>, SideEffectConsumer<SideEffect>) -> Flow<State>
+typealias ActionDispatcher = suspend (Action) -> Unit
+typealias Reducer<State> = Flow<Action>.(StateProvider<State>, ActionDispatcher) -> Flow<State>

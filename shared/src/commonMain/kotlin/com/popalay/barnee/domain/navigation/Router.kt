@@ -28,23 +28,33 @@ import com.popalay.barnee.util.wrap
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 
-interface Router {
-    val destinationFlow: CFlow<Destination>
-    suspend fun navigate(destination: Destination)
+sealed interface StackChange {
+    data class Push(val destinations: List<TypedScreenProvider>) : StackChange {
+        constructor(destination: TypedScreenProvider) : this(listOf(destination))
+    }
+
+    data class Replace(val destination: TypedScreenProvider) : StackChange
+
+    data class ReplaceAll(val destinations: List<TypedScreenProvider>) : StackChange {
+        constructor(destination: TypedScreenProvider) : this(listOf(destination))
+    }
+
+    object Pop : StackChange
 }
 
-suspend fun Router.navigateBack() {
-    navigate(BackDestination)
+interface Router {
+    val stackChangeFlow: CFlow<StackChange>
+    suspend fun updateStack(stackChange: StackChange)
 }
 
 internal class RouterImpl(
     private val navigationLogger: NavigationLogger
 ) : Router {
-    private val _routeFlow = MutableSharedFlow<Destination>()
-    override val destinationFlow: CFlow<Destination> = _routeFlow.asSharedFlow().wrap()
+    private val _routeFlow = MutableSharedFlow<StackChange>()
+    override val stackChangeFlow: CFlow<StackChange> = _routeFlow.asSharedFlow().wrap()
 
-    override suspend fun navigate(destination: Destination) {
-        navigationLogger.log(this, destination)
-        _routeFlow.emit(destination)
+    override suspend fun updateStack(stackChange: StackChange) {
+        navigationLogger.log(this, stackChange)
+        _routeFlow.emit(stackChange)
     }
 }

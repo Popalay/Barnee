@@ -27,8 +27,6 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.Input
-import com.popalay.barnee.domain.NoSideEffect
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +41,7 @@ data class ParameterizedDrinkListInput(
     val title: String,
     val emptyStateMessage: String,
     val titleHighlighted: String = ""
-) : Input
+)
 
 data class ParameterizedDrinkListState(
     val request: DrinksRequest,
@@ -57,15 +55,15 @@ data class ParameterizedDrinkListState(
 
 class ParameterizedDrinkListStateMachine(
     input: ParameterizedDrinkListInput,
-    drinkRepository: DrinkRepository
-) : StateMachine<ParameterizedDrinkListState, NoSideEffect>(
+    drinkRepository: DrinkRepository,
+) : StateMachine<ParameterizedDrinkListState>(
     initialState = ParameterizedDrinkListState(input),
     reducer = { state, _ ->
         merge(
             filterIsInstance<InitialAction>()
                 .take(1)
                 .map { drinkRepository.drinks(state().request) }
-                .map { state().copy(drinks = it) }
+                .map { state().copy(drinks = it) },
         )
     }
 )

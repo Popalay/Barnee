@@ -39,29 +39,24 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.data.model.Collection
+import com.popalay.barnee.domain.collectionlist.CollectionListState
 import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.screen.collectionlist.CollectionCover
-import com.popalay.barnee.ui.screen.collectionlist.CollectionListViewModel
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import org.koin.androidx.compose.getViewModel
 
 @Composable
 fun ChooseCollectionBottomSheet(
+    state: CollectionListState,
     onCollectionClicked: (Collection) -> Unit,
     onCreateNewClicked: () -> Unit
 ) {
-    val viewModel: CollectionListViewModel = getViewModel()
-    val state by viewModel.stateFlow.collectAsStateWithLifecycle()
-
     StateLayout(state.collections) { value ->
         BottomSheetContent(
             title = { Text(text = "Save to") },

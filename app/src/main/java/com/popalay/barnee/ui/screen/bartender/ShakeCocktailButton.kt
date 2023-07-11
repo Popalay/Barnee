@@ -30,20 +30,15 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import com.popalay.barnee.R
-import com.popalay.barnee.domain.navigation.BartenderDestination
-import com.popalay.barnee.domain.navigation.Router
-import kotlinx.coroutines.launch
-import org.koin.compose.koinInject
 
 @Composable
-fun ShakeCocktailButton(modifier: Modifier = Modifier) {
-    val coroutineScope = rememberCoroutineScope()
-    val router: Router = koinInject()
-
+fun ShakeCocktailButton(
+    onShakeClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     ExtendedFloatingActionButton(
         text = { Text(text = "Shake cocktail") },
         icon = {
@@ -54,7 +49,7 @@ fun ShakeCocktailButton(modifier: Modifier = Modifier) {
         },
         interactionSource = remember { MutableInteractionSource() },
         backgroundColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.medium),
-        onClick = { coroutineScope.launch { router.navigate(BartenderDestination) } },
+        onClick = onShakeClick,
         modifier = modifier
     )
 }
