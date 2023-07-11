@@ -59,8 +59,6 @@ class CloudinaryApi(
                     append("signature", signature)
                 }
             ).body<CloudinaryResponse>().secureUrl.substringAfter(CLOUDINARY_RES_URL)
-        } catch (e: Exception) {
-            error("Failed to upload image to Cloudinary: " + e.message)
         } finally {
             client.close()
         }
