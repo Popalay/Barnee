@@ -45,7 +45,13 @@ internal fun NavigationHost(
                 if (stackChange.destinations.size == 1) {
                     val destination = stackChange.destinations.first()
                     when (destination.type) {
-                        TypedScreenProvider.Type.FullScreen  -> navigator.push(ScreenRegistry.get(destination))
+                        TypedScreenProvider.Type.FullScreen  -> {
+                            if (bottomSheetNavigator.isVisible) {
+                                bottomSheetNavigator.hide()
+                            }
+                            navigator.push(ScreenRegistry.get(destination))
+                        }
+
                         TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
                     }
                 } else {
@@ -57,8 +63,12 @@ internal fun NavigationHost(
                 val destination = stackChange.destination
                 when (destination.type) {
                     TypedScreenProvider.Type.FullScreen  -> {
-                        bottomSheetNavigator.hide()
-                        navigator.replace(ScreenRegistry.get(destination))
+                        if (bottomSheetNavigator.isVisible) {
+                            bottomSheetNavigator.hide()
+                            navigator.push(ScreenRegistry.get(destination))
+                        } else {
+                            navigator.replace(ScreenRegistry.get(destination))
+                        }
                     }
 
                     TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
@@ -71,7 +81,7 @@ internal fun NavigationHost(
                     when (destination.type) {
                         TypedScreenProvider.Type.FullScreen  -> {
                             bottomSheetNavigator.hide()
-                            navigator.replace(ScreenRegistry.get(destination))
+                            navigator.replaceAll(ScreenRegistry.get(destination))
                         }
 
                         TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))

@@ -33,16 +33,16 @@ import kotlinx.coroutines.flow.onEach
 
 sealed interface StackChangeAction : Action
 data class NavigateToAction(val screen: TypedScreenProvider) : StackChangeAction
-data class ReplaceCurrentScreenWith(val screen: TypedScreenProvider) : StackChangeAction
+data class ReplaceCurrentScreenAction(val screen: TypedScreenProvider) : StackChangeAction
 object NavigateBackAction : StackChangeAction
 
 internal fun <T : State> Flow<Action>.navigationSideEffect(state: StateProvider<T>, router: Router): Flow<T> =
     filterIsInstance<StackChangeAction>()
         .onEach {
             when (it) {
-                is NavigateToAction         -> router.updateStack(StackChange.Push(it.screen))
-                is ReplaceCurrentScreenWith -> router.updateStack(StackChange.Replace(it.screen))
-                is NavigateBackAction       -> router.updateStack(StackChange.Pop)
+                is NavigateToAction           -> router.updateStack(StackChange.Push(it.screen))
+                is ReplaceCurrentScreenAction -> router.updateStack(StackChange.Replace(it.screen))
+                is NavigateBackAction         -> router.updateStack(StackChange.Pop)
             }
         }
         .map { state() }

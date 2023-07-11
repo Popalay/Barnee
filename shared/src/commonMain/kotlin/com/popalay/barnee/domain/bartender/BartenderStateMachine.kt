@@ -62,8 +62,8 @@ class BartenderStateMachine(
                     drinkRepository.drinkForPrompt(state().prompt)
                         .map { state().copy(generatedDrink = it, isLoading = false, error = "") }
                         .onStart { emit(state().copy(isLoading = true, error = "")) }
+                        .catch { emit(state().copy(error = "Something went wrong. Please try again.", isLoading = false)) }
                 }
-                .catch { emit(state().copy(error = "Something went wrong. Please try again.", isLoading = false)) },
         )
     }
 )

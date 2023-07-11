@@ -18,6 +18,7 @@ jobs:
       ANDROID_RELEASE_KEYSTORE_PWD: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PWD }}
       ANDROID_RELEASE_KEY_PWD: ${{ secrets.ANDROID_RELEASE_KEY_PWD }}
       OPEN_AI_API_KEY: ${{ secrets.OPEN_AI_API_KEY }}
+      CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
 
     steps:
       - name: Cancel Previous Runs
@@ -36,7 +37,7 @@ jobs:
       - name: set up JDK
         uses: actions/setup-java@v1
         with:
-          java-version: 11
+          java-version: 19
 
       - name: Make checksum executable
         run: chmod +x .github/checksum.sh

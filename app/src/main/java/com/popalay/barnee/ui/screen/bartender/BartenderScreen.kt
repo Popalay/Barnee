@@ -56,12 +56,12 @@ import cafe.adriel.voyager.core.screen.Screen
 import com.popalay.barnee.R
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.navigation.NavigateBackAction
-import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenWith
 import com.popalay.barnee.domain.bartender.BartenderAction
 import com.popalay.barnee.domain.bartender.BartenderState
 import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenAction
 import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.screen.drinklist.DrinkListItem
@@ -95,7 +95,7 @@ private fun BartenderScreen(
                     ) {
                         DrinkListItem(
                             data = drink,
-                            onClick = { onAction(ReplaceCurrentScreenWith(AppScreens.Drink(drink.toMinimumData()))) },
+                            onClick = { onAction(ReplaceCurrentScreenAction(AppScreens.Drink(drink.toMinimumData()))) },
                             modifier = Modifier.fillMaxWidth(0.5F)
                         )
                     }

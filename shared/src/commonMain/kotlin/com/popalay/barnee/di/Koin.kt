@@ -30,6 +30,7 @@ import com.popalay.barnee.data.message.MessagesProvider
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.remote.AiApi
 import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.remote.CloudinaryApi
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.CollectionRepositoryImpl
 import com.popalay.barnee.data.repository.DrinkRepository
@@ -41,15 +42,15 @@ import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.collection.CollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
+import com.popalay.barnee.domain.deeplink.CollectionDeeplinkHandler
+import com.popalay.barnee.domain.deeplink.DeeplinkHandler
+import com.popalay.barnee.domain.deeplink.DeeplinkManager
+import com.popalay.barnee.domain.deeplink.DrinkDeeplinkHandler
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.log.NavigationLogger
 import com.popalay.barnee.domain.log.StateMachineLogger
-import com.popalay.barnee.domain.deeplink.CollectionDeeplinkHandler
-import com.popalay.barnee.domain.deeplink.DeeplinkHandler
-import com.popalay.barnee.domain.deeplink.DeeplinkManager
-import com.popalay.barnee.domain.deeplink.DrinkDeeplinkHandler
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.RouterImpl
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
@@ -113,7 +114,8 @@ val commonModule = module {
             )
         )
     }
-    single<AiApi> { AiApi(get(), get(), get()) }
+    single { CloudinaryApi(get(), BuildKonfig.CLOUDINARY_API_SECRET) }
+    single { AiApi(get(), get(), get(), get()) }
     single { MessagesProvider() }
     single { NavigationLogger(get()) }
     single<Router> { RouterImpl(get()) }

@@ -43,7 +43,7 @@ import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.navigation.NavigateToAction
-import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenWith
+import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenAction
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
@@ -64,7 +64,7 @@ class CollectionListScreen : Screen {
 private fun CollectionListScreen(state: CollectionListState, onAction: (Action) -> Unit) {
     LaunchedEffect(state.collections) {
         if (state.collections()?.size == 1) {
-            onAction(ReplaceCurrentScreenWith(AppScreens.SingleCollection()))
+            onAction(ReplaceCurrentScreenAction(AppScreens.SingleCollection()))
         }
     }
     if (state.collections()?.size == 1) return
