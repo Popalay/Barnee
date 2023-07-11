@@ -95,7 +95,7 @@ jobs:
 
       - name: Publish to Play store
         if: startsWith(github.ref, 'refs/tags/v')
-        uses: r0adkll/upload-google-play@v1.0.15
+        uses: r0adkll/upload-google-play@v1.1.1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_ACCOUNT_JSON }}
           packageName: com.popalay.barnee
