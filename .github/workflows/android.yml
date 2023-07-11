@@ -75,7 +75,7 @@ jobs:
 
       - name: Generate changellog
         id: generate-release-changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.2
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
