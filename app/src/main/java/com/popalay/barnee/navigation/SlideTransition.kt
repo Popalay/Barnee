@@ -56,8 +56,13 @@ fun SlideTransition(
         content = content,
         transition = {
             val (initialOffset, targetOffset) = when (navigator.lastEvent) {
-                StackEvent.Pop -> ({ size: Int -> -size } to { size: Int -> size })
-                else           -> ({ size: Int -> size } to { size: Int -> -size })
+                StackEvent.Pop -> {
+                    { size: Int -> -size } to { size: Int -> size }
+                }
+
+                else           -> {
+                    { size: Int -> size } to { size: Int -> -size }
+                }
             }
 
             when (orientation) {
