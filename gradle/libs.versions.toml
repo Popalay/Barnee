@@ -19,7 +19,7 @@ androidx-constraintlayout-compose = "1.1.0-alpha10"
 
 accompanist = "0.30.1"
 kotlinxDatetime = "0.4.0"
-ktor = "2.3.1"
+ktor = "2.3.2"
 junit = "4.13.2"
 androidx-test = "1.1.5"
 logback = "1.2.3"
