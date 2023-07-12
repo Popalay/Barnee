@@ -68,6 +68,7 @@ import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
@@ -89,8 +90,10 @@ import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.inCollections
 import com.popalay.barnee.util.toMinimumData
+import io.matthewnelson.component.parcelize.Parcelize
 
-class ShakeToDrinkScreen : Screen {
+@Parcelize
+class ShakeToDrinkScreen : ParcelableScreen {
     @Composable
     override fun Content() {
         val stateMachine = injectStateMachine<ShakeToDrinkStateMachine>()

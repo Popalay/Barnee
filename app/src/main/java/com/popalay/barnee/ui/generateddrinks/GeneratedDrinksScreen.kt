@@ -37,8 +37,10 @@ import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListSt
 import com.popalay.barnee.ui.screen.bartender.ShakeCocktailButton
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.util.asStateFlow
+import io.matthewnelson.component.parcelize.Parcelize
 import org.koin.core.parameter.parametersOf
 
+@Parcelize
 data class GeneratedDrinksScreen(
     override val input: ParameterizedDrinkListInput
 ) : ScreenWithInputAsKey<ParameterizedDrinkListInput> {

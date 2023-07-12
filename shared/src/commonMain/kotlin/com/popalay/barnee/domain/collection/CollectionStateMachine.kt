@@ -29,10 +29,12 @@ import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.ShareRepository
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.InitialAction
-import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -42,10 +44,11 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 
+@Parcelize
 data class CollectionInput(
     val name: String,
     val aliases: Set<String>
-)
+): Input
 
 data class CollectionState(
     val name: String,

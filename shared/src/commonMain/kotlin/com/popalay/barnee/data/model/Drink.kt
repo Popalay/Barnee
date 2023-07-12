@@ -23,6 +23,8 @@
 package com.popalay.barnee.data.model
 
 import com.popalay.barnee.data.transformer.SanitizeStringTransformer
+import com.popalay.barnee.domain.Input
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -44,8 +46,9 @@ data class Drink(
     @SerialName("nutritions") internal val nutrition: Nutrition = Nutrition(0)
 )
 
+@Parcelize
 data class DrinkMinimumData(
     val identifier: String,
     val name: String,
     val displayImageUrl: ImageUrl,
-)
+) : Input

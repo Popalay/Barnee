@@ -32,6 +32,7 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.SnackbarResult
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
@@ -39,8 +40,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
+import cafe.adriel.voyager.navigator.LocalNavigatorSaver
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
+import cafe.adriel.voyager.navigator.parcelableNavigatorSaver
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.popalay.barnee.data.message.Message
@@ -59,7 +63,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalVoyagerApi::class)
 @Composable
 internal fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
@@ -71,12 +75,14 @@ internal fun ComposeApp() {
                 sheetContentColor = MaterialTheme.colors.onBackground,
                 scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
             ) { bottomSheetNavigator ->
-                Navigator(DiscoveryScreen()) { navigator ->
-                    MessagesHost(snackbarHostState)
-                    HandleIntent()
-                    NavigationHost(navigator, bottomSheetNavigator)
-                    SlideTransition(navigator)
-                    ShakeToDrinkScreen().Content()
+                CompositionLocalProvider(LocalNavigatorSaver provides parcelableNavigatorSaver()) {
+                    Navigator(DiscoveryScreen()) { navigator ->
+                        MessagesHost(snackbarHostState)
+                        HandleIntent()
+                        NavigationHost(navigator, bottomSheetNavigator)
+                        SlideTransition(navigator)
+                        ShakeToDrinkScreen().Content()
+                    }
                 }
             }
             SnackbarHost(

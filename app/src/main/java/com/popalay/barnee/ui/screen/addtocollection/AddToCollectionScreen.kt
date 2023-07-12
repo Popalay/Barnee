@@ -41,8 +41,10 @@ import com.popalay.barnee.domain.collectionlist.CollectionListState
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
 import com.popalay.barnee.util.asStateFlow
+import io.matthewnelson.component.parcelize.Parcelize
 import org.koin.core.parameter.parametersOf
 
+@Parcelize
 data class AddToCollectionScreen(override val input: DrinkMinimumData) : ScreenWithInputAsKey<DrinkMinimumData> {
 
     @Composable

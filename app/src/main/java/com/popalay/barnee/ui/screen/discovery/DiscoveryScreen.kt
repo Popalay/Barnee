@@ -23,6 +23,7 @@
 package com.popalay.barnee.ui.screen.discovery
 
 import android.content.res.Configuration
+import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -36,23 +37,25 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.screen.Screen
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.R
 import com.popalay.barnee.R.string
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.discovery.DiscoveryState
 import com.popalay.barnee.domain.discovery.DiscoveryStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateToAction
+import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.util.asStateFlow
+import io.matthewnelson.component.parcelize.Parcelize
 
-class DiscoveryScreen : Screen {
+@Parcelize
+class DiscoveryScreen : ParcelableScreen {
     @Composable
     override fun Content() {
         val stateMachine = injectStateMachine<DiscoveryStateMachine>()

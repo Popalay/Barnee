@@ -114,8 +114,6 @@ import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.navigation.NavigateBackAction
-import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.Success
 import com.popalay.barnee.domain.drink.DrinkAction
@@ -124,6 +122,8 @@ import com.popalay.barnee.domain.drink.DrinkStateMachine
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
 import com.popalay.barnee.domain.navigation.ScreenWithTransition
 import com.popalay.barnee.ui.common.ActionsAppBar
@@ -155,12 +155,16 @@ import com.popalay.barnee.util.isGenerated
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
 import com.popalay.barnee.util.videoId
+import io.matthewnelson.component.parcelize.Parcelize
+import kotlinx.parcelize.IgnoredOnParcel
 import org.koin.core.parameter.parametersOf
 import kotlin.math.min
 import kotlin.math.roundToInt
 
+@Parcelize
 data class DrinkScreen(override val input: DrinkMinimumData) : ScreenWithInputAsKey<DrinkMinimumData> {
 
+    @IgnoredOnParcel
     override val transition: ScreenWithTransition.Transition = ScreenWithTransition.Transition.SlideVertical
 
     @Composable

@@ -29,6 +29,7 @@ import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.navigationSideEffect
 import com.popalay.barnee.util.CFlow
 import com.popalay.barnee.util.wrap
+import io.matthewnelson.component.parcelize.Parcelable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -41,6 +42,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
+interface Input: Parcelable
 interface State
 object NoState : State
 interface Action

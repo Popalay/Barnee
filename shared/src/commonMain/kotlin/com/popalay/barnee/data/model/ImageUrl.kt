@@ -23,16 +23,20 @@
 package com.popalay.barnee.data.model
 
 import com.popalay.barnee.data.transformer.StringAsImageUrlTransformer
+import io.matthewnelson.component.parcelize.IgnoredOnParcel
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlinx.serialization.Serializable
 import kotlin.jvm.JvmInline
 
 @Serializable(with = StringAsImageUrlTransformer::class)
-interface ImageUrl {
+interface ImageUrl : Parcelable {
     val url: String
     fun scaledUrl(size: Pair<Int, Int>): String
 }
 
 @JvmInline
+@Parcelize
 value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
     override val url: String get() = "${URL_PREFIX}$rawUrl"
 
@@ -47,6 +51,7 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
 }
 
 @JvmInline
+@Parcelize
 value class ExternalImageUrl(override val url: String) : ImageUrl {
 
     override fun scaledUrl(size: Pair<Int, Int>): String {
@@ -57,7 +62,10 @@ value class ExternalImageUrl(override val url: String) : ImageUrl {
     override fun toString(): String = url
 }
 
+@Parcelize
 object EmptyImageUrl : ImageUrl {
+
+    @IgnoredOnParcel
     override val url: String = ""
     override fun scaledUrl(size: Pair<Int, Int>): String = ""
     override fun toString(): String = ""

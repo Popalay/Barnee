@@ -27,8 +27,10 @@ import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.InitialAction
+import com.popalay.barnee.domain.Input
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
+import io.matthewnelson.component.parcelize.Parcelize
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.filterIsInstance
@@ -36,12 +38,13 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.take
 
+@Parcelize
 data class ParameterizedDrinkListInput(
     val request: DrinksRequest,
     val title: String,
     val emptyStateMessage: String,
     val titleHighlighted: String = ""
-)
+) : Input
 
 data class ParameterizedDrinkListState(
     val request: DrinksRequest,

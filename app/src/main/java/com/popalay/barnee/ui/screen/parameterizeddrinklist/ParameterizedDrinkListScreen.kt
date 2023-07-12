@@ -53,6 +53,7 @@ import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListState
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
@@ -62,13 +63,13 @@ import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.util.asStateFlow
+import io.matthewnelson.component.parcelize.Parcelize
 import org.koin.core.parameter.parametersOf
 
+@Parcelize
 data class ParameterizedDrinkListScreen(
-    private val input: ParameterizedDrinkListInput
-) : Screen {
-
-    override val key: ScreenKey = input.request.toString()
+    override val input: ParameterizedDrinkListInput
+) : ScreenWithInputAsKey<ParameterizedDrinkListInput> {
 
     @Composable
     override fun Content() {

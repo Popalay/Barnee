@@ -43,14 +43,17 @@ import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.navigation.NavigateBackAction
 import com.popalay.barnee.domain.navigation.NavigateToAction
+import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenAction
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.liftOnScroll
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.util.asStateFlow
+import io.matthewnelson.component.parcelize.Parcelize
 
-class CollectionListScreen : Screen {
+@Parcelize
+class CollectionListScreen : ParcelableScreen {
     @Composable
     override fun Content() {
         val stateMachine = injectStateMachine<CollectionListStateMachine>()

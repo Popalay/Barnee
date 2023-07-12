@@ -24,8 +24,12 @@ package com.popalay.barnee.domain.navigation
 
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.ScreenKey
+import com.popalay.barnee.domain.Input
+import io.matthewnelson.component.parcelize.Parcelable
 
-interface ScreenWithTransition : Screen {
+interface ParcelableScreen: Screen, Parcelable
+
+interface ScreenWithTransition : ParcelableScreen {
     val transition: Transition get() = Transition.SlideHorizontally
 
     enum class Transition {
@@ -33,7 +37,7 @@ interface ScreenWithTransition : Screen {
     }
 }
 
-interface ScreenWithInputAsKey<T : Any> : ScreenWithTransition {
+interface ScreenWithInputAsKey<T : Input> : ScreenWithTransition {
     val input: T
     override val key: ScreenKey get() = input.toString()
 }

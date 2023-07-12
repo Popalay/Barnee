@@ -82,6 +82,7 @@ import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.domain.search.SearchAction
 import com.popalay.barnee.domain.search.SearchState
 import com.popalay.barnee.domain.search.SearchStateMachine
@@ -97,8 +98,10 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkGrid
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.displayNames
+import io.matthewnelson.component.parcelize.Parcelize
 
-class SearchScreen : Screen {
+@Parcelize
+class SearchScreen : ParcelableScreen {
     @Composable
     override fun Content() {
         val stateMachine = injectStateMachine<SearchStateMachine>()

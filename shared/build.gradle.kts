@@ -28,6 +28,7 @@ plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version libs.versions.kotlin
     id("com.android.library")
+    id("kotlin-parcelize")
     id("org.jetbrains.kotlin.native.cocoapods")
     id("com.codingfeline.buildkonfig") version libs.versions.buildkonfig.gradle.plugin
 }
@@ -73,6 +74,7 @@ kotlin {
                 implementation(libs.bundles.vojager)
                 implementation(libs.uuid)
                 implementation(libs.bundles.kotlinx)
+                api(libs.parcelize)
                 api(libs.uri)
                 api(libs.multiplatformpaging)
             }

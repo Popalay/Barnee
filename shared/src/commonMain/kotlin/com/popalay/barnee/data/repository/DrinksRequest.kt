@@ -22,17 +22,34 @@
 
 package com.popalay.barnee.data.repository
 
-sealed class DrinksRequest {
+import io.matthewnelson.component.parcelize.Parcelable
+import io.matthewnelson.component.parcelize.Parcelize
+
+sealed class DrinksRequest : Parcelable {
+    @Parcelize
     data class RelatedTo(val alias: String) : DrinksRequest()
+
+    @Parcelize
     data class ForTags(val tags: Set<String>) : DrinksRequest()
+
+    @Parcelize
     data class ByAliases(val aliases: Set<String>) : DrinksRequest()
+
+    @Parcelize
     data class ForQuery(val query: String) : DrinksRequest()
+
+    @Parcelize
     data class Collection(val name: String) : DrinksRequest()
+
+    @Parcelize
     data class Search(
         val query: String,
         val filters: Map<String, List<String>>
     ) : DrinksRequest()
 
+    @Parcelize
     object Random : DrinksRequest()
+
+    @Parcelize
     object Generated : DrinksRequest()
 }

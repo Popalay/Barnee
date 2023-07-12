@@ -61,6 +61,7 @@ import com.popalay.barnee.domain.bartender.BartenderState
 import com.popalay.barnee.domain.bartender.BartenderStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.navigation.NavigateBackAction
+import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.domain.navigation.ReplaceCurrentScreenAction
 import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.BottomSheetContent
@@ -68,8 +69,10 @@ import com.popalay.barnee.ui.screen.drinklist.DrinkListItem
 import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.toMinimumData
+import io.matthewnelson.component.parcelize.Parcelize
 
-class BartenderScreen : Screen {
+@Parcelize
+class BartenderScreen : ParcelableScreen {
     @Composable
     override fun Content() {
         val stateMachine = injectStateMachine<BartenderStateMachine>()
