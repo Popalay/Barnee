@@ -77,6 +77,7 @@ kotlin {
                 api(libs.parcelize)
                 api(libs.uri)
                 api(libs.multiplatformpaging)
+                api(libs.imageLoader)
             }
         }
 

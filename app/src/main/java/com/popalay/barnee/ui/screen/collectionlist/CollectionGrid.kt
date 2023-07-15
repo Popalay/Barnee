@@ -22,16 +22,13 @@
 
 package com.popalay.barnee.ui.screen.collectionlist
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -44,14 +41,11 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.ImageUrl
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -65,8 +59,6 @@ import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.topShift
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.toIntSize
 
 @Composable
 fun CollectionGrid(
@@ -172,8 +164,8 @@ private fun CoverRow(
 ) {
     Row(modifier = modifier) {
         images.elementAtOrNull(0)?.let {
-            CoverImage(
-                image = it,
+            AsyncImage(
+                imageUrl = it,
                 modifier = Modifier
                     .weight(1F)
                     .fillMaxHeight()
@@ -181,31 +173,12 @@ private fun CoverRow(
         }
         images.elementAtOrNull(1)?.let {
             Spacer(modifier = Modifier.width(2.dp))
-            CoverImage(
-                image = it,
+            AsyncImage(
+                imageUrl = it,
                 modifier = Modifier
                     .weight(1F)
                     .fillMaxHeight()
             )
         }
-    }
-}
-
-@Composable
-private fun CoverImage(
-    image: ImageUrl,
-    modifier: Modifier = Modifier
-) {
-    BoxWithConstraints(modifier = modifier) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .applyForImageUrl(image, constraints.toIntSize())
-                    .build()
-            ),
-            contentDescription = null,
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
     }
 }

@@ -22,8 +22,6 @@
 
 package com.popalay.barnee.ui.screen.addtocollection
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -44,21 +42,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.DrinkMinimumData
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.ui.common.BarneeTextField
 import com.popalay.barnee.ui.common.BottomSheetContent
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.toIntSize
 
 @Composable
 fun CreateCollectionBottomSheet(
@@ -99,17 +92,7 @@ fun CreateCollectionBottomSheet(
                         .height(96.dp)
                         .aspectRatio(DefaultAspectRatio)
                 ) {
-                    BoxWithConstraints {
-                        Image(
-                            painter = rememberAsyncImagePainter(
-                                ImageRequest.Builder(LocalContext.current)
-                                    .applyForImageUrl(drink.displayImageUrl, constraints.toIntSize())
-                                    .build()
-                            ),
-                            contentDescription = null,
-                            contentScale = ContentScale.Crop
-                        )
-                    }
+                    AsyncImage(drink.displayImageUrl)
                 }
                 BarneeTextField(
                     value = collectionName,

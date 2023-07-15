@@ -2,6 +2,7 @@
 android-minSdk = "28"
 android-targetSdk = "33"
 android-compileSdk = "33"
+imageLoader = "1.6.0"
 kotlin = "1.8.10"
 android-gradlePlugin = "7.4.2"
 google-services-gradlePlugin = "4.3.15"
@@ -19,18 +20,17 @@ androidx-constraintlayout-compose = "1.1.0-alpha10"
 
 accompanist = "0.30.1"
 kotlinxDatetime = "0.4.0"
-ktor = "2.3.1"
+ktor = "2.3.2"
 junit = "4.13.2"
 androidx-test = "1.1.5"
 logback = "1.2.3"
-coroutines = "1.7.1"
+coroutines = "1.7.2"
 koin = "3.4.2"
 koin-compose = "3.4.5"
 multiplatformsettings = "1.0.0"
 firebase-dynamicLinks = "21.1.0"
 paging-compose = "1.0.0-alpha20"
 multiplatformpaging = "0.6.2"
-coil = "2.4.0"
 parcelize = "0.1.2"
 uri = "0.0.12"
 uuid = "0.7.1"
@@ -104,12 +104,12 @@ firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-k
 paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
 multiplatformpaging = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "multiplatformpaging" }
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
-coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 uri = { module = "com.eygraber:uri-kmp", version.ref = "uri" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
 youtubePlayer = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core", version.ref = "youtubePlayer" }
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai" }
 parcelize = { module = "io.matthewnelson.kotlin-components:parcelize", version.ref = "parcelize" }
+imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 
 [bundles]
 androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime", "androidx-compose-animation"]

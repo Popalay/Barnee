@@ -38,4 +38,8 @@ actual class RealLogger : Logger {
     override fun error(tag: String, message: String, throwable: Throwable?) {
         TODO("Not yet implemented")
     }
+
+    override fun verbose(tag: String, message: String, throwable: Throwable?) {
+        TODO("Not yet implemented")
+    }
 }

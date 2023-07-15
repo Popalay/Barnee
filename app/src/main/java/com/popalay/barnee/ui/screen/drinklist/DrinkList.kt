@@ -23,15 +23,14 @@
 package com.popalay.barnee.ui.screen.drinklist
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -47,19 +46,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.domain.navigation.NavigateToAction
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.ui.common.AnimatedHeartButton
 import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -75,8 +71,6 @@ import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.common.topShift
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.displayName
 import com.popalay.barnee.util.displayRating
@@ -182,17 +176,8 @@ fun DrinkListItem(
         shape = MediumSquircleShape,
         modifier = modifier.aspectRatio(DefaultAspectRatio)
     ) {
-        BoxWithConstraints(modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .applyForImageUrl(data.displayImageUrl, constraints.toIntSize())
-                        .build()
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+        Box(modifier = Modifier.combinedClickable(onClick = onClick, onDoubleClick = onDoubleClick)) {
+            AsyncImage(data.displayImageUrl)
             Row(
                 verticalAlignment = Alignment.Bottom,
                 horizontalArrangement = Arrangement.SpaceBetween,
