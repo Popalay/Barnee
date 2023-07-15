@@ -22,12 +22,12 @@
 
 package com.popalay.barnee.domain.log
 
+import co.touchlab.kermit.Logger
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
-import com.popalay.barnee.util.Logger
 
-class NavigationLogger(private val logger: Logger) {
+class NavigationLogger {
     fun <T : Router> log(tag: T, stackChange: StackChange) {
-        logger.info(tag::class.simpleName.orEmpty(), "stack change => $stackChange")
+        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Stack change => $stackChange" }
     }
 }

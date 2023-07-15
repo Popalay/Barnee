@@ -59,16 +59,14 @@ import com.popalay.barnee.domain.search.SearchStateMachine
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkStateMachine
 import com.popalay.barnee.domain.usecase.GetCollectionUseCase
 import com.popalay.barnee.shared.BuildKonfig
-import com.popalay.barnee.util.EmptyLogger
-import com.popalay.barnee.util.RealLogger
 import com.popalay.barnee.util.isDebug
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.DEFAULT
 import io.ktor.client.plugins.logging.EMPTY
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.logging.SIMPLE
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.json.Json
 import org.koin.core.context.startKoin
@@ -79,8 +77,7 @@ import com.aallam.openai.api.logging.LogLevel as OpenAiLogLevel
 import com.aallam.openai.api.logging.Logger as OpenAiLogger
 
 val commonModule = module {
-    single { if (isDebug) RealLogger() else EmptyLogger }
-    single { StateMachineLogger(get()) }
+    single { StateMachineLogger() }
 
     single { Api(get()) }
     single<LocalStore> { LocalStoreImpl(get()) }
@@ -97,7 +94,7 @@ val commonModule = module {
                 json(get())
             }
             install(Logging) {
-                logger = if (isDebug) Logger.DEFAULT else Logger.EMPTY
+                logger = if (isDebug) Logger.SIMPLE else Logger.EMPTY
                 level = LogLevel.ALL
             }
         }
@@ -115,12 +112,12 @@ val commonModule = module {
         )
     }
     single { CloudinaryApi(get(), BuildKonfig.CLOUDINARY_API_SECRET) }
-    single { AiApi(get(), get(), get(), get()) }
+    single { AiApi(get(), get(), get()) }
     single { MessagesProvider() }
-    single { NavigationLogger(get()) }
+    single { NavigationLogger() }
     single<Router> { RouterImpl(get()) }
     single<Set<DeeplinkHandler>> { setOf(DrinkDeeplinkHandler(), CollectionDeeplinkHandler()) }
-    single { DeeplinkManager(get(), get(), get()) }
+    single { DeeplinkManager(get(), get()) }
 
     single { GetCollectionUseCase(get(), get()) }
 

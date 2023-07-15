@@ -22,17 +22,17 @@
 
 package com.popalay.barnee.domain.log
 
+import co.touchlab.kermit.Logger
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.State
 import com.popalay.barnee.domain.StateMachine
-import com.popalay.barnee.util.Logger
 
-class StateMachineLogger(private val logger: Logger) {
+class StateMachineLogger {
     fun <T : StateMachine<*>> log(tag: T, action: Action) {
-        logger.info(tag::class.simpleName.orEmpty(), "action => $action")
+        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Action => $action" }
     }
 
     fun <T : StateMachine<*>> log(tag: T, state: State) {
-        logger.info(tag::class.simpleName.orEmpty(), "state => $state")
+        Logger.i(tag = tag::class.simpleName.orEmpty()) { "State => $state" }
     }
 }
