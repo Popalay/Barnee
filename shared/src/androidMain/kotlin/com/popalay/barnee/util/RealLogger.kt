@@ -40,4 +40,8 @@ actual class RealLogger : Logger {
     override fun error(tag: String, message: String, throwable: Throwable?) {
         Log.e(tag, message, throwable)
     }
+
+    override fun verbose(tag: String, message: String, throwable: Throwable?) {
+        Log.v(tag, message, throwable)
+    }
 }

@@ -22,13 +22,11 @@
 
 package com.popalay.barnee.ui.screen.discovery
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -43,15 +41,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.popalay.barnee.R
 import com.popalay.barnee.data.model.Category
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
@@ -65,8 +60,6 @@ import com.popalay.barnee.ui.common.plus
 import com.popalay.barnee.ui.common.scrim
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.toIntSize
 
 @Composable
 fun CategoryGrid(
@@ -126,18 +119,8 @@ private fun CategoryListItem(
         shape = MediumSquircleShape,
         modifier = modifier.aspectRatio(DefaultAspectRatio)
     ) {
-        BoxWithConstraints(modifier = Modifier.clickable(onClick = onClick)) {
-            Image(
-                painter = rememberAsyncImagePainter(
-                    ImageRequest.Builder(LocalContext.current)
-                        .data(data.imageUrl)
-                        .applyForImageUrl(data.imageUrl, constraints.toIntSize())
-                        .build()
-                ),
-                contentDescription = null,
-                modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
-            )
+        Box(modifier = Modifier.clickable(onClick = onClick)) {
+            AsyncImage(data.imageUrl)
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier

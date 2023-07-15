@@ -23,15 +23,13 @@
 package com.popalay.barnee.ui.screen.shaketodrink
 
 import android.content.res.Configuration
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -49,25 +47,21 @@ import androidx.compose.ui.graphics.BlendMode.Companion.SrcAtop
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import cafe.adriel.voyager.core.screen.Screen
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
-import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
+import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkAction
 import com.popalay.barnee.domain.shakedrink.ShakeToDrinkState
@@ -80,8 +74,6 @@ import com.popalay.barnee.ui.screen.drink.CollectionBanner
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.MediumSquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
-import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
@@ -168,16 +160,9 @@ private fun RandomDrink(
     onCollectionClick: (Collection) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    BoxWithConstraints(modifier = modifier.clickable(onClick = onClick)) {
-        Image(
-            painter = rememberAsyncImagePainter(
-                ImageRequest.Builder(LocalContext.current)
-                    .applyForImageUrl(data.displayImageUrl, constraints.toIntSize())
-                    .build()
-            ),
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
+    Box(modifier = modifier.clickable(onClick = onClick)) {
+        AsyncImage(
+            imageUrl = data.displayImageUrl,
             colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), SrcAtop)
         )
         Column(

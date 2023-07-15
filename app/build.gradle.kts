@@ -37,7 +37,6 @@ dependencies {
     implementation(libs.androidx.core.splashscreen)
     implementation(libs.youtubePlayer)
     implementation(libs.paging.compose)
-    implementation(libs.coil.compose)
     implementation(libs.firebase.dynamicLinks)
     implementation(libs.bundles.koin)
     implementation(libs.bundles.androidx.compose)

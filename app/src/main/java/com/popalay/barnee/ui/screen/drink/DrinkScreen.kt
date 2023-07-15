@@ -30,13 +30,11 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -86,9 +84,7 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -99,8 +95,6 @@ import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.google.accompanist.flowlayout.FlowRow
 import com.google.accompanist.insets.LocalWindowInsets
 import com.google.accompanist.insets.navigationBarsHeight
@@ -112,6 +106,7 @@ import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
+import com.popalay.barnee.di.AsyncImage
 import com.popalay.barnee.di.injectStateMachine
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Result
@@ -141,9 +136,7 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
-import com.popalay.barnee.ui.util.applyForImageUrl
 import com.popalay.barnee.ui.util.findActivity
-import com.popalay.barnee.ui.util.toIntSize
 import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
@@ -334,19 +327,11 @@ private fun DrinkAppBar(
                         .padding(bottom = 16.dp)
                 )
             } else {
-                BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
-                    Image(
-                        painter = rememberAsyncImagePainter(
-                            ImageRequest.Builder(LocalContext.current)
-                                .applyForImageUrl(state.displayImage, constraints.toIntSize())
-                                .build()
-                        ),
-                        contentDescription = null,
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
-                    )
-                }
+                AsyncImage(
+                    imageUrl = state.displayImage,
+                    modifier = Modifier.fillMaxSize(),
+                    colorFilter = ColorFilter.tint(Color.Black.copy(alpha = ContentAlpha.disabled), BlendMode.SrcAtop)
+                )
             }
         }
 

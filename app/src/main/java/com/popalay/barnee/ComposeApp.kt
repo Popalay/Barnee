@@ -59,6 +59,8 @@ import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
 import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.util.LifecycleAwareLaunchedEffect
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.LocalImageLoader
 import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
@@ -67,31 +69,34 @@ import org.koin.compose.koinInject
 @Composable
 internal fun ComposeApp() {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            val snackbarHostState = remember { SnackbarHostState() }
-            BottomSheetNavigator(
-                sheetElevation = 1.dp,
-                sheetBackgroundColor = MaterialTheme.colors.background,
-                sheetContentColor = MaterialTheme.colors.onBackground,
-                scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
-            ) { bottomSheetNavigator ->
-                CompositionLocalProvider(LocalNavigatorSaver provides parcelableNavigatorSaver()) {
-                    Navigator(DiscoveryScreen()) { navigator ->
-                        MessagesHost(snackbarHostState)
-                        HandleIntent()
-                        NavigationHost(navigator, bottomSheetNavigator)
-                        SlideTransition(navigator)
-                        ShakeToDrinkScreen().Content()
+        val imageLoader = koinInject<ImageLoader>()
+        CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                val snackbarHostState = remember { SnackbarHostState() }
+                BottomSheetNavigator(
+                    sheetElevation = 1.dp,
+                    sheetBackgroundColor = MaterialTheme.colors.background,
+                    sheetContentColor = MaterialTheme.colors.onBackground,
+                    scrimColor = MaterialTheme.colors.background.copy(alpha = 0.7F),
+                ) { bottomSheetNavigator ->
+                    CompositionLocalProvider(LocalNavigatorSaver provides parcelableNavigatorSaver()) {
+                        Navigator(DiscoveryScreen()) { navigator ->
+                            MessagesHost(snackbarHostState)
+                            HandleIntent()
+                            NavigationHost(navigator, bottomSheetNavigator)
+                            SlideTransition(navigator)
+                            ShakeToDrinkScreen().Content()
+                        }
                     }
                 }
+                SnackbarHost(
+                    hostState = snackbarHostState,
+                    snackbar = { PrimarySnackbar(it) },
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .navigationBarsPadding()
+                )
             }
-            SnackbarHost(
-                hostState = snackbarHostState,
-                snackbar = { PrimarySnackbar(it) },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-            )
         }
     }
 }

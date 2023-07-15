@@ -22,20 +22,32 @@
 
 package com.popalay.barnee.di
 
-import coil.Coil
-import coil.ImageLoader
-import coil.util.DebugLogger
-import com.popalay.barnee.ui.util.ImageUrlCoilMapper
-import com.popalay.barnee.util.isDebug
+import android.content.Context
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
+import okio.Path.Companion.toOkioPath
 import org.koin.dsl.module
 
 val uiModule = module {
     single<ImageLoader> {
-        ImageLoader.Builder(get())
-            .logger(if (isDebug) DebugLogger() else null).components {
-                add(ImageUrlCoilMapper())
+        ImageLoader {
+            components {
+                setupDefaultComponents(
+                    context = get(),
+                    httpClient = { get() },
+                )
             }
-            .build()
-            .also(Coil::setImageLoader)
+            interceptor {
+                memoryCacheConfig {
+                    // Set the max size to 25% of the app's available memory.
+                    maxSizePercent(get<Context>(), percent = 0.25)
+                }
+                diskCacheConfig {
+                    directory(get<Context>().cacheDir.resolve("image_cache").toOkioPath())
+                    maxSizeBytes(512L * 1024 * 1024) // 512MB
+                }
+            }
+        }
     }
 }
