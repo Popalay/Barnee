@@ -22,6 +22,7 @@
 
 package com.popalay.barnee.data.remote
 
+import co.touchlab.kermit.Logger
 import com.aallam.openai.api.BetaOpenAI
 import com.aallam.openai.api.chat.ChatMessage
 import com.aallam.openai.api.chat.ChatRole
@@ -36,7 +37,6 @@ import com.benasher44.uuid.uuid4
 import com.popalay.barnee.data.model.AiGenerationResponse
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Image
-import com.popalay.barnee.util.Logger
 import com.popalay.barnee.util.toImageUrl
 import kotlinx.serialization.json.Json
 
@@ -44,7 +44,6 @@ class AiApi(
     private val openAi: OpenAI,
     private val cloudinaryApi: CloudinaryApi,
     private val json: Json,
-    private val logger: Logger
 ) {
 
     @OptIn(BetaOpenAI::class)
@@ -54,14 +53,14 @@ class AiApi(
             json.decodeFromString(it)
         }
 
-        logger.debug("AiAPI", result.toString())
+        Logger.d(tag = "AiAPI") { result.toString() }
 
         val drink = result?.drink ?: error("Drink is null")
 
         val imageUrl = openAi.imageURL(creteImageCreationRequest(result.imagePrompt)).firstOrNull()?.url ?: error("Image is null")
         val cloudinaryImageUrl = cloudinaryApi.uploadImage(imageUrl).toImageUrl()
 
-        logger.debug("AiAPI", "Image url: $cloudinaryImageUrl")
+        Logger.d(tag = "AiAPI") { "Image url: $cloudinaryImageUrl" }
 
         return drink.copy(
             id = "generated_${uuid4()}",

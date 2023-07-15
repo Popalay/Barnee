@@ -22,10 +22,10 @@
 
 package com.popalay.barnee.domain.deeplink
 
+import co.touchlab.kermit.Logger
 import com.eygraber.uri.Url
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
-import com.popalay.barnee.util.Logger
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -33,16 +33,18 @@ import kotlinx.coroutines.launch
 class DeeplinkManager(
     private val router: Router,
     private val deeplinkHandlers: Set<DeeplinkHandler>,
-    private val logger: Logger,
 ) {
 
     @OptIn(DelicateCoroutinesApi::class)
     fun handle(deeplink: Url) {
-        logger.debug("DeeplinkHandler", "Deeplink received: $deeplink")
+        Logger.i(tag = "DeeplinkManager") { "Deeplink received: $deeplink" }
         deeplinkHandlers.firstOrNull { it.supports(deeplink) }?.createDestination(deeplink)?.let { destinations ->
+            Logger.i(tag = "DeeplinkManager") { "Deeplink handled: $deeplink" }
             GlobalScope.launch {
                 router.updateStack(StackChange.ReplaceAll(destinations))
             }
+        } ?: run {
+            Logger.i(tag = "DeeplinkManager") { "Deeplink not handled: $deeplink" }
         }
     }
 }

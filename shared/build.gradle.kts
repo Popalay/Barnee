@@ -66,7 +66,7 @@ kotlin {
                 implementation(libs.ktor.logging)
                 implementation(libs.ktor.contentNegotiation)
                 implementation(libs.ktor.json)
-                implementation(libs.logback.classic)
+                implementation(libs.logger)
                 implementation(libs.koin.core)
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
