@@ -23,7 +23,6 @@
 package com.popalay.barnee.ui.screen.discovery
 
 import android.content.res.Configuration
-import android.os.Parcelable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
