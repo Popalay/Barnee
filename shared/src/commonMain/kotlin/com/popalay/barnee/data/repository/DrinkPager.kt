@@ -22,17 +22,19 @@
 
 package com.popalay.barnee.data.repository
 
-import com.kuuurt.paging.multiplatform.Pager
-import com.kuuurt.paging.multiplatform.PagingConfig
-import com.kuuurt.paging.multiplatform.PagingData
-import com.kuuurt.paging.multiplatform.PagingResult
-import com.kuuurt.paging.multiplatform.helpers.cachedIn
+import app.cash.paging.Pager
+import app.cash.paging.PagingConfig
+import app.cash.paging.PagingData
+import app.cash.paging.PagingSource
+import app.cash.paging.PagingSourceLoadParams
+import app.cash.paging.PagingSourceLoadResult
+import app.cash.paging.PagingSourceLoadResultError
+import app.cash.paging.PagingSourceLoadResultPage
+import app.cash.paging.PagingState
 import com.popalay.barnee.data.model.Drink
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.plus
 
 private const val DefaultPageSize = 60
 
@@ -47,27 +49,47 @@ internal data class PageRequest(
 )
 
 internal class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
-    val pages
-        get(): Flow<PagingData<Drink>> {
-            val scope = MainScope() + Job()
-            return createPager(scope)
-                .pagingData
-                .cachedIn(scope)
-        }
+    val pages get(): Flow<PagingData<Drink>> = createPager().flow
 
-    private fun createPager(coroutineScope: CoroutineScope) = Pager(
+    private fun createPager() = Pager(
         config = DefaultPagingConfig,
-        clientScope = coroutineScope,
         initialKey = 0,
-        getItems = { skip, take ->
-            val pageRequest = PageRequest(skip, take)
-            val items = request(pageRequest)
-            PagingResult(
-                items = items,
-                currentKey = skip,
-                prevKey = { (skip - take).coerceAtLeast(0) },
-                nextKey = { if (items.size == take) skip + take else null }
-            )
-        }
+        pagingSourceFactory = { DrinkPagingSource(request) }
     )
+}
+
+private class DrinkPagingSource(
+    private val request: suspend (PageRequest) -> List<Drink>
+) : PagingSource<Int, Drink>() {
+
+    override suspend fun load(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Drink> {
+        val position = params.key ?: 0
+        val pageSize = params.loadSize
+        return try {
+            val pageRequest = PageRequest(position, pageSize)
+            val items = request(pageRequest)
+
+            val nextKey = if (items.isEmpty()) {
+                null
+            } else {
+                position + pageSize
+            }
+            PagingSourceLoadResultPage(
+                data = items,
+                prevKey = if (position == 0) null else position - pageSize,
+                nextKey = nextKey
+            )
+        } catch (exception: IOException) {
+            PagingSourceLoadResultError<Int, Drink>(exception)
+        } catch (exception: ClientRequestException) {
+            PagingSourceLoadResultError<Int, Drink>(exception)
+        } as PagingSourceLoadResult<Int, Drink>
+    }
+
+    override fun getRefreshKey(state: PagingState<Int, Drink>): Int? {
+        return state.anchorPosition?.let { anchorPosition ->
+            state.closestPageToPosition(anchorPosition)?.prevKey?.plus(1)
+                ?: state.closestPageToPosition(anchorPosition)?.nextKey?.minus(1)
+        }
+    }
 }

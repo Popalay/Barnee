@@ -22,7 +22,7 @@
 
 package com.popalay.barnee.domain.search
 
-import com.kuuurt.paging.multiplatform.PagingData
+import app.cash.paging.PagingData
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.AggregationGroup
 import com.popalay.barnee.data.model.Drink

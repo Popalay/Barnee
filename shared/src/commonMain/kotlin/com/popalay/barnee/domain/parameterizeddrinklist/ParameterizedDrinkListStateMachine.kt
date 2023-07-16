@@ -22,7 +22,7 @@
 
 package com.popalay.barnee.domain.parameterizeddrinklist
 
-import com.kuuurt.paging.multiplatform.PagingData
+import app.cash.paging.PagingData
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.repository.DrinkRepository
 import com.popalay.barnee.data.repository.DrinksRequest
