@@ -26,16 +26,18 @@ androidx-test = "1.1.5"
 logger = "2.0.0-RC4"
 coroutines = "1.7.2"
 koin = "3.4.2"
-koin-compose = "3.4.5"
+koin-compose = "1.0.3"
 multiplatformsettings = "1.0.0"
 firebase-dynamicLinks = "21.1.0"
 multiplatformpaging = "3.2.0-alpha05-0.2.2"
 parcelize = "0.1.2"
+composeResources = "0.23.0"
 uri = "0.0.12"
 uuid = "0.7.1"
 youtubePlayer = "12.0.0"
 openai = "3.3.0"
 voyager = "1.0.0-rc06"
+jetbrainsCompose = "1.4.1"
 
 [libraries]
 #Core
@@ -50,7 +52,6 @@ androidx-compose-ui = { module = "androidx.compose.ui:ui" }
 androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
-androidx-compose-animation = { module = "androidx.compose.animation:animation" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
@@ -85,7 +86,7 @@ junit = { module = "junit:junit", version.ref = "junit" }
 #Koin
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-android = { module = "io.insert-koin:koin-android", version.ref = "koin" }
-koin-compose = { module = "io.insert-koin:koin-androidx-compose", version.ref = "koin-compose" }
+koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
 
 #Multiplatform settings
 multiplatformsettings-noarg = { module = "com.russhwolf:multiplatform-settings-no-arg", version.ref = "multiplatformsettings" }
@@ -100,7 +101,7 @@ voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voy
 
 #Others
 firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.ref = "firebase-dynamicLinks" }
-paging-compose = { module = "app.cash.paging:paging-runtime-composeui", version.ref = "multiplatformpaging" }
+compose-paging = { module = "app.cash.paging:paging-runtime-composeui", version.ref = "multiplatformpaging" }
 multiplatformpaging = { module = "app.cash.paging:paging-common", version.ref = "multiplatformpaging" }
 logger = { module = "co.touchlab:kermit", version.ref = "logger" }
 uri = { module = "com.eygraber:uri-kmp", version.ref = "uri" }
@@ -109,9 +110,10 @@ youtubePlayer = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:core
 openai-client = { module = "com.aallam.openai:openai-client", version.ref = "openai" }
 parcelize = { module = "io.matthewnelson.kotlin-components:parcelize", version.ref = "parcelize" }
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
+compose-resources = { module = "dev.icerock.moko:resources-compose", version.ref = "composeResources" }
 
 [bundles]
-androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime", "androidx-compose-animation"]
+androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime"]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
 accompanist = ["accompanist-insets", "accompanist-flowlayout"]
 koin = ["koin-android", "koin-core", "koin-compose"]
