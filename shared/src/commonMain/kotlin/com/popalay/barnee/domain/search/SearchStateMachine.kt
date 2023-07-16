@@ -76,11 +76,7 @@ class SearchStateMachine(
             filterIsInstance<InitialAction>()
                 .take(1)
                 .flatMapToResult { drinkRepository.aggregation() }
-                .map { state().copy(aggregation = it) },
-            filterIsInstance<InitialAction>()
-                .take(1)
-                .map { state().searchRequest(drinkRepository) }
-                .map { state().copy(drinks = it, appliedFilters = state().selectedFilters) },
+                .map { state().copy(aggregation = it, drinks = state().searchRequest(drinkRepository)) },
             filterIsInstance<SearchAction.Retry>()
                 .filter { state().aggregation is Fail }
                 .flatMapToResult { drinkRepository.aggregation() }

@@ -66,7 +66,6 @@ private class DrinkPagingSource(
     private val request: suspend (PageRequest) -> List<Drink>
 ) : PagingSource<Int, Drink>() {
 
-    @Suppress("UNCHECKED_CAST")
     override suspend fun load(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Drink> {
         val position = params.key ?: 0
         val pageSize = params.loadSize
@@ -74,7 +73,7 @@ private class DrinkPagingSource(
             val pageRequest = PageRequest(position, pageSize)
             val items = request(pageRequest)
 
-            val nextKey = if (items.isEmpty()) {
+            val nextKey = if (items.size < pageSize) {
                 null
             } else {
                 position + pageSize
@@ -88,7 +87,7 @@ private class DrinkPagingSource(
             PagingSourceLoadResultError<Int, Drink>(exception)
         } catch (exception: ClientRequestException) {
             PagingSourceLoadResultError<Int, Drink>(exception)
-        } as PagingSourceLoadResult<Int, Drink>
+        }
     }
 
     override fun getRefreshKey(state: PagingState<Int, Drink>): Int? {

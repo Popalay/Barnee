@@ -21,31 +21,12 @@
  */
 
 plugins {
-    kotlin("android")
+    kotlin("multiplatform")
     id("com.android.application")
     id("com.google.gms.google-services")
     id("kotlin-parcelize")
+    id("org.jetbrains.compose") version libs.versions.jetbrainsCompose
 }
-
-dependencies {
-    implementation(project(":shared"))
-    implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.constraintlayout.compose)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.core.splashscreen)
-    implementation(libs.youtubePlayer)
-    implementation(libs.paging.compose)
-    implementation(libs.firebase.dynamicLinks)
-    implementation(libs.bundles.koin)
-    implementation(libs.bundles.androidx.compose)
-    implementation(libs.bundles.accompanist)
-    implementation(libs.bundles.vojager)
-}
-
-val isCI = System.getenv("CI") == "true"
-println("Is CI environment: $isCI")
 
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -99,18 +80,36 @@ android {
         targetCompatibility = JavaVersion.VERSION_19
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_19.toString()
-        kotlinOptions.freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-        kotlinOptions.freeCompilerArgs += "-opt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi"
-    }
-
     packagingOptions {
         resources.excludes.add("META-INF/INDEX.LIST")
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.androidx.compose.compiler.get()
-    }
     namespace = "com.popalay.barnee"
 }
+
+kotlin {
+    android()
+    sourceSets {
+        val androidMain by getting {
+            dependencies {
+                implementation(project(":shared"))
+                implementation(project(":ui"))
+//                implementation(platform(libs.androidx.compose.bom))
+                implementation(libs.androidx.activity.compose)
+                implementation(libs.androidx.constraintlayout.compose)
+                implementation(libs.androidx.lifecycle.runtime.ktx)
+                implementation(libs.androidx.lifecycle.runtime.compose)
+                implementation(libs.androidx.core.splashscreen)
+                implementation(libs.youtubePlayer)
+                implementation(libs.firebase.dynamicLinks)
+                implementation(libs.bundles.koin)
+                implementation(libs.bundles.androidx.compose)
+                implementation(libs.bundles.accompanist)
+                implementation(libs.bundles.vojager)
+            }
+        }
+    }
+}
+
+val isCI = System.getenv("CI") == "true"
+println("Is CI environment: $isCI")

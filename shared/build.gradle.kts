@@ -71,13 +71,13 @@ kotlin {
                 implementation(libs.multiplatformsettings.noarg)
                 implementation(libs.multiplatformsettings.coroutines)
                 implementation(libs.openai.client)
-                implementation(libs.bundles.vojager)
                 implementation(libs.uuid)
                 implementation(libs.bundles.kotlinx)
+                api(libs.koin.core)
+                api(libs.bundles.vojager)
                 api(libs.parcelize)
                 api(libs.uri)
                 api(libs.multiplatformpaging)
-                api(libs.imageLoader)
             }
         }
 
