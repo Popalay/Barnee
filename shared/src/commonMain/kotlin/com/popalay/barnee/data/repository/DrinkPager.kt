@@ -36,32 +36,37 @@ import io.ktor.client.plugins.ClientRequestException
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.flow.Flow
 
-private const val DefaultPageSize = 60
-
-private val DefaultPagingConfig = PagingConfig(
-    pageSize = DefaultPageSize,
-    initialLoadSize = DefaultPageSize * 2
-)
-
 internal data class PageRequest(
     val skip: Int,
     val take: Int
 )
 
 internal class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
-    val pages get(): Flow<PagingData<Drink>> = createPager().flow
+    val pages
+        get(): Flow<PagingData<Drink>> = createPager().flow
 
     private fun createPager() = Pager(
         config = DefaultPagingConfig,
         initialKey = 0,
         pagingSourceFactory = { DrinkPagingSource(request) }
     )
+
+    companion object {
+        private const val DefaultPageSize = 60
+
+        private val DefaultPagingConfig = PagingConfig(
+            pageSize = DefaultPageSize,
+            initialLoadSize = DefaultPageSize * 2,
+            enablePlaceholders = false
+        )
+    }
 }
 
 private class DrinkPagingSource(
     private val request: suspend (PageRequest) -> List<Drink>
 ) : PagingSource<Int, Drink>() {
 
+    @Suppress("UNCHECKED_CAST")
     override suspend fun load(params: PagingSourceLoadParams<Int>): PagingSourceLoadResult<Int, Drink> {
         val position = params.key ?: 0
         val pageSize = params.loadSize
