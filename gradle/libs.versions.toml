@@ -29,8 +29,7 @@ koin = "3.4.2"
 koin-compose = "3.4.5"
 multiplatformsettings = "1.0.0"
 firebase-dynamicLinks = "21.1.0"
-paging-compose = "1.0.0-alpha20"
-multiplatformpaging = "0.6.2"
+multiplatformpaging = "3.2.0-alpha05-0.2.2"
 parcelize = "0.1.2"
 uri = "0.0.12"
 uuid = "0.7.1"
@@ -101,8 +100,8 @@ voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voy
 
 #Others
 firebase-dynamicLinks = { module = "com.google.firebase:firebase-dynamic-links-ktx", version.ref = "firebase-dynamicLinks" }
-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "paging-compose" }
-multiplatformpaging = { module = "io.github.kuuuurt:multiplatform-paging", version.ref = "multiplatformpaging" }
+paging-compose = { module = "app.cash.paging:paging-runtime-composeui", version.ref = "multiplatformpaging" }
+multiplatformpaging = { module = "app.cash.paging:paging-common", version.ref = "multiplatformpaging" }
 logger = { module = "co.touchlab:kermit", version.ref = "logger" }
 uri = { module = "com.eygraber:uri-kmp", version.ref = "uri" }
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }

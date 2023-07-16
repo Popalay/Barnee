@@ -22,9 +22,9 @@
 
 package com.popalay.barnee.data.repository
 
-import com.kuuurt.paging.multiplatform.PagingData
-import com.kuuurt.paging.multiplatform.filter
-import com.kuuurt.paging.multiplatform.map
+import app.cash.paging.PagingData
+import app.cash.paging.filter
+import app.cash.paging.map
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Aggregation
 import com.popalay.barnee.data.model.Category
