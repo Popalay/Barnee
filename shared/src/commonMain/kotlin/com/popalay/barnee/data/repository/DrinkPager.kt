@@ -31,10 +31,14 @@ import app.cash.paging.PagingSourceLoadResult
 import app.cash.paging.PagingSourceLoadResultError
 import app.cash.paging.PagingSourceLoadResultPage
 import app.cash.paging.PagingState
+import app.cash.paging.cachedIn
 import com.popalay.barnee.data.model.Drink
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.utils.io.errors.IOException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.plus
 
 internal data class PageRequest(
     val skip: Int,
@@ -43,7 +47,7 @@ internal data class PageRequest(
 
 internal class DrinkPager(private val request: suspend (PageRequest) -> List<Drink>) {
     val pages
-        get(): Flow<PagingData<Drink>> = createPager().flow
+        get(): Flow<PagingData<Drink>> = createPager().flow.cachedIn(MainScope() + Job())
 
     private fun createPager() = Pager(
         config = DefaultPagingConfig,

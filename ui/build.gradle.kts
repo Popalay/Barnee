@@ -16,7 +16,7 @@ kotlin {
     android()
 
     sourceSets {
-        val commonMain by getting {
+        commonMain {
             dependencies {
                 implementation(project(":shared"))
                 implementation(libs.compose.resources)
@@ -29,7 +29,7 @@ kotlin {
                 api(libs.compose.paging)
             }
         }
-        val commonTest by getting {
+        commonTest {
             dependencies {
                 implementation(kotlin("test"))
             }

@@ -90,23 +90,20 @@ android {
 kotlin {
     android()
     sourceSets {
-        val androidMain by getting {
-            dependencies {
-                implementation(project(":shared"))
-                implementation(project(":ui"))
-//                implementation(platform(libs.androidx.compose.bom))
-                implementation(libs.androidx.activity.compose)
-                implementation(libs.androidx.constraintlayout.compose)
-                implementation(libs.androidx.lifecycle.runtime.ktx)
-                implementation(libs.androidx.lifecycle.runtime.compose)
-                implementation(libs.androidx.core.splashscreen)
-                implementation(libs.youtubePlayer)
-                implementation(libs.firebase.dynamicLinks)
-                implementation(libs.bundles.koin)
-                implementation(libs.bundles.androidx.compose)
-                implementation(libs.bundles.accompanist)
-                implementation(libs.bundles.vojager)
-            }
+        sourceSets["androidMain"].dependencies {
+            implementation(project(":shared"))
+            implementation(project(":ui"))
+            implementation(libs.androidx.activity.compose)
+            implementation(libs.androidx.constraintlayout.compose)
+            implementation(libs.androidx.lifecycle.runtime.ktx)
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.androidx.core.splashscreen)
+            implementation(libs.youtubePlayer)
+            implementation(libs.firebase.dynamicLinks)
+            implementation(libs.bundles.koin)
+            implementation(libs.bundles.androidx.compose)
+            implementation(libs.bundles.accompanist)
+            implementation(libs.bundles.vojager)
         }
     }
 }
