@@ -97,7 +97,6 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.LocalWindowInsets
 import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.DrinkMinimumData
