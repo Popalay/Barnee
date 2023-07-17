@@ -23,12 +23,10 @@
 package com.popalay.barnee.ui.screen.addtocollection
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -62,7 +60,8 @@ fun CreateCollectionBottomSheet(
     canBeSaved: Boolean,
     onSaveClicked: () -> Unit,
     onBackClicked: () -> Unit,
-    onCollectionNameChanged: (String) -> Unit
+    onCollectionNameChanged: (String) -> Unit,
+    bottomPadding: PaddingValues,
 ) {
     val nameFocus = remember { FocusRequester() }
     LaunchedEffect(Unit) {
@@ -117,6 +116,6 @@ fun CreateCollectionBottomSheet(
                 )
             }
         },
-        bottomPadding = WindowInsets.ime.asPaddingValues()
+        bottomPadding = bottomPadding
     )
 }

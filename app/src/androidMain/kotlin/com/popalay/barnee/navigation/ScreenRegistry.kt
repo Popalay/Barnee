@@ -28,13 +28,13 @@ import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.domain.collection.CollectionInput
 import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
-import com.popalay.barnee.ui.generateddrinks.GeneratedDrinksScreen
 import com.popalay.barnee.ui.screen.addtocollection.AddToCollectionScreen
 import com.popalay.barnee.ui.screen.bartender.BartenderScreen
 import com.popalay.barnee.ui.screen.collection.CollectionScreen
 import com.popalay.barnee.ui.screen.collectionlist.CollectionListScreen
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.drink.DrinkScreen
+import com.popalay.barnee.ui.screen.generateddrinks.GeneratedDrinksScreen
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.ui.screen.search.SearchScreen
 import com.popalay.barnee.util.capitalizeFirstChar

@@ -26,10 +26,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
@@ -58,7 +55,8 @@ import com.popalay.barnee.ui.theme.MediumSquircleShape
 fun ChooseCollectionBottomSheet(
     state: CollectionListState,
     onCollectionClicked: (Collection) -> Unit,
-    onCreateNewClicked: () -> Unit
+    onCreateNewClicked: () -> Unit,
+    bottomPadding: PaddingValues,
 ) {
     StateLayout(state.collections) { value ->
         BottomSheetContent(
@@ -84,7 +82,7 @@ fun ChooseCollectionBottomSheet(
                     }
                 }
             },
-            bottomPadding = WindowInsets.ime.asPaddingValues()
+            bottomPadding = bottomPadding
         )
     }
 }

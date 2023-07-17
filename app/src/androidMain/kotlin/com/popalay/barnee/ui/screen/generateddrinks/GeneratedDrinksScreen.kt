@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.generateddrinks
+package com.popalay.barnee.ui.screen.generateddrinks
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
@@ -34,7 +34,7 @@ import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListInput
 import com.popalay.barnee.domain.parameterizeddrinklist.ParameterizedDrinkListStateMachine
-import com.popalay.barnee.ui.screen.bartender.ShakeCocktailButton
+import com.popalay.barnee.ui.bartender.ShakeCocktailButton
 import com.popalay.barnee.ui.screen.parameterizeddrinklist.ParameterizedDrinkListScreen
 import com.popalay.barnee.util.asStateFlow
 import io.matthewnelson.component.parcelize.Parcelize

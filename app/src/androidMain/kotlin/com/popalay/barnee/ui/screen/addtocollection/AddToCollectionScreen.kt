@@ -24,14 +24,16 @@ package com.popalay.barnee.ui.screen.addtocollection
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.popalay.barnee.data.model.DrinkMinimumData
-import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.addtocollection.AddToCollectionAction
 import com.popalay.barnee.domain.addtocollection.AddToCollectionDialogState
@@ -40,6 +42,7 @@ import com.popalay.barnee.domain.addtocollection.AddToCollectionStateMachine
 import com.popalay.barnee.domain.collectionlist.CollectionListState
 import com.popalay.barnee.domain.collectionlist.CollectionListStateMachine
 import com.popalay.barnee.domain.navigation.ScreenWithInputAsKey
+import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.util.asStateFlow
 import io.matthewnelson.component.parcelize.Parcelize
 import org.koin.core.parameter.parametersOf
@@ -71,6 +74,7 @@ private fun AddToCollectionScreen(
                 state = collectionListState,
                 onCollectionClicked = { onAction(AddToCollectionAction.CollectionClicked(it)) },
                 onCreateNewClicked = { onAction(AddToCollectionAction.CreateCollectionClicked) },
+                bottomPadding = WindowInsets.ime.asPaddingValues()
             )
 
             is AddToCollectionDialogState.CreateCollection -> CreateCollectionBottomSheet(
@@ -79,7 +83,8 @@ private fun AddToCollectionScreen(
                 canBeSaved = state.isNewCollectionValid,
                 onSaveClicked = { onAction(AddToCollectionAction.SaveCollectionClicked) },
                 onBackClicked = { onAction(AddToCollectionAction.BackFromCollectionCreationClicked) },
-                onCollectionNameChanged = { onAction(AddToCollectionAction.NewCollectionNameChanged(it)) }
+                onCollectionNameChanged = { onAction(AddToCollectionAction.NewCollectionNameChanged(it)) },
+                bottomPadding = WindowInsets.ime.asPaddingValues()
             )
         }
     }

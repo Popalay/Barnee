@@ -25,6 +25,7 @@ package com.popalay.barnee.ui.screen.collectionlist
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,7 +77,9 @@ private fun CollectionListScreen(state: CollectionListState, onAction: (Action) 
 
         ActionsAppBar(
             title = "Collections",
-            modifier = Modifier.liftOnScroll(listState),
+            modifier = Modifier
+                .liftOnScroll(listState)
+                .statusBarsPadding(),
             leadingButtons = { BackButton(onClick = { onAction(NavigateBackAction) }) }
         )
         CollectionGrid(

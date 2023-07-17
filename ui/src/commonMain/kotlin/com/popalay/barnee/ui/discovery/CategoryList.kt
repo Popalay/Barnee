@@ -20,7 +20,7 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.screen.discovery
+package com.popalay.barnee.ui.discovery
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

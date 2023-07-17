@@ -23,7 +23,6 @@
 package com.popalay.barnee.ui.screen.drink
 
 import android.content.res.Configuration
-import android.view.WindowManager
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.animateIntAsState
@@ -39,16 +38,20 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -70,7 +73,6 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -87,7 +89,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -96,17 +97,12 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.flowlayout.FlowRow
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.navigationBarsHeight
 import com.popalay.barnee.data.model.Category
-import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.model.Ingredient
 import com.popalay.barnee.data.model.Instruction
-import com.popalay.barnee.ui.common.AsyncImage
-import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.domain.Action
 import com.popalay.barnee.domain.Result
 import com.popalay.barnee.domain.Success
@@ -123,6 +119,7 @@ import com.popalay.barnee.domain.navigation.ScreenWithTransition
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.ActionsAppBarHeight
 import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.AsyncImage
 import com.popalay.barnee.ui.common.BackButton
 import com.popalay.barnee.ui.common.CollapsingScaffold
 import com.popalay.barnee.ui.common.ErrorAndRetryStateView
@@ -130,6 +127,7 @@ import com.popalay.barnee.ui.common.LoadingStateView
 import com.popalay.barnee.ui.common.StateLayout
 import com.popalay.barnee.ui.common.YouTubePlayer
 import com.popalay.barnee.ui.common.rememberCollapsingScaffoldState
+import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.ui.icons.ChevronLeft
 import com.popalay.barnee.ui.icons.Cross
 import com.popalay.barnee.ui.icons.LightOff
@@ -139,14 +137,12 @@ import com.popalay.barnee.ui.theme.BarneeTheme
 import com.popalay.barnee.ui.theme.DefaultAspectRatio
 import com.popalay.barnee.ui.theme.LightGrey
 import com.popalay.barnee.ui.theme.SquircleShape
-import com.popalay.barnee.ui.util.findActivity
 import com.popalay.barnee.util.asStateFlow
 import com.popalay.barnee.util.calories
 import com.popalay.barnee.util.collection
 import com.popalay.barnee.util.displayRatingWithMax
 import com.popalay.barnee.util.displayStory
 import com.popalay.barnee.util.displayText
-import com.popalay.barnee.util.isDefault
 import com.popalay.barnee.util.isGenerated
 import com.popalay.barnee.util.keywords
 import com.popalay.barnee.util.toImageUrl
@@ -181,20 +177,12 @@ private fun DrinkScreen(
 ) {
     val screenWidthDp = with(LocalConfiguration.current) { remember(this) { screenWidthDp.dp } }
     val toolbarHeightPx = with(LocalDensity.current) { (screenWidthDp / DefaultAspectRatio).toPx() }
-    val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + LocalWindowInsets.current.statusBars.top }
-    val activity = findActivity()
-    val keepScreenOnFlag = WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON
+    val collapsedToolbarHeightPx = with(LocalDensity.current) { ActionsAppBarHeight.toPx() + WindowInsets.statusBars.getTop(this) }
     val listState = rememberLazyListState()
     val collapsingScaffoldState = rememberCollapsingScaffoldState(
         minHeight = collapsedToolbarHeightPx,
         maxHeight = toolbarHeightPx
     )
-
-    DisposableEffect(Unit) {
-        onDispose {
-            activity?.window?.clearFlags(keepScreenOnFlag)
-        }
-    }
 
     CollapsingScaffold(
         state = collapsingScaffoldState,
@@ -284,7 +272,11 @@ private fun DrinkScreenBody(
                             onShowMoreClick = onMoreRecommendedDrinksClicked,
                         )
                     }
-                    Spacer(modifier = Modifier.navigationBarsHeight(16.dp))
+                    Spacer(
+                        modifier = Modifier
+                            .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                            .padding(bottom = 16.dp)
+                    )
                 }
             }
         }
@@ -481,37 +473,6 @@ private fun DrinkActionBar(
 }
 
 @Composable
-fun CollectionBanner(
-    collection: Collection?,
-    onCollectionClick: (Collection) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    AnimatedVisibility(
-        visible = collection?.isDefault == false,
-        enter = fadeIn(),
-        exit = fadeOut(),
-        modifier = modifier
-    ) {
-        Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colors.secondary.copy(alpha = ContentAlpha.medium),
-            modifier = Modifier
-                .clip(CircleShape)
-                .clickable { onCollectionClick(requireNotNull(collection)) }
-        ) {
-            Text(
-                text = collection?.name.orEmpty(),
-                style = MaterialTheme.typography.caption,
-                fontWeight = FontWeight.Bold,
-                overflow = TextOverflow.Ellipsis,
-                maxLines = 1,
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp)
-            )
-        }
-    }
-}
-
-@Composable
 private fun PlayButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -560,8 +521,8 @@ private fun Story(
     modifier: Modifier = Modifier
 ) {
     var isTextCollapsed by rememberSaveable { mutableStateOf(true) }
-    val textLength by animateIntAsState(if (isTextCollapsed) 100 else story.length)
-    val arrowRotation by animateIntAsState(if (isTextCollapsed) 270 else 90)
+    val textLength by animateIntAsState(if (isTextCollapsed) 100 else story.length, label = "textLength")
+    val arrowRotation by animateIntAsState(if (isTextCollapsed) 270 else 90, label = "arrowRotation")
 
     Column(
         modifier = modifier.clickable(
