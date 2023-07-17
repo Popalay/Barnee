@@ -48,15 +48,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.paging.LoadState
-import androidx.paging.compose.LazyPagingItems
+import app.cash.paging.LoadStateLoading
+import app.cash.paging.compose.LazyPagingItems
 import com.popalay.barnee.data.model.Drink
-import com.popalay.barnee.ui.common.AsyncImage
 import com.popalay.barnee.domain.drinkitem.DrinkItemAction.ToggleFavorite
 import com.popalay.barnee.domain.drinkitem.DrinkItemStateMachine
 import com.popalay.barnee.domain.navigation.AppScreens
 import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.ui.common.AnimatedHeartButton
+import com.popalay.barnee.ui.common.AsyncImage
 import com.popalay.barnee.ui.common.DefaultColumns
 import com.popalay.barnee.ui.common.DefaultHorizontalItemPadding
 import com.popalay.barnee.ui.common.DefaultVerticalItemPadding
@@ -128,7 +128,7 @@ fun DrinkGrid(
                     )
                 }
             }
-            if (value.loadState.append == LoadState.Loading) {
+            if (value.loadState.append == LoadStateLoading) {
                 item { PageLoadingIndicator() }
             }
         }

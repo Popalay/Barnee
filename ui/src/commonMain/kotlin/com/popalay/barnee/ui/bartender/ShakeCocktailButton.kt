@@ -20,35 +20,36 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.util
+package com.popalay.barnee.ui.bartender
 
-import android.app.Activity
-import android.content.ContextWrapper
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.material.ContentAlpha
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import androidx.compose.ui.Modifier
+import com.popalay.barnee.ui.icons.CocktailShaker
 
 @Composable
-fun <T : Any> LifecycleAwareLaunchedEffect(
-    flow: Flow<T>,
-    key1: Any = Unit,
-    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
-    action: suspend (T) -> Unit
+fun ShakeCocktailButton(
+    onShakeClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val flowLifecycleAware = remember(flow, lifecycleOwner) {
-        flow.flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState)
-    }
-    LaunchedEffect(flow, key1) {
-        flowLifecycleAware
-            .onEach { action(it) }
-            .collect()
-    }
+    ExtendedFloatingActionButton(
+        text = { Text(text = "Shake cocktail") },
+        icon = {
+            Icon(
+                imageVector = Icons.CocktailShaker,
+                contentDescription = "Shake cocktail"
+            )
+        },
+        interactionSource = remember { MutableInteractionSource() },
+        backgroundColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.medium),
+        onClick = onShakeClick,
+        modifier = modifier
+    )
 }

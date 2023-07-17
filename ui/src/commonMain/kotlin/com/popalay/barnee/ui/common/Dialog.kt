@@ -20,35 +20,29 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.util
+package com.popalay.barnee.ui.common
 
-import android.app.Activity
-import android.content.ContextWrapper
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.flowWithLifecycle
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import androidx.compose.runtime.Immutable
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 
 @Composable
-fun <T : Any> LifecycleAwareLaunchedEffect(
-    flow: Flow<T>,
-    key1: Any = Unit,
-    minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
-    action: suspend (T) -> Unit
-) {
-    val lifecycleOwner = LocalLifecycleOwner.current
-    val flowLifecycleAware = remember(flow, lifecycleOwner) {
-        flow.flowWithLifecycle(lifecycleOwner.lifecycle, minActiveState)
-    }
-    LaunchedEffect(flow, key1) {
-        flowLifecycleAware
-            .onEach { action(it) }
-            .collect()
-    }
-}
+expect fun Dialog(
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties = DialogProperties(),
+    content: @Composable () -> Unit,
+)
+
+@Immutable
+data class DialogProperties(
+    val dismissOnBackPress: Boolean = true,
+    val dismissOnClickOutside: Boolean = true,
+    val usePlatformDefaultWidth: Boolean = false,
+    val decorFitsSystemWindows: Boolean = true,
+    val size: DpSize = DpSize(400.dp, 300.dp),
+    val title: String = "Untitled",
+    val icon: Painter? = null,
+    val resizable: Boolean = true,
+)

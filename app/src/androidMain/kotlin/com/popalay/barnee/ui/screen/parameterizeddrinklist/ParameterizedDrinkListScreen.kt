@@ -25,6 +25,10 @@ package com.popalay.barnee.ui.screen.parameterizeddrinklist
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -46,8 +50,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.google.accompanist.insets.LocalWindowInsets
-import com.google.accompanist.insets.rememberInsetsPaddingValues
 import com.popalay.barnee.data.repository.DrinksRequest
 import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.domain.Action
@@ -86,13 +88,13 @@ internal fun ParameterizedDrinkListScreen(
     floatingActionButton: (@Composable () -> Unit)? = null
 ) {
     val listState = rememberLazyListState()
-    val localDensity = LocalDensity.current
+    val density = LocalDensity.current
     var fabHeight by remember { mutableStateOf(0.dp) }
 
     val fab: @Composable () -> Unit = {
         Box(
             Modifier.onGloballyPositioned { coordinates ->
-                fabHeight = with(localDensity) { coordinates.size.height.toDp() }
+                fabHeight = with(density) { coordinates.size.height.toDp() }
             }
         ) { floatingActionButton?.invoke() }
     }
@@ -123,12 +125,13 @@ internal fun ParameterizedDrinkListScreen(
                 listState = listState,
                 emptyMessage = state.emptyStateMessage,
                 onRetry = { lazyPagingItems.retry() },
-                contentPadding = rememberInsetsPaddingValues(
-                    insets = LocalWindowInsets.current.navigationBars,
-                    additionalStart = 8.dp,
-                    additionalEnd = 8.dp,
-                    additionalBottom = fabHeight
-                ),
+                contentPadding = WindowInsets.navigationBars.add(
+                    WindowInsets(
+                        left = 8.dp,
+                        right = 8.dp,
+                        bottom = fabHeight
+                    )
+                ).asPaddingValues()
             )
         }
     }

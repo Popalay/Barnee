@@ -20,36 +20,24 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.ui.screen.bartender
+package com.popalay.barnee.ui.common
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.ExtendedFloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import com.popalay.barnee.ui.icons.CocktailShaker
 
 @Composable
-fun ShakeCocktailButton(
-    onShakeClick: () -> Unit,
-    modifier: Modifier = Modifier
+actual fun Dialog(
+    onDismissRequest: () -> Unit,
+    properties: DialogProperties,
+    content: @Composable () -> Unit,
 ) {
-    ExtendedFloatingActionButton(
-        text = { Text(text = "Shake cocktail") },
-        icon = {
-            Icon(
-                imageVector = Icons.CocktailShaker,
-                contentDescription = "Shake cocktail"
-            )
-        },
-        interactionSource = remember { MutableInteractionSource() },
-        backgroundColor = MaterialTheme.colors.primary.copy(alpha = ContentAlpha.medium),
-        onClick = onShakeClick,
-        modifier = modifier
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = onDismissRequest,
+        properties = androidx.compose.ui.window.DialogProperties(
+            dismissOnBackPress = properties.dismissOnBackPress,
+            dismissOnClickOutside = properties.dismissOnClickOutside,
+            usePlatformDefaultWidth = properties.usePlatformDefaultWidth,
+            decorFitsSystemWindows = properties.decorFitsSystemWindows,
+        ),
+        content = content,
     )
 }

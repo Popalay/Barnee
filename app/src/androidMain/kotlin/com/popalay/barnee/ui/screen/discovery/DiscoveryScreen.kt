@@ -51,6 +51,7 @@ import com.popalay.barnee.domain.navigation.NavigateToAction
 import com.popalay.barnee.domain.navigation.ParcelableScreen
 import com.popalay.barnee.ui.common.ActionsAppBar
 import com.popalay.barnee.ui.common.liftOnScroll
+import com.popalay.barnee.ui.discovery.CategoryGrid
 import com.popalay.barnee.ui.extensions.injectStateMachine
 import com.popalay.barnee.ui.icons.Bartender
 import com.popalay.barnee.ui.icons.HeartFilled

@@ -4,6 +4,7 @@ import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
+    id("kotlin-parcelize")
     id("org.jetbrains.compose") version libs.versions.jetbrainsCompose
     id("dev.icerock.mobile.multiplatform-resources") version libs.versions.composeResources
 }
@@ -25,6 +26,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api(compose.animation)
+                api(compose.ui)
                 api(libs.imageLoader)
                 api(libs.compose.paging)
             }
