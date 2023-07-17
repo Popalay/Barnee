@@ -23,15 +23,13 @@
 package com.popalay.barnee.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
 import com.popalay.barnee.domain.navigation.TypedScreenProvider
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import com.popalay.barnee.ui.platform.LifecycleAwareLaunchedEffect
 import org.koin.compose.koinInject
 
 @Composable
@@ -41,69 +39,69 @@ fun NavigationHost(
 ) {
     val changeStackFlow = koinInject<Router>().stackChangeFlow
 
-    LaunchedEffect(changeStackFlow) {
-        changeStackFlow
-            .onEach { stackChange ->
-                when (stackChange) {
-                    is StackChange.Push       -> {
-                        if (stackChange.destinations.size == 1) {
-                            val destination = stackChange.destinations.first()
-                            when (destination.type) {
-                                TypedScreenProvider.Type.FullScreen  -> {
-                                    if (bottomSheetNavigator.isVisible) {
-                                        bottomSheetNavigator.hide()
-                                    }
-                                    navigator.push(ScreenRegistry.get(destination))
-                                }
+    LifecycleAwareLaunchedEffect(changeStackFlow) { stackChange ->
+        when (stackChange) {
+            is StackChange.Push       -> push(navigator, bottomSheetNavigator, stackChange.destinations)
+            is StackChange.Replace    -> replace(navigator, bottomSheetNavigator, stackChange.destination)
+            is StackChange.ReplaceAll -> replaceAll(navigator, bottomSheetNavigator, stackChange.destinations)
+            is StackChange.Pop        -> pop(navigator, bottomSheetNavigator)
+        }
+    }
+}
 
-                                TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
-                            }
-                        } else {
-                            navigator.push(stackChange.destinations.map(ScreenRegistry::get))
-                        }
-                    }
+private fun push(
+    navigator: Navigator,
+    bottomSheetNavigator: BottomSheetNavigator,
+    destinations: List<TypedScreenProvider>
+) {
+    if (bottomSheetNavigator.isVisible) {
+        bottomSheetNavigator.hide()
+    }
+    val (fullScreens, bottomSheets) = destinations.partition { it.type == TypedScreenProvider.Type.FullScreen }
 
-                    is StackChange.Replace    -> {
-                        val destination = stackChange.destination
-                        when (destination.type) {
-                            TypedScreenProvider.Type.FullScreen  -> {
-                                if (bottomSheetNavigator.isVisible) {
-                                    bottomSheetNavigator.hide()
-                                    navigator.push(ScreenRegistry.get(destination))
-                                } else {
-                                    navigator.replace(ScreenRegistry.get(destination))
-                                }
-                            }
+    navigator.push(fullScreens.map(ScreenRegistry::get))
+    bottomSheets.firstOrNull()?.let { bottomSheetNavigator.show(ScreenRegistry.get(it)) }}
 
-                            TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
-                        }
-                    }
-
-                    is StackChange.ReplaceAll -> {
-                        if (stackChange.destinations.size == 1) {
-                            val destination = stackChange.destinations.first()
-                            when (destination.type) {
-                                TypedScreenProvider.Type.FullScreen  -> {
-                                    bottomSheetNavigator.hide()
-                                    navigator.replaceAll(ScreenRegistry.get(destination))
-                                }
-
-                                TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
-                            }
-                        } else {
-                            navigator.replaceAll(stackChange.destinations.map(ScreenRegistry::get))
-                        }
-                    }
-
-                    is StackChange.Pop        -> {
-                        if (bottomSheetNavigator.isVisible) {
-                            bottomSheetNavigator.hide()
-                        } else {
-                            navigator.pop()
-                        }
-                    }
-                }
+private fun replace(
+    navigator: Navigator,
+    bottomSheetNavigator: BottomSheetNavigator,
+    destination: TypedScreenProvider
+) {
+    when (destination.type) {
+        TypedScreenProvider.Type.FullScreen  -> {
+            if (bottomSheetNavigator.isVisible) {
+                bottomSheetNavigator.hide()
+                navigator.push(ScreenRegistry.get(destination))
+            } else {
+                navigator.replace(ScreenRegistry.get(destination))
             }
-            .collect()
+        }
+
+        TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
+    }
+}
+
+private fun replaceAll(
+    navigator: Navigator,
+    bottomSheetNavigator: BottomSheetNavigator,
+    destinations: List<TypedScreenProvider>
+) {
+    if (bottomSheetNavigator.isVisible) {
+        bottomSheetNavigator.hide()
+    }
+    val (fullScreens, bottomSheets) = destinations.partition { it.type == TypedScreenProvider.Type.FullScreen }
+
+    navigator.replaceAll(fullScreens.map(ScreenRegistry::get))
+    bottomSheets.firstOrNull()?.let { bottomSheetNavigator.show(ScreenRegistry.get(it)) }
+}
+
+private fun pop(
+    navigator: Navigator,
+    bottomSheetNavigator: BottomSheetNavigator,
+) {
+    if (bottomSheetNavigator.isVisible) {
+        bottomSheetNavigator.hide()
+    } else {
+        navigator.pop()
     }
 }

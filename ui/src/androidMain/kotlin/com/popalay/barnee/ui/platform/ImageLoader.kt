@@ -20,22 +20,33 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.platform
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.ComposeApp
-import com.popalay.barnee.ui.navigation.registerScreens
+import android.content.Context
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
+import okio.Path.Companion.toOkioPath
+import org.koin.core.Koin
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        registerScreens()
-        setContent { ComposeApp() }
+actual fun generateImageLoader(koin: Koin): ImageLoader {
+    val context = koin.get<Context>()
+    return ImageLoader {
+        components {
+            setupDefaultComponents(
+                context = context,
+                httpClient = { koin.get() },
+            )
+        }
+        interceptor {
+            memoryCacheConfig {
+                // Set the max size to 25% of the app's available memory.
+                maxSizePercent(context, percent = 0.25)
+            }
+            diskCacheConfig {
+                directory(context.cacheDir.resolve("image_cache").toOkioPath())
+                maxSizeBytes(512L * 1024 * 1024) // 512MB
+            }
+        }
     }
 }

@@ -94,16 +94,8 @@ kotlin {
             implementation(project(":shared"))
             implementation(project(":ui"))
             implementation(libs.androidx.activity.compose)
-            implementation(libs.androidx.constraintlayout.compose)
-            implementation(libs.androidx.lifecycle.runtime.ktx)
-            implementation(libs.androidx.lifecycle.runtime.compose)
             implementation(libs.androidx.core.splashscreen)
-            implementation(libs.youtubePlayer)
-            implementation(libs.firebase.dynamicLinks)
             implementation(libs.bundles.koin)
-            implementation(libs.bundles.androidx.compose)
-            implementation(libs.bundles.accompanist)
-            implementation(libs.bundles.vojager)
         }
     }
 }

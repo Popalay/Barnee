@@ -22,14 +22,20 @@ kotlin {
                 implementation(project(":shared"))
                 implementation(libs.compose.resources)
                 implementation(libs.koin.compose)
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
-                api(compose.animation)
-                api(compose.ui)
+                implementation(libs.insetsx)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+                implementation(compose.animation)
+                implementation(compose.ui)
+                implementation(libs.compose.paging)
                 api(libs.imageLoader)
-                api(libs.compose.paging)
             }
+        }
+        sourceSets["androidMain"].dependencies {
+            implementation(libs.androidx.lifecycle.runtime.compose)
+            implementation(libs.firebase.dynamicLinks)
+            implementation(libs.youtubePlayer)
         }
         commonTest {
             dependencies {

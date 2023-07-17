@@ -91,10 +91,10 @@ class DrinkStateMachine(
                 .onEach { keepScreenOn ->
                     val toast = if (keepScreenOn) {
                         keepScreenOnSetter.on()
-                        Message.Toast("The screen will remain on on this screen", Message.Toast.Duration.Long)
+                        Message.SnackBar("The screen will remain on on this screen")
                     } else {
                         keepScreenOnSetter.off()
-                        Message.Toast("The screen will turn off as usual", Message.Toast.Duration.Long)
+                        Message.SnackBar("The screen will turn off as usual")
                     }
                     messagesProvider.dispatch(toast)
                 }
