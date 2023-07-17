@@ -41,7 +41,8 @@ internal fun parcelableNavigatorSaver(): NavigatorSaver<Any> = NavigatorSaver { 
                     .map { it::class.simpleName }
                     .joinToString()
 
-                throw RuntimeException("Unable to save instance state for Screens: $screensNotParcelable. Implement android.os.Parcelable on your Screen.")
+                throw IllegalStateException("Unable to save instance state for Screens: $screensNotParcelable. " +
+                        "Implement io.matthewnelson.component.parcelize.Parcelable on your Screen.")
             }
 
             screenAsParcelables
