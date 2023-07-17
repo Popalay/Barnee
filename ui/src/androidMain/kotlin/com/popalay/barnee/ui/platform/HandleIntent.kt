@@ -37,7 +37,7 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.compose.koinInject
 
 @Composable
-actual fun HandleIntent() {
+actual fun HandleDeeplink() {
     val context = LocalContext.current
     val deeplinkManager = koinInject<DeeplinkManager>()
     LaunchedEffect(Unit) {

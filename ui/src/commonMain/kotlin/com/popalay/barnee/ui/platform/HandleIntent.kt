@@ -25,4 +25,4 @@ package com.popalay.barnee.ui.platform
 import androidx.compose.runtime.Composable
 
 @Composable
-internal expect fun HandleIntent()
+internal expect fun HandleDeeplink()

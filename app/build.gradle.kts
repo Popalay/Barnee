@@ -96,7 +96,6 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.androidx.core.splashscreen)
             implementation(libs.bundles.koin)
-            implementation(libs.bundles.androidx.compose)
         }
     }
 }

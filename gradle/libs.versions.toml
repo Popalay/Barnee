@@ -10,7 +10,6 @@ google-services-gradlePlugin = "4.3.15"
 dependencyUpdatesPlugin = "0.47.0"
 buildkonfig-gradle-plugin = "0.13.3"
 
-androidx-compose-bom = "2023.06.01"
 androidx-activity = "1.7.2"
 androidx-lifecycle = "2.6.1"
 androidx-datastore = "1.0.0"
@@ -45,13 +44,7 @@ google-services = { module = "com.google.gms:google-services", version.ref = "go
 buildkonfig-gradle-plugin = { module = "com.codingfeline.buildkonfig:buildkonfig-gradle-plugin", version.ref = "buildkonfig-gradle-plugin" }
 
 #AndroidX
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "androidx-compose-bom" }
-androidx-compose-ui = { module = "androidx.compose.ui:ui" }
-androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
-androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
-androidx-compose-material = { module = "androidx.compose.material:material" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-datastore-runtime = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "androidx-datastore" }
@@ -107,7 +100,6 @@ compose-resources = { module = "dev.icerock.moko:resources-compose", version.ref
 insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" }
 
 [bundles]
-androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime"]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
 koin = ["koin-android", "koin-core", "koin-compose"]
 vojager = ["voyager-navigator", "voyager-bottomSheetNavigator", "voyager-transitions", "voyager-koin"]

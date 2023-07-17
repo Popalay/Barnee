@@ -51,7 +51,7 @@ import com.popalay.barnee.domain.navigation.StackChange
 import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.extensions.parcelableNavigatorSaver
 import com.popalay.barnee.ui.navigation.NavigationHost
-import com.popalay.barnee.ui.platform.HandleIntent
+import com.popalay.barnee.ui.platform.HandleDeeplink
 import com.popalay.barnee.ui.platform.LifecycleAwareLaunchedEffect
 import com.popalay.barnee.ui.screen.discovery.DiscoveryScreen
 import com.popalay.barnee.ui.screen.shaketodrink.ShakeToDrinkScreen
@@ -83,7 +83,7 @@ fun ComposeApp() {
                         CompositionLocalProvider(LocalNavigatorSaver provides parcelableNavigatorSaver()) {
                             Navigator(DiscoveryScreen()) { navigator ->
                                 MessagesHost(snackbarHostState)
-                                HandleIntent()
+                                HandleDeeplink()
                                 NavigationHost(navigator, bottomSheetNavigator)
                                 SlideTransition(navigator)
                                 ShakeToDrinkScreen().Content()
