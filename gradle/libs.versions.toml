@@ -3,6 +3,7 @@ android-minSdk = "28"
 android-targetSdk = "33"
 android-compileSdk = "33"
 imageLoader = "1.6.0"
+insetsx = "0.1.0-alpha10"
 kotlin = "1.8.10"
 android-gradlePlugin = "7.4.2"
 google-services-gradlePlugin = "4.3.15"
@@ -10,15 +11,12 @@ dependencyUpdatesPlugin = "0.47.0"
 buildkonfig-gradle-plugin = "0.13.3"
 
 androidx-compose-bom = "2023.06.01"
-androidx-compose-compiler = "1.4.3"
 androidx-activity = "1.7.2"
 androidx-lifecycle = "2.6.1"
 androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-core-splashscreen = "1.0.1"
-androidx-constraintlayout-compose = "1.1.0-alpha10"
 
-accompanist = "0.30.1"
 kotlinxDatetime = "0.4.0"
 ktor = "2.3.2"
 junit = "4.13.2"
@@ -53,7 +51,6 @@ androidx-compose-runtime = { module = "androidx.compose.runtime:runtime" }
 androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling" }
 androidx-compose-material = { module = "androidx.compose.material:material" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
-androidx-constraintlayout-compose = { module = "androidx.constraintlayout:constraintlayout-compose", version.ref = "androidx-constraintlayout-compose" }
 androidx-lifecycle-runtime-ktx = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "androidx-lifecycle" }
 androidx-lifecycle-runtime-compose = { module = "androidx.lifecycle:lifecycle-runtime-compose", version.ref = "androidx-lifecycle" }
 androidx-datastore-runtime = { module = "androidx.datastore:datastore", version.ref = "androidx-datastore" }
@@ -61,10 +58,6 @@ androidx-datastore-core = { module = "androidx.datastore:datastore-core", versio
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "androidx-datastore" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "androidx-core-splashscreen" }
 androidx-test-junit = { module = "androidx.test.ext:junit", version.ref = "androidx-test" }
-
-#Accompanist
-accompanist-insets = { module = "com.google.accompanist:accompanist-insets", version.ref = "accompanist" }
-accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 
 #Kotlinx
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
@@ -111,11 +104,11 @@ openai-client = { module = "com.aallam.openai:openai-client", version.ref = "ope
 parcelize = { module = "io.matthewnelson.kotlin-components:parcelize", version.ref = "parcelize" }
 imageLoader = { module = "io.github.qdsfdhvh:image-loader", version.ref = "imageLoader" }
 compose-resources = { module = "dev.icerock.moko:resources-compose", version.ref = "composeResources" }
+insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" }
 
 [bundles]
 androidx-compose = ["androidx-compose-ui", "androidx-compose-tooling", "androidx-compose-material", "androidx-compose-runtime"]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
-accompanist = ["accompanist-insets", "accompanist-flowlayout"]
 koin = ["koin-android", "koin-core", "koin-compose"]
 vojager = ["voyager-navigator", "voyager-bottomSheetNavigator", "voyager-transitions", "voyager-koin"]
 kotlinx = ["kotlinx-coroutines-core", "kotlinx-datetime"]

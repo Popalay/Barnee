@@ -23,6 +23,7 @@
 package com.popalay.barnee.navigation
 
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.VisibilityThreshold
@@ -39,6 +40,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.ScreenTransitionContent
 import cafe.adriel.voyager.transitions.SlideOrientation
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SlideTransition(
     navigator: Navigator,

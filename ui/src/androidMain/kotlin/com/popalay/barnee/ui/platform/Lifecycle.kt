@@ -20,22 +20,37 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.platform
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.ComposeApp
-import com.popalay.barnee.ui.navigation.registerScreens
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
+import androidx.compose.runtime.remember
+import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.flowWithLifecycle
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.onEach
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        registerScreens()
-        setContent { ComposeApp() }
+@Composable
+actual fun <T> StateFlow<T>.collectAsStateWithLifecycle(): State<T> = collectAsStateWithLifecycle()
+
+@Composable
+actual fun <T : Any> LifecycleAwareLaunchedEffect(
+    flow: Flow<T>,
+    key1: Any,
+    action: suspend (T) -> Unit
+) {
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val flowLifecycleAware = remember(flow, lifecycleOwner) {
+        flow.flowWithLifecycle(lifecycleOwner.lifecycle, Lifecycle.State.STARTED)
+    }
+    LaunchedEffect(flow, key1) {
+        flowLifecycleAware
+            .onEach { action(it) }
+            .collect()
     }
 }

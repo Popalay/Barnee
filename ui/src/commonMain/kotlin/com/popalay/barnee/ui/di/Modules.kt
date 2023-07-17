@@ -20,22 +20,14 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.di
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
-import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.core.view.WindowCompat
-import com.popalay.barnee.ui.ComposeApp
-import com.popalay.barnee.ui.navigation.registerScreens
+import com.popalay.barnee.ui.platform.generateImageLoader
+import com.seiko.imageloader.ImageLoader
+import org.koin.dsl.module
 
-class MainActivity : ComponentActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
-        super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        registerScreens()
-        setContent { ComposeApp() }
+val uiModule = module {
+    single<ImageLoader> {
+        generateImageLoader(koin = getKoin())
     }
 }

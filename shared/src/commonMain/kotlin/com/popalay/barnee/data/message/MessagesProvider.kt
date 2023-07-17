@@ -39,15 +39,6 @@ sealed interface Message {
             val destination: TypedScreenProvider,
         )
     }
-
-    data class Toast(
-        val content: String,
-        val duration: Duration,
-    ) : Message {
-        enum class Duration {
-            Short, Long
-        }
-    }
 }
 
 class MessagesProvider {

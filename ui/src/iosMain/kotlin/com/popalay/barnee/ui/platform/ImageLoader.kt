@@ -20,21 +20,43 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee
+package com.popalay.barnee.ui.platform
 
-import android.app.Application
-import com.popalay.barnee.di.initKoin
-import com.popalay.barnee.ui.di.uiModule
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
+import com.seiko.imageloader.ImageLoader
+import com.seiko.imageloader.cache.memory.maxSizePercent
+import com.seiko.imageloader.component.setupDefaultComponents
+import okio.Path.Companion.toPath
+import org.koin.core.Koin
+import platform.Foundation.NSCachesDirectory
+import platform.Foundation.NSFileManager
+import platform.Foundation.NSUserDomainMask
 
-class App : Application() {
-    override fun onCreate() {
-        super.onCreate()
-        initKoin {
-            androidContext(this@App)
-            androidLogger()
-            modules(uiModule)
+actual fun generateImageLoader(koin: Koin): ImageLoader {
+    return ImageLoader {
+        components {
+            setupDefaultComponents(
+                httpClient = { koin.get() },
+            )
+        }
+        interceptor {
+            memoryCacheConfig {
+                maxSizePercent(0.25)
+            }
+            diskCacheConfig {
+                // about getCacheDir() see demo
+                directory(getCacheDir().toPath().resolve("image_cache"))
+                maxSizeBytes(512L * 1024 * 1024) // 512MB
+            }
         }
     }
+}
+
+private fun getCacheDir(): String {
+    return NSFileManager.defaultManager.URLForDirectory(
+        NSCachesDirectory,
+        NSUserDomainMask,
+        null,
+        true,
+        null,
+    )!!.path.orEmpty()
 }

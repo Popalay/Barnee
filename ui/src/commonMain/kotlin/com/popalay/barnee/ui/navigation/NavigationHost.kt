@@ -23,15 +23,13 @@
 package com.popalay.barnee.ui.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
 import com.popalay.barnee.domain.navigation.TypedScreenProvider
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
+import com.popalay.barnee.ui.platform.LifecycleAwareLaunchedEffect
 import org.koin.compose.koinInject
 
 @Composable
@@ -41,69 +39,65 @@ fun NavigationHost(
 ) {
     val changeStackFlow = koinInject<Router>().stackChangeFlow
 
-    LaunchedEffect(changeStackFlow) {
-        changeStackFlow
-            .onEach { stackChange ->
-                when (stackChange) {
-                    is StackChange.Push       -> {
-                        if (stackChange.destinations.size == 1) {
-                            val destination = stackChange.destinations.first()
-                            when (destination.type) {
-                                TypedScreenProvider.Type.FullScreen  -> {
-                                    if (bottomSheetNavigator.isVisible) {
-                                        bottomSheetNavigator.hide()
-                                    }
-                                    navigator.push(ScreenRegistry.get(destination))
-                                }
-
-                                TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
+    LifecycleAwareLaunchedEffect(changeStackFlow) { stackChange ->
+        when (stackChange) {
+            is StackChange.Push       -> {
+                if (stackChange.destinations.size == 1) {
+                    val destination = stackChange.destinations.first()
+                    when (destination.type) {
+                        TypedScreenProvider.Type.FullScreen  -> {
+                            if (bottomSheetNavigator.isVisible) {
+                                bottomSheetNavigator.hide()
                             }
-                        } else {
-                            navigator.push(stackChange.destinations.map(ScreenRegistry::get))
+                            navigator.push(ScreenRegistry.get(destination))
                         }
+
+                        TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
                     }
-
-                    is StackChange.Replace    -> {
-                        val destination = stackChange.destination
-                        when (destination.type) {
-                            TypedScreenProvider.Type.FullScreen  -> {
-                                if (bottomSheetNavigator.isVisible) {
-                                    bottomSheetNavigator.hide()
-                                    navigator.push(ScreenRegistry.get(destination))
-                                } else {
-                                    navigator.replace(ScreenRegistry.get(destination))
-                                }
-                            }
-
-                            TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
-                        }
-                    }
-
-                    is StackChange.ReplaceAll -> {
-                        if (stackChange.destinations.size == 1) {
-                            val destination = stackChange.destinations.first()
-                            when (destination.type) {
-                                TypedScreenProvider.Type.FullScreen  -> {
-                                    bottomSheetNavigator.hide()
-                                    navigator.replaceAll(ScreenRegistry.get(destination))
-                                }
-
-                                TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
-                            }
-                        } else {
-                            navigator.replaceAll(stackChange.destinations.map(ScreenRegistry::get))
-                        }
-                    }
-
-                    is StackChange.Pop        -> {
-                        if (bottomSheetNavigator.isVisible) {
-                            bottomSheetNavigator.hide()
-                        } else {
-                            navigator.pop()
-                        }
-                    }
+                } else {
+                    navigator.push(stackChange.destinations.map(ScreenRegistry::get))
                 }
             }
-            .collect()
+
+            is StackChange.Replace    -> {
+                val destination = stackChange.destination
+                when (destination.type) {
+                    TypedScreenProvider.Type.FullScreen  -> {
+                        if (bottomSheetNavigator.isVisible) {
+                            bottomSheetNavigator.hide()
+                            navigator.push(ScreenRegistry.get(destination))
+                        } else {
+                            navigator.replace(ScreenRegistry.get(destination))
+                        }
+                    }
+
+                    TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
+                }
+            }
+
+            is StackChange.ReplaceAll -> {
+                if (stackChange.destinations.size == 1) {
+                    val destination = stackChange.destinations.first()
+                    when (destination.type) {
+                        TypedScreenProvider.Type.FullScreen  -> {
+                            bottomSheetNavigator.hide()
+                            navigator.replaceAll(ScreenRegistry.get(destination))
+                        }
+
+                        TypedScreenProvider.Type.BottomSheet -> bottomSheetNavigator.show(ScreenRegistry.get(destination))
+                    }
+                } else {
+                    navigator.replaceAll(stackChange.destinations.map(ScreenRegistry::get))
+                }
+            }
+
+            is StackChange.Pop        -> {
+                if (bottomSheetNavigator.isVisible) {
+                    bottomSheetNavigator.hide()
+                } else {
+                    navigator.pop()
+                }
+            }
+        }
     }
 }

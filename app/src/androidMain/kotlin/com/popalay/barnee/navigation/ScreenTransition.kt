@@ -23,20 +23,22 @@
 package com.popalay.barnee.navigation
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.Navigator
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ScreenTransition(
     navigator: Navigator,
-    enterTransition: AnimatedContentTransitionScope<Screen>.() -> ContentTransform,
-    exitTransition: AnimatedContentTransitionScope<Screen>.() -> ContentTransform,
+    enterTransition: AnimatedContentScope<Screen>.() -> ContentTransform,
+    exitTransition: AnimatedContentScope<Screen>.() -> ContentTransform,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.(Screen) -> Unit = { it.Content() }
 ) {
@@ -53,10 +55,11 @@ fun ScreenTransition(
     )
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun ScreenTransition(
     navigator: Navigator,
-    transition: AnimatedContentTransitionScope<Screen>.() -> ContentTransform,
+    transition: AnimatedContentScope<Screen>.() -> ContentTransform,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.(Screen) -> Unit = { it.Content() }
 ) {
