@@ -23,16 +23,13 @@
 package com.popalay.barnee.ui.screen.collectionlist
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -40,7 +37,10 @@ import androidx.compose.material.Card
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.popalay.barnee.data.model.Collection
@@ -109,76 +109,59 @@ fun CollectionGrid(
 }
 
 @Composable
-fun CollectionItem(
+fun CollectionCover(
+    images: Set<ImageUrl>,
+    modifier: Modifier = Modifier
+) {
+    val blackAndWhiteColorMatrix = remember {
+        ColorMatrix(
+            floatArrayOf(
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0.33f, 0.33f, 0.33f, 0f, 0f,
+                0f, 0f, 0f, 1f, 0f
+            )
+        )
+    }
+    Box(modifier) {
+        val shift = 24.dp / images.size
+        images.forEachIndexed { index, image ->
+            Card(
+                elevation = 4.dp,
+                shape = MediumSquircleShape,
+                modifier = Modifier
+                    .aspectRatio(DefaultAspectRatio)
+                    .padding(top = shift * index)
+            ) {
+                AsyncImage(
+                    imageUrl = image,
+                    colorFilter = if (index < images.size - 1) ColorFilter.colorMatrix(blackAndWhiteColorMatrix) else null,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CollectionItem(
     data: Collection,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(modifier = modifier) {
-        Card(
-            elevation = 4.dp,
-            shape = MediumSquircleShape,
-            modifier = Modifier.aspectRatio(DefaultAspectRatio),
-        ) {
-            CollectionCover(
-                images = data.cover,
-                modifier = Modifier.clickable(onClick = onClick)
-            )
-        }
+    Column(
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+    ) {
+        CollectionCover(
+            images = data.cover,
+            modifier = Modifier.clickable(onClick = onClick)
+        )
         Text(
             text = data.name,
             style = MaterialTheme.typography.h4,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 8.dp)
+            modifier = Modifier.fillMaxWidth()
         )
-    }
-}
-
-@Composable
-fun CollectionCover(
-    images: Set<ImageUrl>,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        CoverRow(
-            images = images.take(2),
-            modifier = Modifier.weight(1F)
-        )
-        if (images.size > 2) {
-            Spacer(modifier = Modifier.height(2.dp))
-            CoverRow(
-                images = images.drop(2).take(2),
-                modifier = Modifier.weight(1F)
-            )
-        }
-    }
-}
-
-@Composable
-private fun CoverRow(
-    images: List<ImageUrl>,
-    modifier: Modifier = Modifier
-) {
-    Row(modifier = modifier) {
-        images.elementAtOrNull(0)?.let {
-            AsyncImage(
-                imageUrl = it,
-                modifier = Modifier
-                    .weight(1F)
-                    .fillMaxHeight()
-            )
-        }
-        images.elementAtOrNull(1)?.let {
-            Spacer(modifier = Modifier.width(2.dp))
-            AsyncImage(
-                imageUrl = it,
-                modifier = Modifier
-                    .weight(1F)
-                    .fillMaxHeight()
-            )
-        }
     }
 }
