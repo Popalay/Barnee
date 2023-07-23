@@ -50,7 +50,12 @@ class AiApi(
     suspend fun getDrinkByPrompt(prompt: String): Drink {
         val response = openAi.chatCompletion(createChatCompletionRequest(prompt))
         val result: AiGenerationResponse? = response.choices[0].message?.functionCall?.arguments?.let {
-            json.decodeFromString(it)
+            try {
+                json.decodeFromString(it)
+            } catch (e: Exception) {
+                Logger.e(throwable = e, tag = "AiAPI") { "Drink parsed with error" }
+                null
+            }
         }
 
         Logger.d(tag = "AiAPI") { result.toString() }
@@ -80,7 +85,7 @@ private fun creteImageCreationRequest(prompt: String) = imageCreation {
 private fun createChatCompletionRequest(prompt: String) = chatCompletionRequest {
     model = ModelId("gpt-3.5-turbo-0613")
     n = 1
-    temperature = 1.5
+    temperature = 0.9
     messages = listOf(
         ChatMessage(
             role = ChatRole.System,
