@@ -22,17 +22,13 @@
 
 package com.popalay.barnee.data.transformer
 
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-@OptIn(ExperimentalSerializationApi::class)
-@Serializer(forClass = String::class)
 object SanitizeStringTransformer : KSerializer<String> {
 
     private val substituteMap = mapOf(

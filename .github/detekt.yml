@@ -634,7 +634,7 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
-    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
+    excludes: [ '**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**' ]
   ModifierOrder:
     active: true
   MultilineLambdaItParameter:
@@ -734,11 +734,12 @@ style:
     active: true
   UnusedPrivateMember:
     active: true
-    ignoreAnnotated: ['Preview']
+    ignoreAnnotated: [ 'Preview' ]
     allowedNames: ''
   UnusedPrivateProperty:
     active: true
     allowedNames: '_|ignored|expected|serialVersionUID'
+    excludes: [ '**/*.kts' ]
   UseAnyOrNoneInsteadOfFind:
     active: true
   UseArrayLiteralsInAnnotations:

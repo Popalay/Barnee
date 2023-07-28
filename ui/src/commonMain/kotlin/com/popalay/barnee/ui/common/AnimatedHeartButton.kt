@@ -26,6 +26,7 @@ import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
@@ -36,6 +37,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -57,6 +59,15 @@ fun AnimatedHeartButton(
         enabled = enabled,
         modifier = modifier
     ) {
+        Image(
+            imageVector = if (isSelected) Icons.HeartFilled else Icons.HeartOutline,
+            colorFilter = ColorFilter.tint(Color.Black.copy(alpha = 0.5F)),
+            contentDescription = "Like",
+            alpha = LocalContentAlpha.current,
+            modifier = Modifier
+                .size(transitionData.size)
+                .offset(1.dp, 1.dp)
+        )
         Image(
             imageVector = if (isSelected) Icons.HeartFilled else Icons.HeartOutline,
             colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface),
