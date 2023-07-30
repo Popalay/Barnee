@@ -26,9 +26,12 @@ gradle-app.setting
 /captures
 
 
-*.xcworkspacedata
-*.xcuserstate
-*.xcscheme
-xcschememanagement.plist
-*.xcbkptlist
-/ios/iosApp.xcworkspace/xcuserdata/denys.nykyforov.xcuserdatad/xcdebugger/Expressions.xcexplist
+.externalNativeBuild
+.cxx
+iosApp/Podfile.lock
+iosApp/Pods/*
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
+shared/shared.podspec
+ui/ui.podspec

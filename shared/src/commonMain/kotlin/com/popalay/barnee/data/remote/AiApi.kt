@@ -38,6 +38,7 @@ import com.popalay.barnee.data.model.AiGenerationResponse
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.Image
 import com.popalay.barnee.util.toImageUrl
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 
 class AiApi(
@@ -52,7 +53,7 @@ class AiApi(
         val result: AiGenerationResponse? = response.choices[0].message?.functionCall?.arguments?.let {
             try {
                 json.decodeFromString(it)
-            } catch (e: Exception) {
+            } catch (e: SerializationException) {
                 Logger.e(throwable = e, tag = "AiAPI") { "Drink parsed with error" }
                 null
             }

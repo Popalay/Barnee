@@ -80,15 +80,19 @@ android {
         targetCompatibility = JavaVersion.VERSION_19
     }
 
-    packagingOptions {
+    packaging {
         resources.excludes.add("META-INF/INDEX.LIST")
     }
 
     namespace = "com.popalay.barnee"
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.jetbrainsComposeCompiler.get()
+    }
 }
 
 kotlin {
-    android()
+    androidTarget()
     sourceSets {
         sourceSets["androidMain"].dependencies {
             implementation(project(":shared"))

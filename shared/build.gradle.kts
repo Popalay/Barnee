@@ -22,31 +22,34 @@
 
 import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import com.codingfeline.buildkonfig.compiler.FieldSpec
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization") version libs.versions.kotlin
+    kotlin("native.cocoapods")
     id("com.android.library")
     id("kotlin-parcelize")
-    id("org.jetbrains.kotlin.native.cocoapods")
     id("com.codingfeline.buildkonfig") version libs.versions.buildkonfig.gradle.plugin
 }
 
-// CocoaPods requires the podspec to have a version.
-version = "1.0"
-
 kotlin {
-    val iOSTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget =
-        if (System.getenv("SDK_NAME")?.startsWith("iphoneos") == true) ::iosArm64 else ::iosX64
-
-    iOSTarget("ios") {}
-    android()
+    androidTarget()
+    iosX64()
+    iosArm64()
+    iosSimulatorArm64()
 
     cocoapods {
+        version = "1.0"
         // Configure fields required by CocoaPods.
         summary = "Some description for a Kotlin/Native module"
         homepage = "Link to a Kotlin/Native module homepage"
+        ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
@@ -59,7 +62,7 @@ kotlin {
             }
         }
 
-        commonMain {
+        val commonMain by getting {
             dependencies {
                 implementation(libs.ktor.core)
                 implementation(libs.ktor.serialization)
@@ -94,8 +97,17 @@ kotlin {
             implementation(libs.firebase.dynamicLinks)
         }
 
-        sourceSets["iosMain"].dependencies {
-            implementation(libs.ktor.ios)
+        val iosX64Main by getting
+        val iosArm64Main by getting
+        val iosSimulatorArm64Main by getting
+        val iosMain by creating {
+            dependsOn(commonMain)
+            iosX64Main.dependsOn(this)
+            iosArm64Main.dependsOn(this)
+            iosSimulatorArm64Main.dependsOn(this)
+            dependencies {
+                implementation(libs.ktor.ios)
+            }
         }
     }
 }
@@ -134,14 +146,6 @@ buildkonfig {
             )
         }
     }
-}
-
-// https://youtrack.jetbrains.com/issue/KT-55751
-configurations {
-    val myAttribute = Attribute.of("dummy.attribute", String::class.java)
-
-    named("podDebugFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
-    named("podReleaseFrameworkIosFat") { attributes.attribute(myAttribute, "dummy-value") }
 }
 
 fun getSecret(name: String): Pair<String, String> {

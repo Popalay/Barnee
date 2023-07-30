@@ -11,3 +11,4 @@
 -keepclassmembers class <1>.<2> {
   <1>.<2>$Companion Companion;
 }
+-dontwarn org.slf4j.impl.StaticLoggerBinder
