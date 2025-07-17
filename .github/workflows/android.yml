@@ -106,7 +106,7 @@ jobs:
 
       - name: Upload build outputs
         if: always()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: build-outputs
           path: app/build/outputs
