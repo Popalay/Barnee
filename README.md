@@ -34,7 +34,7 @@ And let this app help you in searching for amazing drinks and cooking steps!
 ```
 MIT License
 
-Copyright (c) 2023 Denys Nykyforov
+Copyright (c) 2025 Denys Nykyforov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

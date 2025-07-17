@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Denys Nykyforov
+ * Copyright (c) 2025 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
-        versionName = "1.3.1"
+        versionName = "1.4.0"
 
         signingConfigs {
             getByName("debug") {
@@ -57,7 +57,7 @@ android {
             }
 
             getByName("release") {
-                signingConfig = if (isCI) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+                signingConfig = signingConfigs.getByName(if (isCI) "release" else "debug")
                 isMinifyEnabled = true
                 proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             }
