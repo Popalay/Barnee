@@ -29,6 +29,9 @@ plugins {
     id("org.jetbrains.compose") version libs.versions.jetbrainsCompose
 }
 
+val isCI = System.getenv("CI") == "true"
+println("Is CI environment: $isCI")
+
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     defaultConfig {
@@ -102,6 +105,3 @@ kotlin {
         }
     }
 }
-
-val isCI = System.getenv("CI") == "true"
-println("Is CI environment: $isCI")
