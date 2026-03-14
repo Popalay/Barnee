@@ -20,14 +20,20 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.transformer
+package com.popalay.barnee.util
 
-import com.popalay.barnee.data.model.Drink
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonTransformingSerializer
+import platform.Foundation.NSBundle
+import platform.Foundation.NSString
+import platform.Foundation.NSUTF8StringEncoding
+import platform.Foundation.stringWithContentsOfFile
 
-object DrinkListFirstElementTransformer : JsonTransformingSerializer<Drink>(Drink.serializer()) {
-    override fun transformDeserialize(element: JsonElement): JsonElement =
-        if (element is JsonArray) element.first() else element
+actual fun readResource(fileName: String): String {
+    val nameWithoutExtension = fileName.substringBeforeLast(".")
+    val extension = fileName.substringAfterLast(".", "")
+    val path = checkNotNull(
+        NSBundle.mainBundle.pathForResource(nameWithoutExtension, extension)
+    ) { "Resource not found: $fileName" }
+    return checkNotNull(
+        NSString.stringWithContentsOfFile(path, NSUTF8StringEncoding, null)
+    ) { "Failed to read resource: $fileName" }
 }

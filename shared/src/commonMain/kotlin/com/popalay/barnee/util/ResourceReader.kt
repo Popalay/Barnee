@@ -20,20 +20,6 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.model
+package com.popalay.barnee.util
 
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class Aggregation(
-    val tasting: AggregationGroup,
-    val skill: AggregationGroup,
-    val servedIn: AggregationGroup,
-    val colored: AggregationGroup,
-    val withType: AggregationGroup
-)
-
-@Serializable
-data class AggregationGroup(
-    internal val values: Map<String, Int>
-)
+expect fun readResource(fileName: String): String

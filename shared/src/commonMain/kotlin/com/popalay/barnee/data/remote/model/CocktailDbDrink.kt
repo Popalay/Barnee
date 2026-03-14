@@ -20,11 +20,22 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.model
+package com.popalay.barnee.data.remote.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DrinksResponse(
-    val result: List<Drink>
+data class CocktailDbDrink(
+    val id: String,
+    val alias: String,
+    val name: String,
+    val imageUrl: String? = null,
+    val ingredients: List<CocktailDbIngredient> = emptyList(),
+    val steps: List<String> = emptyList(),
+    val categories: List<String> = emptyList(),
+    val tags: List<String> = emptyList(),
+    val ibaCategory: String? = null,
 )
+
+@Serializable
+data class CocktailDbIngredient(val text: String)

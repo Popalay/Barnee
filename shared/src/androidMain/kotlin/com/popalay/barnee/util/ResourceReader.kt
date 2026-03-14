@@ -20,20 +20,12 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.model
+package com.popalay.barnee.util
 
-import kotlinx.serialization.Serializable
+import android.content.Context
+import org.koin.core.context.GlobalContext
 
-@Serializable
-data class Aggregation(
-    val tasting: AggregationGroup,
-    val skill: AggregationGroup,
-    val servedIn: AggregationGroup,
-    val colored: AggregationGroup,
-    val withType: AggregationGroup
-)
-
-@Serializable
-data class AggregationGroup(
-    internal val values: Map<String, Int>
-)
+actual fun readResource(fileName: String): String {
+    val context = GlobalContext.get().get<Context>()
+    return context.assets.open(fileName).bufferedReader().use { it.readText() }
+}
