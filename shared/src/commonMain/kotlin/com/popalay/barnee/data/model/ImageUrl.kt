@@ -54,10 +54,7 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
 @Parcelize
 value class ExternalImageUrl(override val url: String) : ImageUrl {
 
-    override fun scaledUrl(size: Pair<Int, Int>): String {
-        val separator = if (url.contains('?')) "&" else "?"
-        return "$url${separator}imwidth=${size.first}"
-    }
+    override fun scaledUrl(size: Pair<Int, Int>): String = url
 
     override fun toString(): String = url
 }

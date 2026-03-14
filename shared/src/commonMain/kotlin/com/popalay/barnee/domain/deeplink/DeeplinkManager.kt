@@ -37,14 +37,14 @@ class DeeplinkManager(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun handle(deeplink: Url) {
-        Logger.i(tag = "DeeplinkManager") { "Deeplink received: $deeplink" }
+        Logger.i("DeeplinkManager") { "Deeplink received: $deeplink" }
         deeplinkHandlers.firstOrNull { it.supports(deeplink) }?.createDestination(deeplink)?.let { destinations ->
-            Logger.i(tag = "DeeplinkManager") { "Deeplink handled: $deeplink" }
+            Logger.i("DeeplinkManager") { "Deeplink handled: $deeplink" }
             GlobalScope.launch {
                 router.updateStack(StackChange.ReplaceAll(destinations))
             }
         } ?: run {
-            Logger.i(tag = "DeeplinkManager") { "Deeplink not handled: $deeplink" }
+            Logger.i("DeeplinkManager") { "Deeplink not handled: $deeplink" }
         }
     }
 }

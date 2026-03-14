@@ -33,6 +33,8 @@ buildscript {
     }
 }
 
-plugins{
+plugins {
     id("com.github.ben-manes.versions") version libs.versions.dependencyUpdatesPlugin
+    id("org.jetbrains.compose") version libs.versions.jetbrainsCompose apply false
+    kotlin("plugin.compose") version libs.versions.kotlin apply false
 }

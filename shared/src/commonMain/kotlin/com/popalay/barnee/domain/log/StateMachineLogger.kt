@@ -29,10 +29,10 @@ import com.popalay.barnee.domain.StateMachine
 
 class StateMachineLogger {
     fun <T : StateMachine<*>> log(tag: T, action: Action) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Action => $action" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "Action => $action" }
     }
 
     fun <T : StateMachine<*>> log(tag: T, state: State) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "State => $state" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "State => $state" }
     }
 }

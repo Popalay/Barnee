@@ -54,19 +54,19 @@ class AiApi(
             try {
                 json.decodeFromString(it)
             } catch (e: SerializationException) {
-                Logger.e(throwable = e, tag = "AiAPI") { "Drink parsed with error" }
+                Logger.e(e, "AiAPI") { "Drink parsed with error" }
                 null
             }
         }
 
-        Logger.d(tag = "AiAPI") { result.toString() }
+        Logger.d("AiAPI") { result.toString() }
 
         val drink = result?.drink ?: error("Drink is null")
 
         val imageUrl = openAi.imageURL(creteImageCreationRequest(result.imagePrompt)).firstOrNull()?.url ?: error("Image is null")
         val cloudinaryImageUrl = cloudinaryApi.uploadImage(imageUrl).toImageUrl()
 
-        Logger.d(tag = "AiAPI") { "Image url: $cloudinaryImageUrl" }
+        Logger.d("AiAPI") { "Image url: $cloudinaryImageUrl" }
 
         return drink.copy(
             id = "generated_${uuid4()}",

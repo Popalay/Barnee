@@ -25,7 +25,6 @@ package com.popalay.barnee.ui.navigation
 import androidx.compose.runtime.Composable
 import cafe.adriel.voyager.core.registry.ScreenRegistry
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
 import com.popalay.barnee.domain.navigation.TypedScreenProvider
@@ -35,7 +34,7 @@ import org.koin.compose.koinInject
 @Composable
 fun NavigationHost(
     navigator: Navigator,
-    bottomSheetNavigator: BottomSheetNavigator,
+    bottomSheetNavigator: AppBottomSheetNavigator,
 ) {
     val changeStackFlow = koinInject<Router>().stackChangeFlow
 
@@ -51,7 +50,7 @@ fun NavigationHost(
 
 private fun push(
     navigator: Navigator,
-    bottomSheetNavigator: BottomSheetNavigator,
+    bottomSheetNavigator: AppBottomSheetNavigator,
     destinations: List<TypedScreenProvider>
 ) {
     if (bottomSheetNavigator.isVisible) {
@@ -60,11 +59,12 @@ private fun push(
     val (fullScreens, bottomSheets) = destinations.partition { it.type == TypedScreenProvider.Type.FullScreen }
 
     navigator.push(fullScreens.map(ScreenRegistry::get))
-    bottomSheets.firstOrNull()?.let { bottomSheetNavigator.show(ScreenRegistry.get(it)) }}
+    bottomSheets.firstOrNull()?.let { bottomSheetNavigator.show(ScreenRegistry.get(it)) }
+}
 
 private fun replace(
     navigator: Navigator,
-    bottomSheetNavigator: BottomSheetNavigator,
+    bottomSheetNavigator: AppBottomSheetNavigator,
     destination: TypedScreenProvider
 ) {
     when (destination.type) {
@@ -83,7 +83,7 @@ private fun replace(
 
 private fun replaceAll(
     navigator: Navigator,
-    bottomSheetNavigator: BottomSheetNavigator,
+    bottomSheetNavigator: AppBottomSheetNavigator,
     destinations: List<TypedScreenProvider>
 ) {
     if (bottomSheetNavigator.isVisible) {
@@ -97,7 +97,7 @@ private fun replaceAll(
 
 private fun pop(
     navigator: Navigator,
-    bottomSheetNavigator: BottomSheetNavigator,
+    bottomSheetNavigator: AppBottomSheetNavigator,
 ) {
     if (bottomSheetNavigator.isVisible) {
         bottomSheetNavigator.hide()

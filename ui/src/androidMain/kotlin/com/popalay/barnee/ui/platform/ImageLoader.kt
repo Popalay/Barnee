@@ -26,6 +26,8 @@ import android.content.Context
 import com.seiko.imageloader.ImageLoader
 import com.seiko.imageloader.cache.memory.maxSizePercent
 import com.seiko.imageloader.component.setupDefaultComponents
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.android.Android
 import okio.Path.Companion.toOkioPath
 import org.koin.core.Koin
 
@@ -35,12 +37,11 @@ actual fun generateImageLoader(koin: Koin): ImageLoader {
         components {
             setupDefaultComponents(
                 context = context,
-                httpClient = { koin.get() },
+                httpClient = { HttpClient(Android) },
             )
         }
         interceptor {
             memoryCacheConfig {
-                // Set the max size to 25% of the app's available memory.
                 maxSizePercent(context, percent = 0.25)
             }
             diskCacheConfig {

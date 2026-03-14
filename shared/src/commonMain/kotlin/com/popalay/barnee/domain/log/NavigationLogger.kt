@@ -28,6 +28,6 @@ import com.popalay.barnee.domain.navigation.StackChange
 
 class NavigationLogger {
     fun <T : Router> log(tag: T, stackChange: StackChange) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Stack change => $stackChange" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "Stack change => $stackChange" }
     }
 }

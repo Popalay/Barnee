@@ -37,9 +37,9 @@ internal fun parcelableNavigatorSaver(): NavigatorSaver<Any> = NavigatorSaver { 
             val screenAsParcelables = navigator.items.filterIsInstance<Parcelable>()
 
             if (navigator.items.size > screenAsParcelables.size) {
-                val screensNotParcelable = navigator.items.filterNot { screen -> screenAsParcelables.any { screen == it } }
-                    .map { it::class.simpleName }
-                    .joinToString()
+                val screensNotParcelable =
+                    navigator.items.filterNot { screen -> screenAsParcelables.any { screen == it } }
+                        .joinToString { it::class.simpleName.orEmpty() }
 
                 throw IllegalStateException("Unable to save instance state for Screens: $screensNotParcelable. " +
                         "Implement io.matthewnelson.component.parcelize.Parcelable on your Screen.")
