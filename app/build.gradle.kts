@@ -37,31 +37,31 @@ android {
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
         versionName = "1.5.0"
+    }
 
-        signingConfigs {
-            getByName("debug") {
-                storeFile = file("../release/debug.keystore")
-            }
-            register("release") {
-                storeFile = file("../release/release.keystore")
-                keyAlias = "barnee"
-                storePassword = System.getenv("ANDROID_RELEASE_KEYSTORE_PWD").orEmpty()
-                keyPassword = System.getenv("ANDROID_RELEASE_KEY_PWD").orEmpty()
-            }
+    signingConfigs {
+        getByName("debug") {
+            storeFile = file("../release/debug.keystore")
+        }
+        register("release") {
+            storeFile = file("../release/release.keystore")
+            keyAlias = "barnee"
+            storePassword = System.getenv("ANDROID_RELEASE_KEYSTORE_PWD").orEmpty()
+            keyPassword = System.getenv("ANDROID_RELEASE_KEY_PWD").orEmpty()
+        }
+    }
+
+    buildTypes {
+        getByName("debug") {
+            signingConfig = signingConfigs.getByName("debug")
+            versionNameSuffix = "-dev"
+            applicationIdSuffix = ".debug"
         }
 
-        buildTypes {
-            getByName("debug") {
-                signingConfig = signingConfigs.getByName("debug")
-                versionNameSuffix = "-dev"
-                applicationIdSuffix = ".debug"
-            }
-
-            getByName("release") {
-                signingConfig = if (isCI) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
-                isMinifyEnabled = true
-                proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            }
+        getByName("release") {
+            signingConfig = if (isCI) signingConfigs.getByName("release") else signingConfigs.getByName("debug")
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
