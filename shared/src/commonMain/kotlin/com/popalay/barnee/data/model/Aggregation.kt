@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,16 +23,6 @@
 package com.popalay.barnee.data.model
 
 import kotlinx.serialization.Serializable
-
-@Serializable
-data class AggregationResponse(
-    val metaData: AggregationMetadata
-)
-
-@Serializable
-data class AggregationMetadata(
-    val aggregations: Aggregation
-)
 
 @Serializable
 data class Aggregation(

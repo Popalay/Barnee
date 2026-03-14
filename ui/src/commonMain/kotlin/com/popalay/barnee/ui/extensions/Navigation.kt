@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,9 +37,9 @@ internal fun parcelableNavigatorSaver(): NavigatorSaver<Any> = NavigatorSaver { 
             val screenAsParcelables = navigator.items.filterIsInstance<Parcelable>()
 
             if (navigator.items.size > screenAsParcelables.size) {
-                val screensNotParcelable = navigator.items.filterNot { screen -> screenAsParcelables.any { screen == it } }
-                    .map { it::class.simpleName }
-                    .joinToString()
+                val screensNotParcelable =
+                    navigator.items.filterNot { screen -> screenAsParcelables.any { screen == it } }
+                        .joinToString { it::class.simpleName.orEmpty() }
 
                 throw IllegalStateException("Unable to save instance state for Screens: $screensNotParcelable. " +
                         "Implement io.matthewnelson.component.parcelize.Parcelable on your Screen.")

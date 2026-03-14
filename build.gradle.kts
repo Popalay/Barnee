@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ buildscript {
     }
 }
 
-plugins{
+plugins {
     id("com.github.ben-manes.versions") version libs.versions.dependencyUpdatesPlugin
+    id("org.jetbrains.compose") version libs.versions.jetbrainsCompose apply false
+    kotlin("plugin.compose") version libs.versions.kotlin apply false
 }

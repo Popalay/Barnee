@@ -3,6 +3,7 @@ import dev.icerock.gradle.MRVisibility
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
+    kotlin("plugin.compose") version libs.versions.kotlin
     id("com.android.library")
     id("kotlin-parcelize")
     id("org.jetbrains.compose") version libs.versions.jetbrainsCompose
@@ -10,6 +11,7 @@ plugins {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
     androidTarget()
     iosX64()
     iosArm64()
@@ -26,7 +28,7 @@ kotlin {
             baseName = "ui"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+
     }
 
     sourceSets {
@@ -50,6 +52,7 @@ kotlin {
                 implementation(libs.androidx.lifecycle.runtime.compose)
                 implementation(libs.firebase.dynamicLinks)
                 implementation(libs.youtubePlayer)
+                implementation(libs.ktor.android)
             }
         }
         val commonTest by getting {
@@ -57,14 +60,7 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
-            dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
+        val iosMain by getting {
             dependencies {
                 implementation(libs.ktor.ios)
             }
@@ -84,12 +80,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     kotlin {
-        jvmToolchain(19)
+        jvmToolchain(21)
     }
 }
 

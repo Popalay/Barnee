@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,22 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.model
+package com.popalay.barnee.data.remote.model
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class DrinksResponse(
-    val result: List<Drink>
+data class CocktailDbDrink(
+    val id: String,
+    val alias: String,
+    val name: String,
+    val imageUrl: String? = null,
+    val ingredients: List<CocktailDbIngredient> = emptyList(),
+    val steps: List<String> = emptyList(),
+    val categories: List<String> = emptyList(),
+    val tags: List<String> = emptyList(),
+    val ibaCategory: String? = null,
 )
+
+@Serializable
+data class CocktailDbIngredient(val text: String)

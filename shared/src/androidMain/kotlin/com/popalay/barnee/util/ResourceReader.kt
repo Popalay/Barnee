@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,12 @@
  * SOFTWARE.
  */
 
-package com.popalay.barnee.data.transformer
+package com.popalay.barnee.util
 
-import com.popalay.barnee.data.model.Drink
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonTransformingSerializer
+import android.content.Context
+import org.koin.core.context.GlobalContext
 
-object DrinkListFirstElementTransformer : JsonTransformingSerializer<Drink>(Drink.serializer()) {
-    override fun transformDeserialize(element: JsonElement): JsonElement =
-        if (element is JsonArray) element.first() else element
+actual fun readResource(fileName: String): String {
+    val context = GlobalContext.get().get<Context>()
+    return context.assets.open(fileName).bufferedReader().use { it.readText() }
 }

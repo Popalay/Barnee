@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.compose") version libs.versions.kotlin
     id("com.android.application")
     id("com.google.gms.google-services")
     id("kotlin-parcelize")
@@ -35,7 +36,7 @@ android {
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = properties.getOrDefault("barnee.versioncode", 1).toString().toInt()
-        versionName = "1.4.0"
+        versionName = "1.5.0"
 
         signingConfigs {
             getByName("debug") {
@@ -76,8 +77,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 
     packaging {
@@ -86,12 +87,10 @@ android {
 
     namespace = "com.popalay.barnee"
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.jetbrainsComposeCompiler.get()
-    }
 }
 
 kotlin {
+    jvmToolchain(21)
     androidTarget()
     sourceSets {
         sourceSets["androidMain"].dependencies {

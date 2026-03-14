@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ package com.popalay.barnee.data.repository
 import com.popalay.barnee.data.local.LocalStore
 import com.popalay.barnee.data.model.Collection
 import com.popalay.barnee.data.model.DrinkMinimumData
-import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.local.LocalDrinkDataSource
 import com.popalay.barnee.util.capitalizeFirstChar
 import com.popalay.barnee.util.displayImageUrl
 import com.popalay.barnee.util.filter
@@ -55,7 +55,7 @@ interface CollectionRepository {
 
 internal class CollectionRepositoryImpl(
     private val localStore: LocalStore,
-    private val api: Api,
+    private val localDrinkDataSource: LocalDrinkDataSource,
     private val json: Json
 ) : CollectionRepository {
     init {
@@ -111,7 +111,7 @@ internal class CollectionRepositoryImpl(
     override suspend fun saveOrMerge(name: String, aliases: Set<String>) = withContext(Dispatchers.Default) {
         val collections = collections().first()
         val targetCollection = aliases.takeIf { it.any(String::isNotEmpty) }
-            ?.let { runCatching { api.drinksByAliases(it, skip = 0, take = 100) }.getOrNull() }
+            ?.let { runCatching { localDrinkDataSource.drinksByAliases(it, skip = 0, take = 100) }.getOrNull() }
             ?.let { drinks ->
                 (collections().first().firstOrNull { it.name == name } ?: Collection(name = name)).let { collection ->
                     collection.copy(

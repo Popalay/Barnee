@@ -1,17 +1,17 @@
 [versions]
 android-minSdk = "28"
-android-targetSdk = "34"
-android-compileSdk = "34"
+android-targetSdk = "36"
+android-compileSdk = "36"
 imageLoader = "1.6.2"
 insetsx = "0.1.0-alpha10"
-kotlin = "1.9.0"
-android-gradlePlugin = "8.2.2"
+kotlin = "2.0.21"
+android-gradlePlugin = "8.9.1"
 google-services-gradlePlugin = "4.3.15"
 dependencyUpdatesPlugin = "0.47.0"
 buildkonfig-gradle-plugin = "0.13.3"
 
-androidx-activity = "1.7.2"
-androidx-lifecycle = "2.6.1"
+androidx-activity = "1.13.0"
+androidx-lifecycle = "2.8.0"
 androidx-datastore = "1.0.0"
 androidx-espresso = "3.5.1"
 androidx-core-splashscreen = "1.0.1"
@@ -20,11 +20,11 @@ kotlinxDatetime = "0.4.0"
 ktor = "2.3.2"
 junit = "4.13.2"
 androidx-test = "1.1.5"
-logger = "2.0.0-RC5"
-coroutines = "1.7.3"
-koin = "3.4.3"
+logger = "2.0.6"
+coroutines = "1.10.2"
+koin = "3.5.6"
 koin-compose = "1.0.4"
-multiplatformsettings = "1.0.0"
+multiplatformsettings = "1.3.0"
 firebase-dynamicLinks = "21.1.0"
 multiplatformpaging = "3.2.0-alpha05-0.2.3"
 parcelize = "0.1.2"
@@ -33,9 +33,8 @@ uri = "0.0.13"
 uuid = "0.8.0"
 youtubePlayer = "12.0.0"
 openai = "3.3.2"
-voyager = "1.0.0-rc06"
-jetbrainsCompose = "1.4.3"
-jetbrainsComposeCompiler = "1.5.0"
+voyager = "1.1.0-beta02"
+jetbrainsCompose = "1.6.11"
 
 [libraries]
 #Core
@@ -82,7 +81,6 @@ multiplatformsettings-datastore = { module = "com.russhwolf:multiplatform-settin
 
 #Voyager
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
-voyager-bottomSheetNavigator = { module = "cafe.adriel.voyager:voyager-bottom-sheet-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
 voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 
@@ -103,5 +101,5 @@ insetsx = { module = "com.moriatsushi.insetsx:insetsx", version.ref = "insetsx" 
 [bundles]
 ktor = ["ktor-core", "ktor-android", "ktor-serialization", "ktor-logging"]
 koin = ["koin-android", "koin-core", "koin-compose"]
-vojager = ["voyager-navigator", "voyager-bottomSheetNavigator", "voyager-transitions", "voyager-koin"]
+vojager = ["voyager-navigator", "voyager-transitions", "voyager-koin"]
 kotlinx = ["kotlinx-coroutines-core", "kotlinx-datetime"]

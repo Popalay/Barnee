@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,6 @@ package com.popalay.barnee.ui
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
@@ -41,7 +40,6 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.annotation.ExperimentalVoyagerApi
 import cafe.adriel.voyager.navigator.LocalNavigatorSaver
 import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.navigator.bottomSheet.BottomSheetNavigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.moriatsushi.insetsx.navigationBarsPadding
 import com.popalay.barnee.data.message.Message
@@ -50,6 +48,7 @@ import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.StackChange
 import com.popalay.barnee.ui.common.PrimarySnackbar
 import com.popalay.barnee.ui.extensions.parcelableNavigatorSaver
+import com.popalay.barnee.ui.navigation.AppBottomSheetNavigator
 import com.popalay.barnee.ui.navigation.NavigationHost
 import com.popalay.barnee.ui.platform.HandleDeeplink
 import com.popalay.barnee.ui.platform.LifecycleAwareLaunchedEffect
@@ -62,7 +61,7 @@ import kotlinx.coroutines.cancelChildren
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalVoyagerApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalVoyagerApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun ComposeApp() {
     BarneeTheme {
@@ -74,7 +73,7 @@ fun ComposeApp() {
             CompositionLocalProvider(LocalImageLoader provides imageLoader) {
                 Box(modifier = Modifier.fillMaxSize()) {
                     val snackbarHostState = remember { SnackbarHostState() }
-                    BottomSheetNavigator(
+                    AppBottomSheetNavigator(
                         sheetElevation = 1.dp,
                         sheetBackgroundColor = MaterialTheme.colors.background,
                         sheetContentColor = MaterialTheme.colors.onBackground,

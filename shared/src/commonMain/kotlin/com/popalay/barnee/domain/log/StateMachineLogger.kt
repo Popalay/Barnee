@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,10 +29,10 @@ import com.popalay.barnee.domain.StateMachine
 
 class StateMachineLogger {
     fun <T : StateMachine<*>> log(tag: T, action: Action) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Action => $action" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "Action => $action" }
     }
 
     fun <T : StateMachine<*>> log(tag: T, state: State) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "State => $state" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "State => $state" }
     }
 }

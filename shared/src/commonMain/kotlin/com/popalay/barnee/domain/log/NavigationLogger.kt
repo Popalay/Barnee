@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,6 @@ import com.popalay.barnee.domain.navigation.StackChange
 
 class NavigationLogger {
     fun <T : Router> log(tag: T, stackChange: StackChange) {
-        Logger.i(tag = tag::class.simpleName.orEmpty()) { "Stack change => $stackChange" }
+        Logger.i(tag::class.simpleName.orEmpty()) { "Stack change => $stackChange" }
     }
 }

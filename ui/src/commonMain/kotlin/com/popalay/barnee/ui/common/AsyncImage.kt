@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,6 @@
 package com.popalay.barnee.ui.common
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -48,32 +46,22 @@ fun AsyncImage(
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null,
 ) {
-    BoxWithConstraints(modifier) {
-        Image(
-            painter = rememberImageUrlPainter(imageUrl),
-            contentDescription = contentDescription,
-            modifier = Modifier.fillMaxSize(),
-            alpha = alpha,
-            colorFilter = colorFilter,
-            alignment = alignment,
-            contentScale = contentScale
-        )
-    }
+    Image(
+        painter = rememberImageUrlPainter(imageUrl),
+        contentDescription = contentDescription,
+        modifier = modifier.fillMaxSize(),
+        alpha = alpha,
+        colorFilter = colorFilter,
+        alignment = alignment,
+        contentScale = contentScale
+    )
 }
 
 @Composable
-private fun BoxWithConstraintsScope.rememberImageUrlPainter(data: ImageUrl): Painter {
-    val request = remember(data, constraints) {
+private fun rememberImageUrlPainter(data: ImageUrl): Painter {
+    val request = remember(data) {
         ImageRequest {
-            data(data.scaledUrl(constraints.maxWidth to constraints.maxHeight))
-
-            placeholderPainter {
-                rememberImagePainter(data.url)
-            }
-
-            extra {
-                set("key_url", data.url)
-            }
+            data(data.url)
         }
     }
     return rememberImagePainter(request)

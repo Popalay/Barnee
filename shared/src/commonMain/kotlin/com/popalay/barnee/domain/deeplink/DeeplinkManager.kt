@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -37,14 +37,14 @@ class DeeplinkManager(
 
     @OptIn(DelicateCoroutinesApi::class)
     fun handle(deeplink: Url) {
-        Logger.i(tag = "DeeplinkManager") { "Deeplink received: $deeplink" }
+        Logger.i("DeeplinkManager") { "Deeplink received: $deeplink" }
         deeplinkHandlers.firstOrNull { it.supports(deeplink) }?.createDestination(deeplink)?.let { destinations ->
-            Logger.i(tag = "DeeplinkManager") { "Deeplink handled: $deeplink" }
+            Logger.i("DeeplinkManager") { "Deeplink handled: $deeplink" }
             GlobalScope.launch {
                 router.updateStack(StackChange.ReplaceAll(destinations))
             }
         } ?: run {
-            Logger.i(tag = "DeeplinkManager") { "Deeplink not handled: $deeplink" }
+            Logger.i("DeeplinkManager") { "Deeplink not handled: $deeplink" }
         }
     }
 }

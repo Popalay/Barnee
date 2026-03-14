@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 package com.popalay.barnee.domain
 
 import cafe.adriel.voyager.core.model.ScreenModel
-import cafe.adriel.voyager.core.model.coroutineScope
+import cafe.adriel.voyager.core.model.screenModelScope
 import com.popalay.barnee.domain.log.StateMachineLogger
 import com.popalay.barnee.domain.navigation.Router
 import com.popalay.barnee.domain.navigation.navigationSideEffect
@@ -32,13 +32,12 @@ import com.popalay.barnee.util.wrap
 import io.matthewnelson.component.parcelize.Parcelable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 
@@ -53,30 +52,33 @@ abstract class StateMachine<S : State>(
     initialState: S,
     reducer: Reducer<S>,
 ) : KoinComponent, ScreenModel {
-    private val sharedActionFlow = MutableSharedFlow<Action>()
-    private val currentState: S get() = (stateFlow.unwrap() as StateFlow<S>).value
+    private val sharedActionFlow = MutableSharedFlow<Action>(extraBufferCapacity = 64)
     private val logger by inject<StateMachineLogger>()
     private val router by inject<Router>()
+    private val currentStateFlow = MutableStateFlow(initialState)
 
     val stateFlow: CFlow<S> = sharedActionFlow
         .onStart { emit(InitialAction) }
         .onEach { logger.log(this, it) }
         .let {
             merge(
-                it.reducer({ currentState }, ::dispatch),
-                it.navigationSideEffect({ currentState }, router)
+                it.reducer({ currentStateFlow.value }, ::dispatch),
+                it.navigationSideEffect({ currentStateFlow.value }, router)
             )
         }
-        .onEach { logger.log(this, it) }
+        .onEach {
+            currentStateFlow.value = it
+            logger.log(this, it)
+        }
         .stateIn(
-            coroutineScope,
+            screenModelScope,
             SharingStarted.Eagerly,
             initialState
         )
         .wrap()
 
     fun dispatch(action: Action) {
-        coroutineScope.launch { sharedActionFlow.emit(action) }
+        sharedActionFlow.tryEmit(action)
     }
 }
 

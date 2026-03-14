@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,6 +33,8 @@ plugins {
 }
 
 kotlin {
+    applyDefaultHierarchyTemplate()
+    jvmToolchain(21)
     androidTarget()
     iosX64()
     iosArm64()
@@ -49,7 +51,7 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+
     }
 
     sourceSets {
@@ -97,14 +99,7 @@ kotlin {
             implementation(libs.firebase.dynamicLinks)
         }
 
-        val iosX64Main by getting
-        val iosArm64Main by getting
-        val iosSimulatorArm64Main by getting
-        val iosMain by creating {
-            dependsOn(commonMain)
-            iosX64Main.dependsOn(this)
-            iosArm64Main.dependsOn(this)
-            iosSimulatorArm64Main.dependsOn(this)
+        val iosMain by getting {
             dependencies {
                 implementation(libs.ktor.ios)
             }
@@ -115,6 +110,7 @@ kotlin {
 android {
     compileSdk = libs.versions.android.compileSdk.get().toInt()
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].assets.srcDirs("src/androidMain/assets")
     defaultConfig {
         minSdk = libs.versions.android.minSdk.get().toInt()
         consumerProguardFiles("proguard-rules.pro")
@@ -126,8 +122,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_19
-        targetCompatibility = JavaVersion.VERSION_19
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
 }
 
@@ -150,7 +146,7 @@ buildkonfig {
 
 fun getSecret(name: String): Pair<String, String> {
     val secret = System.getenv(name)
-        ?: gradleLocalProperties(rootDir).getProperty(name)
+        ?: gradleLocalProperties(rootDir, providers).getProperty(name)
         ?: error("No $name provided")
     return name to secret
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@ import com.popalay.barnee.data.model.Category
 import com.popalay.barnee.data.model.Drink
 import com.popalay.barnee.data.model.FullDrinkResponse
 import com.popalay.barnee.data.remote.AiApi
-import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.local.LocalDrinkDataSource
 import com.popalay.barnee.data.repository.DrinksRequest.ByAliases
 import com.popalay.barnee.data.repository.DrinksRequest.Collection
 import com.popalay.barnee.data.repository.DrinksRequest.ForQuery
@@ -67,7 +67,7 @@ interface DrinkRepository {
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class DrinkRepositoryImpl(
-    private val api: Api,
+    private val localDrinkDataSource: LocalDrinkDataSource,
     private val aiApi: AiApi,
     private val localStore: LocalStore,
     private val json: Json,
@@ -75,18 +75,18 @@ internal class DrinkRepositoryImpl(
 ) : DrinkRepository {
     override fun drinks(request: DrinksRequest): Flow<PagingData<Drink>> =
         when (request) {
-            is RelatedTo  -> requestPage { api.similarDrinks(request.alias) }
-            is ForTags    -> requestPage { api.drinksByTags(request.tags, it.skip, it.take) }
-            is ForQuery   -> requestPage { api.drinks(request.query, it.skip, it.take) }
-            is ByAliases  -> requestPage { api.drinksByAliases(request.aliases, it.skip, it.take) }
-            is Random     -> requestPage { api.random(it.skip, it.take) }
-            is Search     -> requestPage { searchDrinks(request.query, request.filters, it) }
+            is RelatedTo  -> requestPage { localDrinkDataSource.similarDrinks(request.alias) }
+            is ForTags    -> requestPage { localDrinkDataSource.drinksByTags(request.tags, it.skip, it.take) }
+            is ForQuery   -> requestPage { localDrinkDataSource.drinksByQuery(request.query, it.skip, it.take) }
+            is ByAliases  -> requestPage { localDrinkDataSource.drinksByAliases(request.aliases, it.skip, it.take) }
+            is Random     -> requestPage { localDrinkDataSource.random(it.skip, it.take) }
+            is Search     -> requestPage { localDrinkDataSource.searchDrinks(request.query, request.filters, it.skip, it.take) }
             is Collection -> collection(request.name)
             is Generated  -> generatedDrinks()
         }
             .distinctUntilChanged()
 
-    override fun randomDrink(): Flow<Drink> = flow { emit(api.random(skip = 0, take = 1).first()) }
+    override fun randomDrink(): Flow<Drink> = flow { emit(localDrinkDataSource.random(skip = 0, take = 1).first()) }
         .flatMapLatest { drink ->
             collectionRepository.collections()
                 .mapLatest { collections -> drink.copy(userCollections = collections.filter(drink)) }
@@ -97,7 +97,7 @@ internal class DrinkRepositoryImpl(
         if (identifier.startsWith("generated_")) {
             generatedFullDrink(identifier)
         } else {
-            flow { emit(api.getFullDrink(identifier)) }
+            flow { emit(localDrinkDataSource.getFullDrink(identifier)) }
         }
             .flatMapLatest { response ->
                 collectionRepository.collections()
@@ -120,48 +120,48 @@ internal class DrinkRepositoryImpl(
         }
         .distinctUntilChanged()
 
-    override fun aggregation(): Flow<Aggregation> = flow { emit(api.getAggregation()) }
+    override fun aggregation(): Flow<Aggregation> = flow { emit(localDrinkDataSource.getAggregation()) }
 
     override fun categories(): Flow<List<Category>> = flowOf(
         listOf(
             Category(
-                text = "Iconic",
-                alias = "story/the famous",
+                text = "IBA Classics",
+                alias = "tag/IBA",
                 imageUrl = "v1618925730/categories/most-famous.webp".toImageUrl()
             ),
             Category(
-                text = "Popular",
-                alias = "rating/80",
+                text = "Cocktails",
+                alias = "category/Cocktail",
                 imageUrl = "v1618925107/categories/top-rated.jpg".toImageUrl()
             ),
             Category(
                 text = "Easy",
-                alias = "skill/easy",
+                alias = "tag/Simple",
                 imageUrl = "v1618923610/categories/easy-to-do.webp".toImageUrl()
             ),
             Category(
-                text = "Hot",
-                alias = "hot",
+                text = "Hot drinks",
+                alias = "category/Coffee / Tea",
                 imageUrl = "v1618923901/categories/hot.webp".toImageUrl()
             ),
             Category(
-                text = "Colling",
-                alias = "not/hot",
+                text = "Party",
+                alias = "category/Punch / Party Drink",
                 imageUrl = "v1618925541/categories/cold.webp".toImageUrl()
             ),
             Category(
-                text = "Fizzy",
-                alias = "is/carbonated",
+                text = "Shots",
+                alias = "category/Shot",
                 imageUrl = "v1618923638/categories/carbonated.webp".toImageUrl()
             ),
             Category(
                 text = "Virgin",
-                alias = "is/not/alcoholic",
+                alias = "category/Non alcoholic",
                 imageUrl = "v1618923872/categories/non-alcoholic.webp".toImageUrl()
             ),
             Category(
-                text = "Still",
-                alias = "not/carbonated",
+                text = "Shakes",
+                alias = "category/Shake",
                 imageUrl = "v1618923780/categories/non-carbonated.webp".toImageUrl()
             )
         )
@@ -187,32 +187,19 @@ internal class DrinkRepositoryImpl(
     private fun collection(name: String): Flow<PagingData<Drink>> = collectionRepository.collection(name)
         .take(1)
         .flatMapLatest { collection ->
-            DrinkPager { api.drinksByAliases(collection.aliases, it.skip, it.take) }.pages
+            DrinkPager { localDrinkDataSource.drinksByAliases(collection.aliases, it.skip, it.take) }.pages
                 .flatMapLatest { pagedDrinks ->
                     collectionRepository.collection(name)
                         .flatMapLatest { newCollection ->
                             (if (collection.aliases.containsAll(newCollection.aliases)) {
                                 flowOf(pagedDrinks.filter { it.alias in newCollection.aliases })
                             } else {
-                                DrinkPager { api.drinksByAliases(newCollection.aliases, it.skip, it.take) }.pages
+                                DrinkPager { localDrinkDataSource.drinksByAliases(newCollection.aliases, it.skip, it.take) }.pages
                             })
                                 .map { drinks -> drinks.map { it.copy(userCollections = listOf(newCollection)) } }
                         }
                 }
         }
-
-    private suspend fun searchDrinks(
-        query: String,
-        filters: Map<String, List<String>>,
-        pageRequest: PageRequest
-    ): List<Drink> {
-        val searchRequest = filters
-            .filter { it.key.isNotBlank() && it.value.isNotEmpty() }
-            .map { it.key + "/" + it.value.joinToString(",") }
-            .joinToString(separator = "/", prefix = query.takeIf { it.isNotBlank() }?.let { "search/$it/" } ?: "")
-
-        return api.searchDrinks(searchRequest, pageRequest.skip, pageRequest.take)
-    }
 
     companion object {
         private const val KEY_GENERATED_DRINKS = "KEY_GENERATED_DRINKS"

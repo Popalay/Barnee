@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -54,10 +54,7 @@ value class InternalImageUrl(private val rawUrl: String) : ImageUrl {
 @Parcelize
 value class ExternalImageUrl(override val url: String) : ImageUrl {
 
-    override fun scaledUrl(size: Pair<Int, Int>): String {
-        val separator = if (url.contains('?')) "&" else "?"
-        return "$url${separator}imwidth=${size.first}"
-    }
+    override fun scaledUrl(size: Pair<Int, Int>): String = url
 
     override fun toString(): String = url
 }

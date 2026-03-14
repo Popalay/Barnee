@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2025 Denys Nykyforov
+ * Copyright (c) 2026 Denys Nykyforov
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@ import com.popalay.barnee.data.local.LocalStoreImpl
 import com.popalay.barnee.data.message.MessagesProvider
 import com.popalay.barnee.data.model.DrinkMinimumData
 import com.popalay.barnee.data.remote.AiApi
-import com.popalay.barnee.data.remote.Api
+import com.popalay.barnee.data.local.LocalDrinkDataSource
 import com.popalay.barnee.data.remote.CloudinaryApi
 import com.popalay.barnee.data.repository.CollectionRepository
 import com.popalay.barnee.data.repository.CollectionRepositoryImpl
@@ -79,7 +79,7 @@ import com.aallam.openai.api.logging.Logger as OpenAiLogger
 val commonModule = module {
     single { StateMachineLogger() }
 
-    single { Api(get()) }
+    single { LocalDrinkDataSource(get()) }
     single<LocalStore> { LocalStoreImpl(get()) }
     single {
         Json {
