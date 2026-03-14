@@ -35,6 +35,21 @@ buildscript {
 
 plugins {
     id("com.github.ben-manes.versions") version libs.versions.dependencyUpdatesPlugin
+    id("io.gitlab.arturbosch.detekt") version libs.versions.detekt
     id("org.jetbrains.compose") version libs.versions.jetbrainsCompose apply false
     kotlin("plugin.compose") version libs.versions.kotlin apply false
+}
+
+detekt {
+    config.setFrom("$rootDir/.github/detekt.yml")
+    buildUponDefaultConfig = false
+    source.setFrom(
+        "$rootDir/app/src",
+        "$rootDir/shared/src",
+        "$rootDir/ui/src",
+    )
+    reports {
+        sarif.required.set(true)
+        sarif.outputLocation.set(file("$rootDir/reports/detekt.sarif"))
+    }
 }

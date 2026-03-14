@@ -61,7 +61,7 @@ jobs:
         run: ./gradlew detekt --continue
 
       - name: Upload SARIF to Github
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@v4
         if: always()
         with:
           sarif_file: ./reports/detekt.sarif
@@ -71,7 +71,7 @@ jobs:
 
       - name: Generate changelog
         id: generate-release-changelog
-        uses: heinrichreimer/github-changelog-generator-action@v2.2
+        uses: heinrichreimer/github-changelog-generator-action@v2.3
         if: startsWith(github.ref, 'refs/tags/v')
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
