@@ -10,6 +10,10 @@ on:
     branches:
       - master
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -21,11 +25,6 @@ jobs:
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.4.1
-        with:
-          access_token: ${{ secrets.GITHUB_TOKEN }}
-
       - name: Generate build number
         shell: bash
         run: echo "BUILD_NUMBER=$(expr $GITHUB_RUN_NUMBER + 5210)" >> $GITHUB_ENV
@@ -50,7 +49,7 @@ jobs:
         run: mkdir -p ~/.gradle ; cp .github/ci-gradle.properties ~/.gradle/gradle.properties
 
       - uses: actions/cache@v4
-        continue-on-error: true # continue if the cache restore/upload fails
+        continue-on-error: true
         with:
           path: |
             ~/.gradle/caches/modules-*
@@ -58,23 +57,19 @@ jobs:
             ~/.gradle/caches/build-cache-*
           key: ${{ runner.os }}-gradle-${{ hashFiles('checksum.txt') }}
 
-      - name: Detekt all
-        uses: natiginfo/action-detekt-all@1.23.0
-        with:
-          args: --config .github/detekt.yml --report sarif:./reports/detekt.sarif
+      - name: Run Detekt
+        run: ./gradlew detekt --continue
 
-      - name: Upload SARIF to Github using the upload-sarif action
-        uses: github/codeql-action/upload-sarif@v1.1.5
+      - name: Upload SARIF to Github
+        uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
           sarif_file: ./reports/detekt.sarif
-          sha: ${{ env.GITHUB_SHA }}
-          ref: ${{ env.GITHUB_REF }}
 
       - name: Build with Gradle
         run: ./gradlew assembleDebug assembleRelease bundleRelease -Pbarnee.versioncode=$BUILD_NUMBER --scan --stacktrace
 
-      - name: Generate changellog
+      - name: Generate changelog
         id: generate-release-changelog
         uses: heinrichreimer/github-changelog-generator-action@v2.2
         if: startsWith(github.ref, 'refs/tags/v')
