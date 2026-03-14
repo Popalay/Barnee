@@ -48,6 +48,9 @@ detekt {
         "$rootDir/shared/src",
         "$rootDir/ui/src",
     )
+}
+
+tasks.withType<io.gitlab.arturbosch.detekt.Detekt>().configureEach {
     reports {
         sarif.required.set(true)
         sarif.outputLocation.set(file("$rootDir/reports/detekt.sarif"))
